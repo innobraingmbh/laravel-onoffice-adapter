@@ -2,6 +2,8 @@
 
 namespace Katalam\OnOfficeAdapter;
 
+use Illuminate\Support\Facades\Http;
+use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Katalam\OnOfficeAdapter\Commands\OnOfficeAdapterCommand;
@@ -17,9 +19,21 @@ class OnOfficeAdapterServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('laravel-onoffice-adapter')
-            ->hasConfigFile()
+            ->hasConfigFile('onoffice')
             ->hasViews()
-            ->hasMigration('create_laravel-onoffice-adapter_table')
             ->hasCommand(OnOfficeAdapterCommand::class);
+    }
+
+
+    public function bootingPackage(): void
+    {
+        Http::macro('onOffice', function () {
+            return Http::withHeaders(config('onoffice.headers'))
+                ->baseUrl(config('onoffice.base_url'));
+        });
+
+        $this->app->scoped(OnOfficeService::class, function () {
+            return new OnOfficeService();
+        });
     }
 }

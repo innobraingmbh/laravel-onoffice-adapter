@@ -75,7 +75,7 @@
                 "Katalam\\OnOfficeAdapter\\OnOfficeAdapterServiceProvider"
             ],
             "aliases": {
-                "OnOfficeAdapter": "Katalam\\OnOfficeAdapter\\Facades\\OnOfficeAdapter"
+                "EstateRepository": "Katalam\\OnOfficeAdapter\\Facades\\EstateRepository"
             }
         }
     },
