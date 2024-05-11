@@ -18,7 +18,9 @@ class OnOfficeService
      * Parameter constants for the onOffice API request.
      */
     public const DATA = 'data';
+
     public const LISTLIMIT = 'listlimit';
+
     public const LISTOFFSET = 'listoffset';
 
     private string $token;
@@ -112,7 +114,6 @@ class OnOfficeService
         return $response;
     }
 
-
     /**
      * Makes a paginated request to the onOffice API.
      * With a max page calculation based on
@@ -125,8 +126,7 @@ class OnOfficeService
         string $countPath = 'response.results.0.data.meta.cntabsolute',
         int $pageSize = 200,
         int $offset = 0
-    ): Collection
-    {
+    ): Collection {
         $maxPage = 0;
         $data = collect();
         do {

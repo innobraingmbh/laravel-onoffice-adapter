@@ -3,8 +3,8 @@
 namespace Katalam\OnOfficeAdapter\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use Katalam\OnOfficeAdapter\OnOfficeAdapterServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {

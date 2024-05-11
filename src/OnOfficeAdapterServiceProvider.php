@@ -3,10 +3,10 @@
 namespace Katalam\OnOfficeAdapter;
 
 use Illuminate\Support\Facades\Http;
+use Katalam\OnOfficeAdapter\Commands\OnOfficeAdapterCommand;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Katalam\OnOfficeAdapter\Commands\OnOfficeAdapterCommand;
 
 class OnOfficeAdapterServiceProvider extends PackageServiceProvider
 {
@@ -23,7 +23,6 @@ class OnOfficeAdapterServiceProvider extends PackageServiceProvider
             ->hasViews()
             ->hasCommand(OnOfficeAdapterCommand::class);
     }
-
 
     public function bootingPackage(): void
     {

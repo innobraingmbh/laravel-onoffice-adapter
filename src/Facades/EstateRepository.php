@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @see \Katalam\OnOfficeAdapter\Repositories\EstateRepository
+ *
  * @method static all()
  */
 class EstateRepository extends Facade

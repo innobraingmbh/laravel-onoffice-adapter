@@ -12,8 +12,7 @@ readonly class EstateRepository
 {
     public function __construct(
         private OnOfficeService $onOfficeService,
-    )
-    {
+    ) {
     }
 
     /**
