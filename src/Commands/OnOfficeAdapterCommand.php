@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Katalam\OnOfficeAdapter\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class OnOfficeAdapterCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'onoffice-adapter';
 
     public $description = 'My command';
 
