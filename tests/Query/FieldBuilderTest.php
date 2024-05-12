@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Facades\FieldRepository;
+use Katalam\OnOfficeAdapter\Query\FieldBuilder;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 use Katalam\OnOfficeAdapter\Tests\Stubs\GetFieldsResponse;
-use Katalam\OnOfficeAdapter\Query\FieldBuilder;
 
 it('works', function () {
     Http::preventStrayRequests();

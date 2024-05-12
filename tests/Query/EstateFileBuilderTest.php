@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Facades\EstateRepository;
 use Katalam\OnOfficeAdapter\Tests\Stubs\GetEstatePicturesResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadEstateResponse;
 
 it('works', function () {
     Http::preventStrayRequests();

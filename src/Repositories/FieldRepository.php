@@ -2,7 +2,6 @@
 
 namespace Katalam\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\EstateBuilder;
 use Katalam\OnOfficeAdapter\Query\FieldBuilder;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
