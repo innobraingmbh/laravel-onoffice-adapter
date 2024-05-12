@@ -2,6 +2,7 @@
 
 namespace Katalam\OnOfficeAdapter\Query;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
@@ -10,6 +11,8 @@ use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
 class AddressBuilder extends Builder
 {
+    public array $recordIds = [];
+
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
     ) {
@@ -17,6 +20,7 @@ class AddressBuilder extends Builder
 
     public function get(): Collection
     {
+        $recordIds = $this->recordIds;
         $columns = $this->columns;
         $filter = $this->getFilters();
         $listLimit = $this->limit;
@@ -28,11 +32,12 @@ class AddressBuilder extends Builder
 
         return $this->onOfficeService->requestAll(/**
          * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy, $filter, $columns) {
+         */ function (int $pageSize, int $offset) use ($recordIds, $sortOrder, $sortBy, $filter, $columns) {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
                 OnOfficeResourceType::Address,
                 parameters: [
+                    OnOfficeService::RECORDIDS => $recordIds,
                     OnOfficeService::DATA => $columns,
                     OnOfficeService::FILTER => $filter,
                     OnOfficeService::LISTLIMIT => $pageSize,
@@ -49,6 +54,7 @@ class AddressBuilder extends Builder
      */
     public function first(): array
     {
+        $recordIds = $this->recordIds;
         $columns = $this->columns;
         $filter = $this->getFilters();
         $listLimit = $this->limit;
@@ -62,6 +68,7 @@ class AddressBuilder extends Builder
             OnOfficeAction::Read,
             OnOfficeResourceType::Address,
             parameters: [
+                OnOfficeService::RECORDIDS => $recordIds,
                 OnOfficeService::DATA => $columns,
                 OnOfficeService::FILTER => $filter,
                 OnOfficeService::LISTLIMIT => $listLimit,
@@ -95,6 +102,7 @@ class AddressBuilder extends Builder
 
     public function each(callable $callback): void
     {
+        $recordIds = $this->recordIds;
         $columns = $this->columns;
         $filter = $this->getFilters();
         $listLimit = $this->limit;
@@ -106,11 +114,12 @@ class AddressBuilder extends Builder
 
         $this->onOfficeService->requestAllChunked(/**
          * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy, $filter, $columns) {
+         */ function (int $pageSize, int $offset) use ($recordIds, $sortOrder, $sortBy, $filter, $columns) {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
                 OnOfficeResourceType::Address,
                 parameters: [
+                    OnOfficeService::RECORDIDS => $recordIds,
                     OnOfficeService::DATA => $columns,
                     OnOfficeService::FILTER => $filter,
                     OnOfficeService::LISTLIMIT => $pageSize,
@@ -120,5 +129,19 @@ class AddressBuilder extends Builder
                 ]
             );
         }, $callback, pageSize: $listLimit, offset: $listOffset);
+    }
+
+    public function recordIds(array|int $recordIds): self
+    {
+        $this->recordIds = Arr::wrap($recordIds);
+
+        return $this;
+    }
+
+    public function addRecordIds(int|array $recordId): self
+    {
+        $this->recordIds = array_merge($this->recordIds, Arr::wrap($recordId));
+
+        return $this;
     }
 }
