@@ -40,8 +40,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Katalam\\OnOfficeAdapter\\Tests\\": "tests/",
-            "Workbench\\App\\": "workbench/app/"
+            "Katalam\\OnOfficeAdapter\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -73,12 +72,9 @@
         "laravel": {
             "providers": [
                 "Katalam\\OnOfficeAdapter\\OnOfficeAdapterServiceProvider"
-            ],
-            "aliases": {
-                "EstateRepository": "Katalam\\OnOfficeAdapter\\Facades\\EstateRepository"
-            }
+            ]
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
