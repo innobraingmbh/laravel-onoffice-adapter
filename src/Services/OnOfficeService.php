@@ -22,8 +22,8 @@ class OnOfficeService
 
     public function __construct()
     {
-        $this->token = config('onoffice.token');
-        $this->secret = config('onoffice.secret');
+        $this->token = config('onoffice.token', '') ?? '';
+        $this->secret = config('onoffice.secret', '') ?? '';
     }
 
     public function getToken(): string
