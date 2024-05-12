@@ -149,7 +149,7 @@ class OnOfficeService
             // and the page size,
             // the first time we get the response from the API
             if ($maxPage === 0) {
-                $countAbsolute = $response->json($countPath);
+                $countAbsolute = $response->json($countPath, 0);
                 $maxPage = ceil($countAbsolute / $pageSize);
             }
 
@@ -160,6 +160,49 @@ class OnOfficeService
         } while ($maxPage > $currentPage);
 
         return $data;
+    }
+
+    /**
+     * Makes a paginated request to the onOffice API.
+     * With a max page calculation based on
+     * the total count of records,
+     * of the first request.
+     *
+     * The request will not return a collection containing the records,
+     * but will call the given callback function with the records of each page.
+     */
+    public function requestAllChunked(
+        callable $request,
+        callable $callback,
+        string $resultPath = 'response.results.0.data.records',
+        string $countPath = 'response.results.0.data.meta.cntabsolute',
+        int $pageSize = 500,
+        int $offset = 0
+    ): void {
+        $maxPage = 0;
+        do {
+            try {
+                $response = $request($pageSize, $offset);
+            } catch (OnOfficeException $exception) {
+                Log::error($exception->getMessage());
+
+                return;
+            }
+
+            // If the maxPage is 0,
+            // we need to calculate it from the total count of estates
+            // and the page size,
+            // the first time we get the response from the API
+            if ($maxPage === 0) {
+                $countAbsolute = $response->json($countPath, 0);
+                $maxPage = ceil($countAbsolute / $pageSize);
+            }
+
+            $callback($response->json($resultPath));
+
+            $offset += $pageSize;
+            $currentPage = $offset / $pageSize;
+        } while ($maxPage > $currentPage);
     }
 
     /**
