@@ -27,6 +27,8 @@ class OnOfficeService
 
     public const SORTBY = 'sortby';
 
+    public const SORTORDER = 'sortorder';
+
     private string $token;
 
     private string $secret;
