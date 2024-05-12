@@ -3,11 +3,12 @@
 namespace Katalam\OnOfficeAdapter\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Katalam\OnOfficeAdapter\Query\EstateBuilder;
 
 /**
  * @see \Katalam\OnOfficeAdapter\Repositories\EstateRepository
  *
- * @method static all()
+ * @method EstateBuilder query()
  */
 class EstateRepository extends Facade
 {

@@ -2,10 +2,7 @@
 
 namespace Katalam\OnOfficeAdapter\Repositories;
 
-use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Katalam\OnOfficeAdapter\Query\EstateBuilder;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
 readonly class EstateRepository
@@ -16,22 +13,10 @@ readonly class EstateRepository
     }
 
     /**
-     * Requests all estates from the onOffice API with a paginated request.
+     * Returns a new estate builder instance.
      */
-    public function all(): Collection
+    public function query(): EstateBuilder
     {
-        return $this->onOfficeService->requestAll(/**
-         * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Read,
-                OnOfficeResourceType::Estate,
-                parameters: [
-                    OnOfficeService::DATA => ['Id'],
-                    OnOfficeService::LISTLIMIT => $pageSize,
-                    OnOfficeService::LISTOFFSET => $offset,
-                ]
-            );
-        });
+        return new EstateBuilder($this->onOfficeService);
     }
 }

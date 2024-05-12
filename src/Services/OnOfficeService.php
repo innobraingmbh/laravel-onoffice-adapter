@@ -23,6 +23,10 @@ class OnOfficeService
 
     public const LISTOFFSET = 'listoffset';
 
+    public const FILTER = 'filter';
+
+    public const SORTBY = 'sortby';
+
     private string $token;
 
     private string $secret;
@@ -84,7 +88,7 @@ class OnOfficeService
     public function requestApi(
         OnOfficeAction $actionId,
         OnOfficeResourceType $resourceType,
-        OnOfficeResourceId $resourceId = OnOfficeResourceId::None,
+        OnOfficeResourceId|string|int $resourceId = OnOfficeResourceId::None,
         string|int $identifier = '',
         array $parameters = [],
     ): Response {
@@ -95,7 +99,7 @@ class OnOfficeService
                     'actions' => [
                         [
                             'actionid' => $actionId->value,
-                            'resourceid' => $resourceId->value,
+                            'resourceid' => $resourceId instanceof OnOfficeResourceId ? $resourceId->value : $resourceId,
                             'resourcetype' => $resourceType->value,
                             'identifier' => $identifier,
                             'timestamp' => Carbon::now()->timestamp,
@@ -107,8 +111,8 @@ class OnOfficeService
                 ],
             ]);
 
-        if ($response->json('status.code') !== 200) {
-            throw new OnOfficeException('Failed to request OnOffice API');
+        if ($this->responseIsFailed($response)) {
+            throw new OnOfficeException($response->json('status.message'));
         }
 
         return $response;
@@ -124,16 +128,16 @@ class OnOfficeService
         callable $request,
         string $resultPath = 'response.results.0.data.records',
         string $countPath = 'response.results.0.data.meta.cntabsolute',
-        int $pageSize = 200,
+        int $pageSize = 500,
         int $offset = 0
     ): Collection {
         $maxPage = 0;
         $data = collect();
         do {
-            $response = $request($pageSize, $offset);
-
-            if ($response->json('status.code') !== 200) {
-                Log::error('Failed to request estates from onOffice API');
+            try {
+                $response = $request($pageSize, $offset);
+            } catch (OnOfficeException $exception) {
+                Log::error($exception->getMessage());
 
                 return $data;
             }
@@ -154,5 +158,16 @@ class OnOfficeService
         } while ($maxPage > $currentPage);
 
         return $data;
+    }
+
+    /**
+     * Returns true if the response has a status code greater than 300
+     * inside the status dot code key in the response.
+     */
+    private function responseIsFailed(Response $response): bool
+    {
+        $statusCode = $response->json('status.code', 500);
+
+        return $statusCode >= 300;
     }
 }
