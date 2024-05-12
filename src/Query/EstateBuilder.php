@@ -35,7 +35,6 @@ class EstateBuilder extends Builder
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
                     OnOfficeService::SORTBY => $orderBy,
-
                 ]
             );
         }, pageSize: $listLimit, offset: $listOffset);
@@ -84,5 +83,30 @@ class EstateBuilder extends Builder
         );
 
         return $response->json('response.results.0.data.records.0');
+    }
+
+    public function each(callable $callback): void
+    {
+        $columns = $this->columns;
+        $filter = $this->getFilters();
+        $listLimit = $this->limit;
+        $listOffset = $this->offset;
+        $orderBy = $this->getOrderBy();
+
+        $this->onOfficeService->requestAllChunked(/**
+         * @throws OnOfficeException
+         */ function (int $pageSize, int $offset) use ($filter, $orderBy, $columns) {
+            return $this->onOfficeService->requestApi(
+                OnOfficeAction::Read,
+                OnOfficeResourceType::Estate,
+                parameters: [
+                    OnOfficeService::DATA => $columns,
+                    OnOfficeService::FILTER => $filter,
+                    OnOfficeService::LISTLIMIT => $pageSize,
+                    OnOfficeService::LISTOFFSET => $offset,
+                    OnOfficeService::SORTBY => $orderBy,
+                ]
+            );
+        }, $callback, pageSize: $listLimit, offset: $listOffset);
     }
 }

@@ -19,6 +19,10 @@ class Builder extends AbstractBuilder
     {
         return [];
     }
+
+    public function each(callable $callback): void
+    {
+    }
 }
 
 describe('select', function () {

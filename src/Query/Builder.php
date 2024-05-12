@@ -123,4 +123,6 @@ abstract class Builder
     abstract public function first(): array;
 
     abstract public function find(int $id): array;
+
+    abstract public function each(callable $callback): void;
 }
