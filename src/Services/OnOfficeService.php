@@ -14,20 +14,7 @@ use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 
 class OnOfficeService
 {
-    /*
-     * Parameter constants for the onOffice API request.
-     */
-    public const DATA = 'data';
-
-    public const LISTLIMIT = 'listlimit';
-
-    public const LISTOFFSET = 'listoffset';
-
-    public const FILTER = 'filter';
-
-    public const SORTBY = 'sortby';
-
-    public const SORTORDER = 'sortorder';
+    use OnOfficeParameterConst;
 
     private string $token;
 
