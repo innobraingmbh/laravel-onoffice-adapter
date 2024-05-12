@@ -3,6 +3,7 @@
 namespace Katalam\OnOfficeAdapter\Repositories;
 
 use Katalam\OnOfficeAdapter\Query\EstateBuilder;
+use Katalam\OnOfficeAdapter\Query\EstateFileBuilder;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
 readonly class EstateRepository
@@ -18,5 +19,13 @@ readonly class EstateRepository
     public function query(): EstateBuilder
     {
         return new EstateBuilder($this->onOfficeService);
+    }
+
+    /**
+     * Returns a new estate file builder instance.
+     */
+    public function files(int $estateId): EstateFileBuilder
+    {
+        return new EstateFileBuilder($this->onOfficeService, $estateId);
     }
 }

@@ -7,12 +7,12 @@ use Illuminate\Support\Facades\Http;
 
 class GetEstatePicturesResponse
 {
-    public static function make(array $data = []): PromiseInterface
+    public static function make(array $data = [], int $count = 2): PromiseInterface
     {
-        return Http::response(self::getBody($data));
+        return Http::response(self::getBody($data, $count));
     }
 
-    private static function getBody(array $data): array
+    private static function getBody(array $data, int $count): array
     {
         return array_merge_recursive([
             'status' => [
@@ -30,7 +30,7 @@ class GetEstatePicturesResponse
                         'identifier' => '',
                         'data' => [
                             'meta' => [
-                                'cntabsolute' => 2,
+                                'cntabsolute' => $count,
                             ],
                             'records' => [
                                 [
