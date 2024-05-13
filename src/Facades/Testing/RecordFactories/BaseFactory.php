@@ -38,12 +38,19 @@ abstract class BaseFactory
         return $this;
     }
 
+    public function data(array $data): self
+    {
+        $this->elements = array_merge($this->elements, $data);
+
+        return $this;
+    }
+
     public static function make(): self
     {
         return new static();
     }
 
-    public static function times(int $times): array
+    public static function times(int $times = 1): array
     {
         return array_fill(0, $times, static::make());
     }
@@ -55,5 +62,17 @@ abstract class BaseFactory
             'type' => $this->type,
             'elements' => $this->elements,
         ];
+    }
+
+    public function __call(string $name, array $arguments): self
+    {
+        if (str_starts_with($name, 'set')) {
+            $key = lcfirst(substr($name, 3));
+            $value = data_get($arguments, 0);
+
+            return $this->set($key, $value);
+        }
+
+        return $this;
     }
 }
