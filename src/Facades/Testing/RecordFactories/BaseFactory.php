@@ -2,13 +2,20 @@
 
 namespace Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories;
 
-class BaseFactory
+abstract class BaseFactory
 {
     public int $id = 0;
 
     public string $type = '';
 
     public array $elements = [];
+
+    /**
+     * Final to solve Unsafe usage of new static()
+     */
+    final public function __construct()
+    {
+    }
 
     public function id(int $id): self
     {
