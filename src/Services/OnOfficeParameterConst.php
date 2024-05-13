@@ -26,4 +26,8 @@ trait OnOfficeParameterConst
     public const CHILDIDS = 'childids';
 
     public const RECORDIDS = 'recordids';
+
+    public const PARAMETERCACHEID = 'parameterCacheId';
+
+    public const EXTENDEDCLAIM = 'extendedclaim';
 }

@@ -13,7 +13,7 @@ readonly class UserRepository
     }
 
     /**
-     * Returns a new relation builder instance.
+     * Returns a new user builder instance.
      */
     public function query(): UserBuilder
     {

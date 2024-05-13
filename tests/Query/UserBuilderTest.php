@@ -15,11 +15,11 @@ it('works', function () {
         ]),
     ]);
 
-    $estates = UserRepository::query()
+    $users = UserRepository::query()
         ->get();
 
-    expect($estates)
+    expect($users)
         ->toHaveCount(3)
-        ->and($estates->first()['id'])->toBe(1)
-        ->and($estates->last()['id'])->toBe(3);
+        ->and($users->first()['id'])->toBe(1)
+        ->and($users->last()['id'])->toBe(3);
 });
