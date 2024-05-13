@@ -3,6 +3,7 @@
 namespace Katalam\OnOfficeAdapter\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Katalam\OnOfficeAdapter\Facades\Testing\EstateRepositoryFake;
 use Katalam\OnOfficeAdapter\Query\EstateBuilder;
 use Katalam\OnOfficeAdapter\Query\EstateFileBuilder;
 
@@ -14,6 +15,13 @@ use Katalam\OnOfficeAdapter\Query\EstateFileBuilder;
  */
 class EstateRepository extends Facade
 {
+    public static function fake(array ...$fakeResponses): EstateRepositoryFake
+    {
+        static::swap($fake = new EstateRepositoryFake(...$fakeResponses));
+
+        return $fake;
+    }
+
     protected static function getFacadeAccessor(): string
     {
         return \Katalam\OnOfficeAdapter\Repositories\EstateRepository::class;

@@ -72,6 +72,36 @@ $users = UserRepository::query()
     ->where('Nr', $this->userId)
     ->get();
 ```
+### Usage in tests
+```php
+EstateRepository::fake([ // First request
+    [ // First page of first request
+        EstateFactory::make() // First record of first page of first request
+            ->id(1)
+            ->set('foo', 'bar'),
+    ],
+], [ // Second request
+    [ // First page of second request
+        EstateFactory::make() // First record of first page of second request
+            ->id(2)
+            ->set('foo', 'baz'),
+        EstateFactory::make() // Second record of first page of second request
+            ->id(3),
+    ],
+]);
+
+// request as normal
+$estates = EstateRepository::query()->get();
+
+expect($estates)->toHaveCount(1)
+    ->and($estates->first()['id'])->toBe(1);
+
+$estates = EstateRepository::query()->get();
+
+expect($estates)->toHaveCount(2)
+    ->and($estates->first()['id'])->toBe(2)
+    ->and($estates->last()['id'])->toBe(3);
+```
 
 ## Testing
 
