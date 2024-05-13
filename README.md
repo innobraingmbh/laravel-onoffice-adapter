@@ -58,6 +58,19 @@ $estates = EstateRepository::query()
     ->orderBy('kaufpreis')
     ->orderByDesc('warmmiete')
     ->get();
+
+$success = MarketplaceRepository::query()
+    ->unlockProvider($parameterCacheId, $extendedClaim);
+
+$users = UserRepository::query()
+    ->select([
+        'Anrede',
+        'Vorname',
+        'Nachname',
+        'Mobil',
+    ])
+    ->where('Nr', $this->userId)
+    ->get();
 ```
 
 ## Testing
