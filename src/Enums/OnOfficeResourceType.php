@@ -9,4 +9,5 @@ enum OnOfficeResourceType: string
     case Fields = 'fields';
     case File = 'file';
     case IdsFromRelation = 'idsfromrelation';
+    case User = 'user';
 }
