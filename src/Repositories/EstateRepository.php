@@ -6,10 +6,10 @@ use Katalam\OnOfficeAdapter\Query\EstateBuilder;
 use Katalam\OnOfficeAdapter\Query\EstateFileBuilder;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
-readonly class EstateRepository
+class EstateRepository
 {
     public function __construct(
-        private OnOfficeService $onOfficeService,
+        private readonly OnOfficeService $onOfficeService,
     ) {
     }
 

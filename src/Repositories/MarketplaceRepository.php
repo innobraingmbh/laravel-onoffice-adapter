@@ -5,10 +5,10 @@ namespace Katalam\OnOfficeAdapter\Repositories;
 use Katalam\OnOfficeAdapter\Query\MarketplaceBuilder;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
-readonly class MarketplaceRepository
+class MarketplaceRepository
 {
     public function __construct(
-        private OnOfficeService $onOfficeService,
+        private readonly OnOfficeService $onOfficeService,
     ) {
     }
 

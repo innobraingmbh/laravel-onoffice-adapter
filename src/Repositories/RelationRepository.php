@@ -5,10 +5,10 @@ namespace Katalam\OnOfficeAdapter\Repositories;
 use Katalam\OnOfficeAdapter\Query\RelationBuilder;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
-readonly class RelationRepository
+class RelationRepository
 {
     public function __construct(
-        private OnOfficeService $onOfficeService,
+        private readonly OnOfficeService $onOfficeService,
     ) {
     }
 

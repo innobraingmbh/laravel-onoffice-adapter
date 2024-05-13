@@ -5,10 +5,10 @@ namespace Katalam\OnOfficeAdapter\Repositories;
 use Katalam\OnOfficeAdapter\Query\AddressBuilder;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
-readonly class AddressRepository
+class AddressRepository
 {
     public function __construct(
-        private OnOfficeService $onOfficeService,
+        private readonly OnOfficeService $onOfficeService,
     ) {
     }
 
