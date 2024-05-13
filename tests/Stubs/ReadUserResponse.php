@@ -35,7 +35,7 @@ class ReadUserResponse
                             'records' => [
                                 [
                                     'id' => $userId,
-                                    'type' => 'estate',
+                                    'type' => 'user',
                                     'elements' => [
                                         'Vorname' => 'Theo',
                                         'Nachname' => 'Test',

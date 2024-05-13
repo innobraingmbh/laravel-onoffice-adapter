@@ -2,6 +2,6 @@
 
 namespace Katalam\OnOfficeAdapter\Query\Testing;
 
-class EstateBuilderFake extends BaseFake
+class UserBuilderFake extends BaseFake
 {
 }
