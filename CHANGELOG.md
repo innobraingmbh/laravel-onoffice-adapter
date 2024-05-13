@@ -1,6 +1,10 @@
 # Changelog
 ## main
+
+## v0.3.0
 - Added a fake implementation for the estate repository
+- Added a fake implementation for the marketplace repository
+- Added a fake implementation for the user repository
 - Added a ResponseFactory for testing
 
 ## v0.2.3
