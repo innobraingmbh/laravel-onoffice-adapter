@@ -14,7 +14,7 @@ describe('get', function () {
     it('can get a fake response', function () {
         MarketplaceRepository::fake([
             [
-                MarketPlaceUnlockProviderFactory::make()->ok()
+                MarketPlaceUnlockProviderFactory::make()->ok(),
             ],
         ]);
 
@@ -26,7 +26,7 @@ describe('get', function () {
     it('can get an error fake response', function () {
         MarketplaceRepository::fake([
             [
-                MarketPlaceUnlockProviderFactory::make()->error()
+                MarketPlaceUnlockProviderFactory::make()->error(),
             ],
         ]);
 

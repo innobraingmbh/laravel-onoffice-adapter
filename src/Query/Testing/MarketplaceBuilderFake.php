@@ -2,11 +2,6 @@
 
 namespace Katalam\OnOfficeAdapter\Query\Testing;
 
-use Exception;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
-use Katalam\OnOfficeAdapter\Query\Builder;
 use Throwable;
 
 class MarketplaceBuilderFake extends BaseFake
