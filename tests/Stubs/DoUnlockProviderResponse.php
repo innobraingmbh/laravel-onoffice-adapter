@@ -25,7 +25,7 @@ class DoUnlockProviderResponse
                     [
                         'actionid' => 'urn:onoffice-de-ns:smart:2.5:smartml:action:do',
                         'resourceid' => '',
-                        'resourcetype' => 'unlockPrivder',
+                        'resourcetype' => 'unlockProvider',
                         'cacheable' => false,
                         'identifier' => '',
                         'data' => [
