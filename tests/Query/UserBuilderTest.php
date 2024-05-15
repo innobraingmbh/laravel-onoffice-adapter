@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\UserRepository;
+use Katalam\OnOfficeAdapter\Facades\SettingRepository;
 use Katalam\OnOfficeAdapter\Tests\Stubs\ReadUserResponse;
 
 it('works', function () {
@@ -15,7 +15,7 @@ it('works', function () {
         ]),
     ]);
 
-    $users = UserRepository::query()
+    $users = SettingRepository::users()
         ->get();
 
     expect($users)

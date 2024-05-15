@@ -1,5 +1,7 @@
 # Changelog
 ## main
+- Moved user repository query to settings repository
+- Added regions to settings repository
 
 ## v0.3.0
 - Added a fake implementation for the estate repository
