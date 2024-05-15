@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Facades\SettingRepository;
 use Katalam\OnOfficeAdapter\Tests\Stubs\GetRegionsResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadUserResponse;
 
 it('works', function () {
     Http::preventStrayRequests();

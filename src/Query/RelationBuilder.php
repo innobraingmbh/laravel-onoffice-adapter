@@ -8,10 +8,18 @@ use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeRelationType;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Katalam\OnOfficeAdapter\Query\Concerns\NonFilterable;
+use Katalam\OnOfficeAdapter\Query\Concerns\NonOrderable;
+use Katalam\OnOfficeAdapter\Query\Concerns\NonSelectable;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
 class RelationBuilder extends Builder
 {
+    use NonFilterable;
+    use NonFilterable;
+    use NonOrderable;
+    use NonSelectable;
+
     public array $parentIds = [];
 
     public array $childIds = [];

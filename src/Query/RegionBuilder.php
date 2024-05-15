@@ -6,10 +6,18 @@ use Illuminate\Support\Collection;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Katalam\OnOfficeAdapter\Query\Concerns\NonFilterable;
+use Katalam\OnOfficeAdapter\Query\Concerns\NonOrderable;
+use Katalam\OnOfficeAdapter\Query\Concerns\NonSelectable;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
 class RegionBuilder extends Builder
 {
+    use NonFilterable;
+    use NonFilterable;
+    use NonOrderable;
+    use NonSelectable;
+
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
     ) {
