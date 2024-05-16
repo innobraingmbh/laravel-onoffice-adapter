@@ -1,5 +1,7 @@
 # Changelog
 ## main
+
+## v0.4.0
 - Moved user repository query to settings repository
 - Added regions to settings repository
 - Added non-filterable, non-limitable, non-sortable and non-selectable traits to repositories if needed
