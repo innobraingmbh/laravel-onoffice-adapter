@@ -3,6 +3,7 @@
 namespace Katalam\OnOfficeAdapter\Facades\Testing;
 
 use Katalam\OnOfficeAdapter\Query\Testing\EstateBuilderFake;
+use Katalam\OnOfficeAdapter\Query\Testing\EstateFileBuilderFake;
 
 class EstateRepositoryFake
 {
@@ -14,5 +15,13 @@ class EstateRepositoryFake
     public function query(): EstateBuilderFake
     {
         return new EstateBuilderFake($this->fakeResponses);
+    }
+
+    /**
+     * Returns a new fake estate files builder instance.
+     */
+    public function files(): EstateFileBuilderFake
+    {
+        return new EstateFileBuilderFake($this->fakeResponses);
     }
 }

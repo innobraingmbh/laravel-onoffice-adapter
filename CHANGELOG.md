@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.4.1
+- Added missing estate files fake method
+
 ## v0.4.0
 - Moved user repository query to settings repository
 - Added regions to settings repository
