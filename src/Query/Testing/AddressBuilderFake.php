@@ -17,4 +17,9 @@ class AddressBuilderFake extends BaseFake
 
         return collect($nextRequest)->flatten()->count();
     }
+
+    public function addCountryIsoCodeType(string $countryIsoCodeType): self
+    {
+        return $this;
+    }
 }
