@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.5.1
+- Added missing address fake builder country iso code type setter
+
 ## v0.5.0
 - Added missing address query fake method
 - Added modify method to base builder
