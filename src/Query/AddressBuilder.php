@@ -131,6 +131,35 @@ class AddressBuilder extends Builder
         }, $callback, pageSize: $listLimit, offset: $listOffset);
     }
 
+    public function count(): int
+    {
+        $recordIds = $this->recordIds;
+        $columns = $this->columns;
+        $filter = $this->getFilters();
+        $listLimit = $this->limit;
+        $listOffset = $this->offset;
+        $orderBy = $this->getOrderBy();
+
+        $sortBy = data_get(array_keys($orderBy), 0);
+        $sortOrder = data_get($orderBy, 0);
+
+        $response = $this->onOfficeService->requestApi(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Address,
+            parameters: [
+                OnOfficeService::RECORDIDS => $recordIds,
+                OnOfficeService::DATA => $columns,
+                OnOfficeService::FILTER => $filter,
+                OnOfficeService::LISTLIMIT => $listLimit,
+                OnOfficeService::LISTOFFSET => $listOffset,
+                OnOfficeService::SORTBY => $sortBy,
+                OnOfficeService::SORTORDER => $sortOrder,
+            ]
+        );
+
+        return $response->json('response.results.0.data.meta.cntabsolute');
+    }
+
     public function recordIds(array|int $recordIds): self
     {
         $this->recordIds = Arr::wrap($recordIds);
