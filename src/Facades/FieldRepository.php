@@ -8,7 +8,7 @@ use Katalam\OnOfficeAdapter\Query\FieldBuilder;
 /**
  * @see \Katalam\OnOfficeAdapter\Repositories\FieldRepository
  *
- * @method FieldBuilder query()
+ * @method static FieldBuilder query()
  */
 class FieldRepository extends Facade
 {

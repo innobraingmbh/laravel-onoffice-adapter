@@ -9,7 +9,7 @@ use Katalam\OnOfficeAdapter\Query\MarketplaceBuilder;
 /**
  * @see \Katalam\OnOfficeAdapter\Repositories\MarketplaceRepository
  *
- * @method MarketplaceBuilder query()
+ * @method static MarketplaceBuilder query()
  */
 class MarketplaceRepository extends Facade
 {

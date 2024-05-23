@@ -10,8 +10,8 @@ use Katalam\OnOfficeAdapter\Query\EstateFileBuilder;
 /**
  * @see \Katalam\OnOfficeAdapter\Repositories\EstateRepository
  *
- * @method EstateBuilder query()
- * @method EstateFileBuilder files(int $estateId)
+ * @method static EstateBuilder query()
+ * @method static EstateFileBuilder files(int $estateId)
  */
 class EstateRepository extends Facade
 {

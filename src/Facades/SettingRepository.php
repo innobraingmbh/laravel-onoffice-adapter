@@ -10,8 +10,8 @@ use Katalam\OnOfficeAdapter\Query\UserBuilder;
 /**
  * @see \Katalam\OnOfficeAdapter\Repositories\SettingRepository
  *
- * @method UserBuilder users()
- * @method RegionBuilder regions()
+ * @method static UserBuilder users()
+ * @method static RegionBuilder regions()
  */
 class SettingRepository extends Facade
 {

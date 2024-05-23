@@ -8,7 +8,7 @@ use Katalam\OnOfficeAdapter\Query\RelationBuilder;
 /**
  * @see \Katalam\OnOfficeAdapter\Repositories\RelationRepository
  *
- * @method RelationBuilder query()
+ * @method static RelationBuilder query()
  */
 class RelationRepository extends Facade
 {

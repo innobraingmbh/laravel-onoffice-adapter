@@ -9,7 +9,7 @@ use Katalam\OnOfficeAdapter\Query\AddressBuilder;
 /**
  * @see \Katalam\OnOfficeAdapter\Repositories\AddressRepository
  *
- * @method AddressBuilder query()
+ * @method static AddressBuilder query()
  */
 class AddressRepository extends Facade
 {
