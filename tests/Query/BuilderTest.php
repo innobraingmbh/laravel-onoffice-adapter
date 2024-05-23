@@ -23,6 +23,11 @@ class Builder extends AbstractBuilder
     public function each(callable $callback): void
     {
     }
+
+    public function modify(int $id): bool
+    {
+        return true;
+    }
 }
 
 describe('select', function () {
@@ -66,6 +71,53 @@ describe('select', function () {
         $builder->addSelect('Name');
 
         expect($builder->columns)->toBe(['ID', 'Name']);
+    });
+});
+
+describe('modifies', function () {
+    it('should return the builder instance', function () {
+        $builder = new Builder();
+
+        $result = $builder->addModify('Name', 'Foo');
+
+        expect($result)->toBeInstanceOf(Builder::class);
+    });
+
+    it('should add modifies parameters', function () {
+        $builder = new Builder();
+
+        $builder->addModify('Name', 'Foo');
+
+        expect($builder->modifies)->toBe(['Name' => 'Foo']);
+    });
+
+    it('should add multiple modifies parameters', function () {
+        $builder = new Builder();
+
+        $builder->addModify('Name', 'Foo');
+        $builder->addModify('ID', 1);
+
+        expect($builder->modifies)->toBe(['Name' => 'Foo', 'ID' => 1]);
+    });
+
+    it('should add multiple modifies parameters with the same key', function () {
+        $builder = new Builder();
+
+        $builder->addModify('Name', 'Foo');
+        $builder->addModify('Name', 'Bar');
+
+        expect($builder->modifies)->toBe(['Name' => 'Bar']);
+    });
+
+    it('should add multiple modifies parameters as array', function () {
+        $builder = new Builder();
+
+        $builder->addModify([
+            'Name' => 'Foo',
+            'ID' => 1,
+        ]);
+
+        expect($builder->modifies)->toBe(['Name' => 'Foo', 'ID' => 1]);
     });
 });
 

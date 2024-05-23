@@ -62,4 +62,12 @@ class MarketplaceBuilder extends Builder
     {
         throw new OnOfficeException('Method not implemented yet');
     }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function modify(int $id): bool
+    {
+        throw new OnOfficeException('Not implemented');
+    }
 }

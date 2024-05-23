@@ -109,4 +109,12 @@ class UserBuilder extends Builder
             );
         }, $callback, pageSize: $listLimit, offset: $listOffset);
     }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function modify(int $id): bool
+    {
+        throw new OnOfficeException('Not implemented');
+    }
 }

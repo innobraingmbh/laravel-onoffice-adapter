@@ -22,6 +22,11 @@ abstract class Builder
     public array $filters = [];
 
     /**
+     * An array of modify parameters.
+     */
+    public array $modifies = [];
+
+    /**
      * The limit for the query.
      */
     public int $limit = 500;
@@ -65,6 +70,19 @@ abstract class Builder
     public function orderByDesc(string $column): self
     {
         return $this->orderBy($column, 'desc');
+    }
+
+    public function addModify(string|array $column, mixed $value = null): self
+    {
+        if (is_array($column)) {
+            $this->modifies = array_merge($this->modifies, $column);
+
+            return $this;
+        }
+
+        $this->modifies[$column] = $value;
+
+        return $this;
     }
 
     public function offset(int $value): self
@@ -125,4 +143,6 @@ abstract class Builder
     abstract public function find(int $id): array;
 
     abstract public function each(callable $callback): void;
+
+    abstract public function modify(int $id): bool;
 }

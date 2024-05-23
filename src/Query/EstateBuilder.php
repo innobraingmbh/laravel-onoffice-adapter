@@ -109,4 +109,19 @@ class EstateBuilder extends Builder
             );
         }, $callback, pageSize: $listLimit, offset: $listOffset);
     }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function modify(int $id): bool
+    {
+        $this->onOfficeService->requestApi(
+            OnOfficeAction::Modify,
+            OnOfficeResourceType::Estate,
+            $id,
+            parameters: $this->modifies,
+        );
+
+        return true;
+    }
 }

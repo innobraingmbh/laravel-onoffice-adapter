@@ -90,4 +90,12 @@ class EstateFileBuilder extends Builder
             );
         }, $callback, pageSize: $this->limit, offset: $this->offset);
     }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function modify(int $id): bool
+    {
+        throw new OnOfficeException('Not implemented');
+    }
 }

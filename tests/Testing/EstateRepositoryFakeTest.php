@@ -124,3 +124,43 @@ describe('find', function () {
             ->toThrow('No more fake responses');
     });
 });
+
+describe('modify', function () {
+    it('can modify', function () {
+        EstateRepository::fake([
+            [
+                true,
+            ],
+        ]);
+
+        $result = EstateRepository::query()->modify(1);
+
+        expect($result)->toBeTrue();
+    });
+
+    it('can modify multiple times', function () {
+        EstateRepository::fake([
+            [
+                true,
+            ],
+        ], [
+            [
+                true,
+            ],
+        ]);
+
+        $result = EstateRepository::query()->modify(1);
+
+        expect($result)->toBeTrue();
+
+        $result = EstateRepository::query()->modify(2);
+
+        expect($result)->toBeTrue();
+    });
+
+    it('throws an exception when no more fake responses are available', function () {
+        EstateRepository::fake();
+
+        EstateRepository::query()->modify(1);
+    })->throws(Exception::class, 'No more fake responses');
+});

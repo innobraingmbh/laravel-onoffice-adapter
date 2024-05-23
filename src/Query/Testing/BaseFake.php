@@ -62,4 +62,17 @@ class BaseFake extends Builder
                 $callback($records);
             });
     }
+
+    /**
+     * @throws Throwable
+     */
+    public function modify(int $id): bool
+    {
+        $nextRequest = $this->fakeResponses->shift();
+        throw_if($nextRequest === null, new Exception('No more fake responses'));
+
+        return collect($nextRequest)
+            ->flatten()
+            ->first();
+    }
 }

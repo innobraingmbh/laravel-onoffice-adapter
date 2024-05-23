@@ -78,4 +78,12 @@ class FieldBuilder extends Builder
 
         return $this;
     }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function modify(int $id): bool
+    {
+        throw new OnOfficeException('Not implemented');
+    }
 }
