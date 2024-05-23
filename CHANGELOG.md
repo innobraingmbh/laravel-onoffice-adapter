@@ -1,6 +1,10 @@
 # Changelog
 ## main
 
+## v0.5.0
+- Added missing address query fake method
+- Added modify method to base builder
+
 ## v0.4.1
 - Added missing estate files fake method
 
