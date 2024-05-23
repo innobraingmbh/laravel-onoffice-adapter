@@ -10,6 +10,7 @@ enum OnOfficeResourceType: string
     case File = 'file';
     case IdsFromRelation = 'idsfromrelation';
     case User = 'user';
+    case Users = 'users';
     case UnlockProvider = 'unlockProvider';
     case Regions = 'regions';
 }

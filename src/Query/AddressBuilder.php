@@ -13,6 +13,8 @@ class AddressBuilder extends Builder
 {
     public array $recordIds = [];
 
+    public array $customParameters = [];
+
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
     ) {
@@ -44,6 +46,7 @@ class AddressBuilder extends Builder
                     OnOfficeService::LISTOFFSET => $offset,
                     OnOfficeService::SORTBY => $sortBy,
                     OnOfficeService::SORTORDER => $sortOrder,
+                    ...$this->customParameters,
                 ]
             );
         }, pageSize: $listLimit, offset: $listOffset);
@@ -75,6 +78,7 @@ class AddressBuilder extends Builder
                 OnOfficeService::LISTOFFSET => $listOffset,
                 OnOfficeService::SORTBY => $sortBy,
                 OnOfficeService::SORTORDER => $sortOrder,
+                ...$this->customParameters,
             ]
         );
 
@@ -126,6 +130,7 @@ class AddressBuilder extends Builder
                     OnOfficeService::LISTOFFSET => $offset,
                     OnOfficeService::SORTBY => $sortBy,
                     OnOfficeService::SORTORDER => $sortOrder,
+                    ...$this->customParameters,
                 ]
             );
         }, $callback, pageSize: $listLimit, offset: $listOffset);
@@ -154,6 +159,7 @@ class AddressBuilder extends Builder
                 OnOfficeService::LISTOFFSET => $listOffset,
                 OnOfficeService::SORTBY => $sortBy,
                 OnOfficeService::SORTORDER => $sortOrder,
+                ...$this->customParameters,
             ]
         );
 
@@ -170,6 +176,13 @@ class AddressBuilder extends Builder
     public function addRecordIds(int|array $recordId): self
     {
         $this->recordIds = array_merge($this->recordIds, Arr::wrap($recordId));
+
+        return $this;
+    }
+
+    public function addCountryIsoCodeType(string $countryIsoCodeType): self
+    {
+        $this->customParameters['countryIsoCodeType'] = $countryIsoCodeType;
 
         return $this;
     }

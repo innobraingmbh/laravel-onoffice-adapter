@@ -69,3 +69,13 @@ describe('recordIds', function () {
         expect($builder->recordIds)->toBe([1, 2]);
     });
 });
+
+describe('customParameters', function () {
+    it('should set the country iso code type property to the given type', function () {
+        $builder = new AddressBuilder(app(OnOfficeService::class));
+
+        $builder->addCountryIsoCodeType('ISO-3166-2');
+
+        expect($builder->customParameters['countryIsoCodeType'])->toBe('ISO-3166-2');
+    });
+});
