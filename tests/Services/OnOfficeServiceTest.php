@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -70,6 +71,40 @@ describe('requestAll', function () {
             );
         });
     })->with([300, 301, 400, 401, 500, 501]);
+
+    it('can handle null in result path', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => [
+                                    'cntabsolute' => 0,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $response = $onOfficeService->requestAll(function () {
+            return app(OnOfficeService::class)->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Estate,
+            );
+        });
+
+        expect($response)->toBeInstanceOf(Collection::class)
+            ->toBeEmpty();
+    });
 });
 
 describe('requestAllChunked', function () {

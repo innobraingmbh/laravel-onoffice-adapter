@@ -139,8 +139,11 @@ class OnOfficeService
                 $countAbsolute = $response->json($countPath, 0);
                 $maxPage = ceil($countAbsolute / $pageSize);
             }
+            $responseResult = $response->json($resultPath);
 
-            $data->push(...$response->json($resultPath));
+            if (is_array($responseResult)) {
+                $data->push(...$responseResult);
+            }
 
             $offset += $pageSize;
             $currentPage = $offset / $pageSize;
