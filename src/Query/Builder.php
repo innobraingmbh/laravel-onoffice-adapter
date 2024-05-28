@@ -42,14 +42,14 @@ abstract class Builder
      */
     public int $offset = 0;
 
-    public function select(array|string $columns = ['ID']): self
+    public function select(array|string $columns = ['ID']): static
     {
         $this->columns = Arr::wrap($columns);
 
         return $this;
     }
 
-    public function addSelect(array|string $column): self
+    public function addSelect(array|string $column): static
     {
         $column = Arr::wrap($column);
 
@@ -58,7 +58,7 @@ abstract class Builder
         return $this;
     }
 
-    public function orderBy(string $column, string $direction = 'asc'): self
+    public function orderBy(string $column, string $direction = 'asc'): static
     {
         $direction = Str::upper($direction);
 
@@ -67,12 +67,12 @@ abstract class Builder
         return $this;
     }
 
-    public function orderByDesc(string $column): self
+    public function orderByDesc(string $column): static
     {
         return $this->orderBy($column, 'desc');
     }
 
-    public function addModify(string|array $column, mixed $value = null): self
+    public function addModify(string|array $column, mixed $value = null): static
     {
         if (is_array($column)) {
             $this->modifies = array_merge($this->modifies, $column);
@@ -85,21 +85,21 @@ abstract class Builder
         return $this;
     }
 
-    public function offset(int $value): self
+    public function offset(int $value): static
     {
         $this->offset = max(0, $value);
 
         return $this;
     }
 
-    public function limit(int $value): self
+    public function limit(int $value): static
     {
         $this->limit = max(0, $value);
 
         return $this;
     }
 
-    public function where(string $column, mixed $operator, mixed $value = null): self
+    public function where(string $column, mixed $operator, mixed $value = null): static
     {
         if (is_null($value)) {
             $value = $operator;

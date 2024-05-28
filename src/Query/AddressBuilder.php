@@ -181,21 +181,21 @@ class AddressBuilder extends Builder
         return $response->json('response.results.0.data.meta.cntabsolute');
     }
 
-    public function recordIds(array|int $recordIds): self
+    public function recordIds(array|int $recordIds): static
     {
         $this->recordIds = Arr::wrap($recordIds);
 
         return $this;
     }
 
-    public function addRecordIds(int|array $recordId): self
+    public function addRecordIds(int|array $recordId): static
     {
         $this->recordIds = array_merge($this->recordIds, Arr::wrap($recordId));
 
         return $this;
     }
 
-    public function addCountryIsoCodeType(string $countryIsoCodeType): self
+    public function addCountryIsoCodeType(string $countryIsoCodeType): static
     {
         $this->customParameters['countryIsoCodeType'] = $countryIsoCodeType;
 

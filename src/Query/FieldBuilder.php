@@ -72,7 +72,7 @@ class FieldBuilder extends Builder
         }, $callback);
     }
 
-    public function withModules(array|string $modules): self
+    public function withModules(array|string $modules): static
     {
         $this->modules = array_merge($this->modules, Arr::wrap($modules));
 
