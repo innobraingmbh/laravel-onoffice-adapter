@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.5.3
+- The return types of the builder methods are now static instead of self
+
 ## v0.5.2
 - The request all method will now check the response for extract ability of the response
 
