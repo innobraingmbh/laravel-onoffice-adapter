@@ -106,21 +106,23 @@ abstract class Builder
             $operator = '=';
         }
 
-        $this->filters[] = [$column, $operator, $value];
+        $this->filters[$column][] = [$operator, $value];
 
         return $this;
     }
 
     protected function getFilters(): array
     {
-        return collect($this->filters)->mapWithKeys(function ($value) {
-            [$column, $operator, $value] = $value;
-
+        return collect($this->filters)->mapWithKeys(function (array $value, string $column) {
             return [
-                $column => [
-                    'op' => $operator,
-                    'val' => $value,
-                ],
+                $column => collect($value)->map(function ($filter) {
+                    [$operator, $value] = $filter;
+
+                    return [
+                        'op' => $operator,
+                        'val' => $value,
+                    ];
+                })->toArray(),
             ];
         })->toArray();
     }

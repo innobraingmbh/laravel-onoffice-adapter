@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.5.4
+- Fixed a bug where the filters are not wrapped in an array for each column
+
 ## v0.5.3
 - The return types of the builder methods are now static instead of self
 

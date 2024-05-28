@@ -222,7 +222,11 @@ describe('where', function () {
 
         $builder->where('ID', '=', 1);
 
-        expect($builder->filters)->toBe([['ID', '=', 1]]);
+        expect($builder->filters)->toBe([
+            'ID' => [
+                ['=', 1],
+            ],
+        ]);
     });
 
     it('should return the builder instance', function () {
@@ -239,7 +243,14 @@ describe('where', function () {
         $builder->where('ID', '=', 1);
         $builder->where('Name', '=', 'John');
 
-        expect($builder->filters)->toBe([['ID', '=', 1], ['Name', '=', 'John']]);
+        expect($builder->filters)->toBe([
+            'ID' => [
+                ['=', 1],
+            ],
+            'Name' => [
+                ['=', 'John'],
+            ],
+        ]);
     });
 
     it('should add multiple filters with different operators', function () {
@@ -248,7 +259,14 @@ describe('where', function () {
         $builder->where('ID', '=', 1);
         $builder->where('Name', 'LIKE', 'John');
 
-        expect($builder->filters)->toBe([['ID', '=', 1], ['Name', 'LIKE', 'John']]);
+        expect($builder->filters)->toBe([
+            'ID' => [
+                ['=', 1],
+            ],
+            'Name' => [
+                ['LIKE', 'John'],
+            ],
+        ]);
     });
 
     it('should default the operator to equality', function () {
@@ -256,7 +274,11 @@ describe('where', function () {
 
         $builder->where('ID', 1);
 
-        expect($builder->filters)->toBe([['ID', '=', 1]]);
+        expect($builder->filters)->toBe([
+            'ID' => [
+                ['=', 1],
+            ],
+        ]);
     });
 });
 
@@ -272,8 +294,10 @@ describe('getFilters', function () {
 
         expect($filters)->toBe([
             'ID' => [
-                'op' => '=',
-                'val' => 1,
+                [
+                    'op' => '=',
+                    'val' => 1,
+                ],
             ],
         ]);
     });
@@ -290,12 +314,16 @@ describe('getFilters', function () {
 
         expect($filters)->toBe([
             'ID' => [
-                'op' => '=',
-                'val' => 1,
+                [
+                    'op' => '=',
+                    'val' => 1,
+                ],
             ],
             'Name' => [
-                'op' => 'LIKE',
-                'val' => 'John',
+                [
+                    'op' => 'LIKE',
+                    'val' => 'John',
+                ],
             ],
         ]);
     });
