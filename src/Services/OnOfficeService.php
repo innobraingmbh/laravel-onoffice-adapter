@@ -20,10 +20,13 @@ class OnOfficeService
 
     private string $secret;
 
+    private string $apiClaim;
+
     public function __construct()
     {
         $this->token = config('onoffice.token', '') ?? '';
         $this->secret = config('onoffice.secret', '') ?? '';
+        $this->apiClaim = config('onoffice.api_claim', '') ?? '';
     }
 
     public function getToken(): string
@@ -34,6 +37,11 @@ class OnOfficeService
     public function getSecret(): string
     {
         return $this->secret;
+    }
+
+    public function getApiClaim(): string
+    {
+        return $this->apiClaim;
     }
 
     /*
@@ -81,6 +89,10 @@ class OnOfficeService
         string|int $identifier = '',
         array $parameters = [],
     ): Response {
+        if (! empty($this->apiClaim)) {
+            $parameters = array_replace([self::EXTENDEDCLAIM => $this->apiClaim], $parameters);
+        }
+
         $response = Http::onOffice()
             ->post('/', [
                 'token' => $this->token,

@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.6.0
+- Fixed a bug where the extended claim is not set in the request factory
+
 ## v0.5.4
 - Fixed a bug where the filters are not wrapped in an array for each column
 
