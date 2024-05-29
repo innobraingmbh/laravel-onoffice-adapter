@@ -178,7 +178,7 @@ class AddressBuilder extends Builder
             ]
         );
 
-        return $response->json('response.results.0.data.meta.cntabsolute');
+        return $response->json('response.results.0.data.meta.cntabsolute', 0);
     }
 
     public function recordIds(array|int $recordIds): static
