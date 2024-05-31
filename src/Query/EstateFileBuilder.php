@@ -98,4 +98,22 @@ class EstateFileBuilder extends Builder
     {
         throw new OnOfficeException('Not implemented');
     }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function delete(int $id): bool
+    {
+        $response = $this->onOfficeService->requestApi(
+            OnOfficeAction::Delete,
+            OnOfficeResourceType::FileRelation,
+            parameters: [
+                'fileId' => $id,
+                'parentId' => $this->estateId,
+                'relationtype' => 'estate',
+            ],
+        );
+
+        return $response->json('response.results.0.data.records.0.elements.success') === 'success';
+    }
 }

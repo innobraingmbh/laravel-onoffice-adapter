@@ -3,6 +3,7 @@
 use Katalam\OnOfficeAdapter\Facades\EstateRepository;
 use Katalam\OnOfficeAdapter\Facades\Testing\EstateRepositoryFake;
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
+use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\FileFactory;
 
 describe('get', function () {
     it('can be faked', function () {
@@ -162,5 +163,48 @@ describe('modify', function () {
         EstateRepository::fake();
 
         EstateRepository::query()->modify(1);
+    })->throws(Exception::class, 'No more fake responses');
+});
+
+describe('delete', function () {
+    it('can delete', function () {
+        EstateRepository::fake([
+            [
+                FileFactory::make()
+                    ->ok(),
+            ],
+        ]);
+
+        $result = EstateRepository::files()->delete(1);
+
+        expect($result)->toBeTrue();
+    });
+
+    it('can delete multiple times', function () {
+        EstateRepository::fake([
+            [
+                FileFactory::make()
+                    ->ok(),
+            ],
+        ], [
+            [
+                FileFactory::make()
+                    ->ok(),
+            ],
+        ]);
+
+        $result = EstateRepository::files()->delete(1);
+
+        expect($result)->toBeTrue();
+
+        $result = EstateRepository::files()->delete(2);
+
+        expect($result)->toBeTrue();
+    });
+
+    it('throws an exception when no more fake responses are available', function () {
+        EstateRepository::fake();
+
+        EstateRepository::files()->delete(1);
     })->throws(Exception::class, 'No more fake responses');
 });
