@@ -17,35 +17,35 @@ abstract class BaseFactory
     {
     }
 
-    public function id(int $id): self
+    public function id(int $id): static
     {
         $this->id = $id;
 
         return $this;
     }
 
-    public function type(string $type): self
+    public function type(string $type): static
     {
         $this->type = $type;
 
         return $this;
     }
 
-    public function set(string $key, mixed $value): self
+    public function set(string $key, mixed $value): static
     {
         $this->elements[$key] = $value;
 
         return $this;
     }
 
-    public function data(array $data): self
+    public function data(array $data): static
     {
         $this->elements = array_merge($this->elements, $data);
 
         return $this;
     }
 
-    public static function make(): self
+    public static function make(): static
     {
         return new static();
     }
@@ -64,7 +64,7 @@ abstract class BaseFactory
         ];
     }
 
-    public function __call(string $name, array $arguments): self
+    public function __call(string $name, array $arguments): static
     {
         if (str_starts_with($name, 'set')) {
             $key = lcfirst(substr($name, 3));

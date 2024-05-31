@@ -2,7 +2,9 @@
 
 namespace Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories;
 
-class MarketPlaceUnlockProviderFactory extends BaseFactory
+use Illuminate\Support\Str;
+
+class FileUploadFactory extends BaseFactory
 {
     public function id(int $id): static
     {
@@ -16,6 +18,17 @@ class MarketPlaceUnlockProviderFactory extends BaseFactory
 
     public function elements(): static
     {
+        return $this;
+    }
+
+    public function tmpUploadId(string $tmpUploadId = ''): static
+    {
+        if ($tmpUploadId === '') {
+            $tmpUploadId = Str::uuid()->toString();
+        }
+
+        $this->elements['tmpUploadId'] = $tmpUploadId;
+
         return $this;
     }
 

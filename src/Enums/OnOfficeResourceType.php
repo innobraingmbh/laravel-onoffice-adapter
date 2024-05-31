@@ -13,4 +13,5 @@ enum OnOfficeResourceType: string
     case Users = 'users';
     case UnlockProvider = 'unlockProvider';
     case Regions = 'regions';
+    case UploadFile = 'uploadfile';
 }
