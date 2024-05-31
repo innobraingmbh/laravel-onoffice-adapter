@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.7.1
+- Added delete to estate file repository
+
 ## v0.7.0
 - Added upload file Repository
 
