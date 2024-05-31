@@ -72,6 +72,15 @@ $users = UserRepository::query()
     ->where('Nr', $this->userId)
     ->get();
 ```
+```php
+$tmpUploadId = FileRepository::upload()
+    ->save(base64_encode($fileContent));
+
+$success = FileRepository::upload()->link($tmpUploadId, [
+    'module' => 'estate',
+    'relatedRecordId' => '12345',
+]);
+```
 ### Usage in tests
 ```php
 EstateRepository::fake([ // First request
