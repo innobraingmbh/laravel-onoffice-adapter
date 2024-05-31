@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.7.0
+- Added upload file Repository
+
 ## v0.6.0
 - Fixed a bug where the extended claim is not set in the request factory
 
