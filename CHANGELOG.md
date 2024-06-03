@@ -1,5 +1,6 @@
 # Changelog
 ## main
+- Added a exception when the file is not found in a estate file query
 
 ## v0.7.2
 - Fixed a typo where the delete method of estate files returns an error

@@ -70,7 +70,13 @@ class EstateFileBuilder extends Builder
             ],
         );
 
-        return $response->json('response.results.0.data.records.0');
+        $result = $response->json('response.results.0.data.records.0');
+
+        if (! $result) {
+            throw new OnOfficeException('File not found');
+        }
+
+        return $result;
     }
 
     public function each(callable $callback): void
