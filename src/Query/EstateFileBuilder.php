@@ -109,7 +109,7 @@ class EstateFileBuilder extends Builder
             OnOfficeResourceType::FileRelation,
             parameters: [
                 'fileId' => $id,
-                'parentId' => $this->estateId,
+                'parentid' => $this->estateId,
                 'relationtype' => 'estate',
             ],
         );

@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.7.2
+- Fixed a typo where the delete method of estate files returns an error
+
 ## v0.7.1
 - Added delete to estate file repository
 
