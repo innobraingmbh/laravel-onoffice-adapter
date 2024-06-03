@@ -83,30 +83,32 @@ class UploadBuilder extends Builder
     }
 
     /**
+     * Returns the linked file data.
+     *
      * @throws OnOfficeException
      */
-    public function link(string $tmpUploadId, array $data = []): self
+    public function link(string $tmpUploadId, array $data = []): array
     {
         $data = array_replace($data, [
             'tmpUploadId' => $tmpUploadId,
         ]);
 
-        $this->onOfficeService->requestApi(
+        $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Do,
             OnOfficeResourceType::UploadFile,
             parameters: $data,
         );
 
-        return $this;
+        return $response->json('response.results.0.data.records.0');
     }
 
     /**
      * File content as base64-encoded binary data.
-     * Returns the temporary upload id.
+     * Returns the linked file data.
      *
      * @throws OnOfficeException
      */
-    public function saveAndLink(string $fileContent, array $data = []): self
+    public function saveAndLink(string $fileContent, array $data = []): array
     {
         $tmpUploadId = $this->save($fileContent);
 

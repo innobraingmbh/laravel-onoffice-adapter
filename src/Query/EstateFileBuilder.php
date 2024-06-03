@@ -102,7 +102,19 @@ class EstateFileBuilder extends Builder
      */
     public function modify(int $id): bool
     {
-        throw new OnOfficeException('Not implemented');
+        $parameters = array_replace($this->modifies, [
+            'fileId' => $id,
+            'parentid' => $this->estateId,
+            'relationtype' => 'estate',
+        ]);
+
+        $response = $this->onOfficeService->requestApi(
+            OnOfficeAction::Modify,
+            OnOfficeResourceType::FileRelation,
+            parameters: $parameters,
+        );
+
+        return $response->json('response.results.0.data.records.0.elements.success') === 'success';
     }
 
     /**
