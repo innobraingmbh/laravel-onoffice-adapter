@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.7.4
+- Added imprint to the settings repository
+
 ## v0.7.3
 - Added an exception when the file is not found in a estate file query
 - Added a modify method for estate files

@@ -2,6 +2,7 @@
 
 namespace Katalam\OnOfficeAdapter\Repositories;
 
+use Katalam\OnOfficeAdapter\Query\ImprintBuilder;
 use Katalam\OnOfficeAdapter\Query\RegionBuilder;
 use Katalam\OnOfficeAdapter\Query\UserBuilder;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
@@ -27,5 +28,13 @@ class SettingRepository
     public function regions(): RegionBuilder
     {
         return new RegionBuilder($this->onOfficeService);
+    }
+
+    /*
+     * Returns a new imprint builder instance.
+     */
+    public function imprint(): ImprintBuilder
+    {
+        return new ImprintBuilder($this->onOfficeService);
     }
 }

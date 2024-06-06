@@ -15,4 +15,5 @@ enum OnOfficeResourceType: string
     case Regions = 'regions';
     case UploadFile = 'uploadfile';
     case FileRelation = 'fileRelation';
+    case Impressum = 'impressum';
 }
