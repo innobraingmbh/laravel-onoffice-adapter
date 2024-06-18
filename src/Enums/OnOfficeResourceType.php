@@ -16,4 +16,5 @@ enum OnOfficeResourceType: string
     case UploadFile = 'uploadfile';
     case FileRelation = 'fileRelation';
     case Impressum = 'impressum';
+    case Activity = 'agentslog';
 }

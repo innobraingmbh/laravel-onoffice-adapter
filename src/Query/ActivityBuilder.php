@@ -2,6 +2,7 @@
 
 namespace Katalam\OnOfficeAdapter\Query;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
@@ -9,9 +10,11 @@ use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
-class AddressBuilder extends Builder
+class ActivityBuilder extends Builder
 {
     use RecordIds;
+
+    public string $estateOrAddress = 'estate';
 
     public array $customParameters = [];
 
@@ -22,11 +25,7 @@ class AddressBuilder extends Builder
 
     public function get(): Collection
     {
-        $recordIds = $this->recordIds;
-        $columns = $this->columns;
         $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
         $orderBy = $this->getOrderBy();
 
         $sortBy = data_get(array_keys($orderBy), 0);
@@ -34,13 +33,13 @@ class AddressBuilder extends Builder
 
         return $this->onOfficeService->requestAll(/**
          * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($recordIds, $sortOrder, $sortBy, $filter, $columns) {
+         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy, $filter) {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
-                OnOfficeResourceType::Address,
+                OnOfficeResourceType::Activity,
                 parameters: [
-                    OnOfficeService::RECORDIDS => $recordIds,
-                    OnOfficeService::DATA => $columns,
+                    $this->estateOrAddress => $this->recordIds,
+                    OnOfficeService::DATA => $this->columns,
                     OnOfficeService::FILTER => $filter,
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
@@ -49,7 +48,7 @@ class AddressBuilder extends Builder
                     ...$this->customParameters,
                 ]
             );
-        }, pageSize: $listLimit, offset: $listOffset);
+        }, pageSize: $this->limit, offset: $this->offset);
     }
 
     /**
@@ -57,11 +56,7 @@ class AddressBuilder extends Builder
      */
     public function first(): array
     {
-        $recordIds = $this->recordIds;
-        $columns = $this->columns;
         $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
         $orderBy = $this->getOrderBy();
 
         $sortBy = data_get(array_keys($orderBy), 0);
@@ -69,13 +64,13 @@ class AddressBuilder extends Builder
 
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Read,
-            OnOfficeResourceType::Address,
+            OnOfficeResourceType::Activity,
             parameters: [
-                OnOfficeService::RECORDIDS => $recordIds,
-                OnOfficeService::DATA => $columns,
+                $this->estateOrAddress => $this->recordIds,
+                OnOfficeService::DATA => $this->columns,
                 OnOfficeService::FILTER => $filter,
-                OnOfficeService::LISTLIMIT => $listLimit,
-                OnOfficeService::LISTOFFSET => $listOffset,
+                OnOfficeService::LISTLIMIT => $this->limit,
+                OnOfficeService::LISTOFFSET => $this->offset,
                 OnOfficeService::SORTBY => $sortBy,
                 OnOfficeService::SORTORDER => $sortOrder,
                 ...$this->customParameters,
@@ -90,14 +85,12 @@ class AddressBuilder extends Builder
      */
     public function find(int $id): array
     {
-        $columns = $this->columns;
-
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Get,
-            OnOfficeResourceType::Address,
+            OnOfficeResourceType::Activity,
             $id,
             parameters: [
-                OnOfficeService::DATA => $columns,
+                OnOfficeService::DATA => $this->columns,
             ]
         );
 
@@ -106,11 +99,7 @@ class AddressBuilder extends Builder
 
     public function each(callable $callback): void
     {
-        $recordIds = $this->recordIds;
-        $columns = $this->columns;
         $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
         $orderBy = $this->getOrderBy();
 
         $sortBy = data_get(array_keys($orderBy), 0);
@@ -118,13 +107,13 @@ class AddressBuilder extends Builder
 
         $this->onOfficeService->requestAllChunked(/**
          * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($recordIds, $sortOrder, $sortBy, $filter, $columns) {
+         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy, $filter) {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
-                OnOfficeResourceType::Address,
+                OnOfficeResourceType::Activity,
                 parameters: [
-                    OnOfficeService::RECORDIDS => $recordIds,
-                    OnOfficeService::DATA => $columns,
+                    $this->estateOrAddress => $this->recordIds,
+                    OnOfficeService::DATA => $this->columns,
                     OnOfficeService::FILTER => $filter,
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
@@ -133,7 +122,7 @@ class AddressBuilder extends Builder
                     ...$this->customParameters,
                 ]
             );
-        }, $callback, pageSize: $listLimit, offset: $listOffset);
+        }, $callback, pageSize: $this->limit, offset: $this->offset);
     }
 
     /**
@@ -141,49 +130,33 @@ class AddressBuilder extends Builder
      */
     public function modify(int $id): bool
     {
-        $this->onOfficeService->requestApi(
-            OnOfficeAction::Modify,
-            OnOfficeResourceType::Address,
-            $id,
-            parameters: $this->modifies,
-        );
-
-        return true;
+        throw new OnOfficeException('Not implemented yet');
     }
 
-    public function count(): int
+    /**
+     * @throws OnOfficeException
+     */
+    public function create(array $data): bool
     {
-        $recordIds = $this->recordIds;
-        $columns = $this->columns;
-        $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
-        $orderBy = $this->getOrderBy();
-
-        $sortBy = data_get(array_keys($orderBy), 0);
-        $sortOrder = data_get($orderBy, 0);
-
         $response = $this->onOfficeService->requestApi(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Address,
-            parameters: [
-                OnOfficeService::RECORDIDS => $recordIds,
-                OnOfficeService::DATA => $columns,
-                OnOfficeService::FILTER => $filter,
-                OnOfficeService::LISTLIMIT => $listLimit,
-                OnOfficeService::LISTOFFSET => $listOffset,
-                OnOfficeService::SORTBY => $sortBy,
-                OnOfficeService::SORTORDER => $sortOrder,
-                ...$this->customParameters,
-            ]
+            OnOfficeAction::Create,
+            OnOfficeResourceType::Activity,
+            parameters: $data,
         );
 
-        return $response->json('response.results.0.data.meta.cntabsolute', 0);
+        return $response->json('response.results.0.data.records.0');
     }
 
-    public function addCountryIsoCodeType(string $countryIsoCodeType): static
+    public function estate(): static
     {
-        $this->customParameters['countryIsoCodeType'] = $countryIsoCodeType;
+        $this->estateOrAddress = 'estateid';
+
+        return $this;
+    }
+
+    public function address(): static
+    {
+        $this->estateOrAddress = 'addressid';
 
         return $this;
     }
