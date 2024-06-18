@@ -7,7 +7,6 @@ namespace Katalam\OnOfficeAdapter\Facades;
 use Illuminate\Support\Facades\Facade;
 use Katalam\OnOfficeAdapter\Facades\Testing\ActivityRepositoryFake;
 use Katalam\OnOfficeAdapter\Query\ActivityBuilder;
-use Katalam\OnOfficeAdapter\Query\Testing\ActivityBuilderFake;
 
 /**
  * @see \Katalam\OnOfficeAdapter\Repositories\ActivityRepository
