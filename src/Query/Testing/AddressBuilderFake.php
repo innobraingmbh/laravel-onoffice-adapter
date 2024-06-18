@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Katalam\OnOfficeAdapter\Query\Testing;
 
 use Exception;
+use Katalam\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Throwable;
 
 class AddressBuilderFake extends BaseFake
 {
+    use RecordIds;
+
     /**
      * @throws Throwable
      */
