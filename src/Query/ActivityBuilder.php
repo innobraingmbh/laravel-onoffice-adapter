@@ -137,7 +137,7 @@ class ActivityBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function create(array $data): bool
+    public function create(array $data): array
     {
         $data = array_replace($data, [
             $this->estateOrAddress => $this->recordIds,
