@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Katalam\OnOfficeAdapter\Tests\Stubs;
 
 use GuzzleHttp\Promise\PromiseInterface;

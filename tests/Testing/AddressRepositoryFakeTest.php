@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Katalam\OnOfficeAdapter\Facades\AddressRepository;
 use Katalam\OnOfficeAdapter\Facades\EstateRepository;
 use Katalam\OnOfficeAdapter\Facades\Testing\EstateRepositoryFake;

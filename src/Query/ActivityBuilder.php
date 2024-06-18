@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Katalam\OnOfficeAdapter\Query;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;

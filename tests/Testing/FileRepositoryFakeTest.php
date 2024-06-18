@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Katalam\OnOfficeAdapter\Facades\FileRepository;
 use Katalam\OnOfficeAdapter\Facades\Testing\FileRepositoryFake;
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\FileUploadFactory;

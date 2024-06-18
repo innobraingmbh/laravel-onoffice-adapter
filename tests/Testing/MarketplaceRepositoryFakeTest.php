@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Katalam\OnOfficeAdapter\Facades\MarketplaceRepository;
 use Katalam\OnOfficeAdapter\Facades\Testing\MarketplaceRepositoryFake;
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\MarketPlaceUnlockProviderFactory;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Katalam\OnOfficeAdapter\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;

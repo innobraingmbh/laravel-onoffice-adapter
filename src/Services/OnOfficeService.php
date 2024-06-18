@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Katalam\OnOfficeAdapter\Services;
 
 use Illuminate\Http\Client\Response;
@@ -113,7 +115,7 @@ class OnOfficeService
             ]);
 
         if ($this->responseIsFailed($response)) {
-            throw new OnOfficeException($response->json('status.message'));
+            throw new OnOfficeException($response->json('status.message', ''));
         }
 
         return $response;

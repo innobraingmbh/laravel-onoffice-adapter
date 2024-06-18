@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
 
 class Factory extends BaseFactory

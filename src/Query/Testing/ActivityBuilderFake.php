@@ -1,9 +1,8 @@
 <?php
 
-namespace Katalam\OnOfficeAdapter\Query\Testing;
+declare(strict_types=1);
 
-use Exception;
-use Throwable;
+namespace Katalam\OnOfficeAdapter\Query\Testing;
 
 class ActivityBuilderFake extends BaseFake
 {

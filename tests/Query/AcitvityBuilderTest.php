@@ -1,12 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Facades\ActivityRepository;
-use Katalam\OnOfficeAdapter\Facades\AddressRepository;
-use Katalam\OnOfficeAdapter\Query\AddressBuilder;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 use Katalam\OnOfficeAdapter\Tests\Stubs\ReadActivityResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadAddressResponse;
 
 it('works', function () {
     Http::preventStrayRequests();
