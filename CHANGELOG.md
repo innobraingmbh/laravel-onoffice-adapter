@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.7.5
+- Added the activity log repository
+
 ## v0.7.4
 - Added imprint to the settings repository
 
