@@ -139,6 +139,10 @@ class ActivityBuilder extends Builder
      */
     public function create(array $data): bool
     {
+        $data = array_replace($data, [
+            $this->estateOrAddress => $this->recordIds,
+        ]);
+
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Create,
             OnOfficeResourceType::Activity,
@@ -158,6 +162,20 @@ class ActivityBuilder extends Builder
     public function address(): static
     {
         $this->estateOrAddress = 'addressid';
+
+        return $this;
+    }
+
+    public function recordIdsAsEstate(): static
+    {
+        $this->estate();
+
+        return $this;
+    }
+
+    public function recordIdsAsAddress(): static
+    {
+        $this->address();
 
         return $this;
     }
