@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Facades\AddressRepository;
 use Katalam\OnOfficeAdapter\Query\AddressBuilder;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Katalam\OnOfficeAdapter\Tests\Stubs\CreateAddressResponse;
 use Katalam\OnOfficeAdapter\Tests\Stubs\ReadAddressResponse;
 
 it('works', function () {
@@ -79,5 +80,24 @@ describe('customParameters', function () {
         $builder->addCountryIsoCodeType('ISO-3166-2');
 
         expect($builder->customParameters['countryIsoCodeType'])->toBe('ISO-3166-2');
+    });
+});
+
+describe('create', function () {
+    it('works', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::sequence([
+                // Each response will have 600 estates to simulate pagination
+                CreateAddressResponse::make(addressId: 1),
+            ]),
+        ]);
+
+        $address = AddressRepository::query()
+            ->create([]);
+
+        expect($address)
+            ->toBeArray()
+            ->and(data_get($address, 'id'))->toBe(1);
     });
 });

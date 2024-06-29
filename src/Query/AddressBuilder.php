@@ -189,4 +189,18 @@ class AddressBuilder extends Builder
 
         return $this;
     }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function create(array $data): array
+    {
+        $response = $this->onOfficeService->requestApi(
+            OnOfficeAction::Create,
+            OnOfficeResourceType::Address,
+            parameters: $data,
+        );
+
+        return $response->json('response.results.0.data.records.0');
+    }
 }

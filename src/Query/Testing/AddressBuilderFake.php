@@ -27,4 +27,12 @@ class AddressBuilderFake extends BaseFake
     {
         return $this;
     }
+
+    /**
+     * @throws Throwable
+     */
+    public function create(array $data): array
+    {
+        return $this->get()->first();
+    }
 }

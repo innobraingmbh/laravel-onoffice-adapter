@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.7.6
+- Added address creation to the address repository
+
 ## v0.7.5
 - Added the activity log repository
 
