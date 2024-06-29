@@ -12,8 +12,7 @@ class EstateRepository
 {
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
-    ) {
-    }
+    ) {}
 
     /**
      * Returns a new estate builder instance.

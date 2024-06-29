@@ -4,6 +4,4 @@ declare(strict_types=1);
 
 namespace Katalam\OnOfficeAdapter\Query\Testing;
 
-class UserBuilderFake extends BaseFake
-{
-}
+class UserBuilderFake extends BaseFake {}

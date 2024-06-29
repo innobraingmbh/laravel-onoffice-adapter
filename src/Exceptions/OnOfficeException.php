@@ -6,6 +6,4 @@ namespace Katalam\OnOfficeAdapter\Exceptions;
 
 use Exception;
 
-class OnOfficeException extends Exception
-{
-}
+class OnOfficeException extends Exception {}

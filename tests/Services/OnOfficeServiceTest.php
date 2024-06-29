@@ -132,8 +132,7 @@ describe('requestAllChunked', function () {
                 OnOfficeAction::Get,
                 OnOfficeResourceType::Estate,
             );
-        }, function () {
-        });
+        }, function () {});
     })->with([300, 301, 400, 401, 500, 501]);
 
     it('will call the callback', function () {

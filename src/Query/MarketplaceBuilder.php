@@ -14,8 +14,7 @@ class MarketplaceBuilder extends Builder
 {
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws OnOfficeException

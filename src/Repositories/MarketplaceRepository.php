@@ -11,8 +11,7 @@ class MarketplaceRepository
 {
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
-    ) {
-    }
+    ) {}
 
     /**
      * Returns a new marketplace builder instance.

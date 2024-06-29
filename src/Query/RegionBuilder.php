@@ -22,8 +22,7 @@ class RegionBuilder extends Builder
 
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
-    ) {
-    }
+    ) {}
 
     public function get(): Collection
     {

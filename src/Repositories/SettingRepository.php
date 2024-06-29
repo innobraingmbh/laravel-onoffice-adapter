@@ -13,8 +13,7 @@ class SettingRepository
 {
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
-    ) {
-    }
+    ) {}
 
     /**
      * Returns a new user builder instance.

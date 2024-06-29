@@ -11,8 +11,7 @@ class RelationRepository
 {
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
-    ) {
-    }
+    ) {}
 
     /**
      * Returns a new relation builder instance.

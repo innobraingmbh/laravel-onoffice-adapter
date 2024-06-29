@@ -14,8 +14,7 @@ class BaseFake extends Builder
 {
     public function __construct(
         public Collection $fakeResponses
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Throwable

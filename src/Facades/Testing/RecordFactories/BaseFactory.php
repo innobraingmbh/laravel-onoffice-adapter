@@ -15,9 +15,7 @@ abstract class BaseFactory
     /**
      * Final to solve Unsafe usage of new static()
      */
-    final public function __construct()
-    {
-    }
+    final public function __construct() {}
 
     public function id(int $id): static
     {

@@ -11,8 +11,7 @@ class FileRepository
 {
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
-    ) {
-    }
+    ) {}
 
     /**
      * Returns a new upload builder instance.

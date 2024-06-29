@@ -22,9 +22,7 @@ class Builder extends AbstractBuilder
         return [];
     }
 
-    public function each(callable $callback): void
-    {
-    }
+    public function each(callable $callback): void {}
 
     public function modify(int $id): bool
     {

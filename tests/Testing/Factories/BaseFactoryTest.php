@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
 
-class Factory extends BaseFactory
-{
-}
+class Factory extends BaseFactory {}
 
 describe('construct', function () {
     it('builds', function () {
