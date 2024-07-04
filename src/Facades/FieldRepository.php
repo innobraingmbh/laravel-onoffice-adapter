@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Katalam\OnOfficeAdapter\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Katalam\OnOfficeAdapter\Facades\Testing\AddressRepositoryFake;
 use Katalam\OnOfficeAdapter\Facades\Testing\FieldRepositoryFake;
 use Katalam\OnOfficeAdapter\Query\FieldBuilder;
 

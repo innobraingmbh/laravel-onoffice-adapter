@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Katalam\OnOfficeAdapter\Query\Testing;
 
-use Exception;
-use Illuminate\Support\Arr;
 use Katalam\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Throwable;
 
