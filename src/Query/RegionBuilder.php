@@ -35,6 +35,7 @@ class RegionBuilder extends Builder
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Get,
                 OnOfficeResourceType::Regions,
+                ...$this->customParameters,
             );
         }, pageSize: $listLimit, offset: $listOffset);
     }
@@ -47,6 +48,7 @@ class RegionBuilder extends Builder
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Get,
             OnOfficeResourceType::Regions,
+            ...$this->customParameters,
         );
 
         return $response->json('response.results.0.data.records.0');
@@ -71,6 +73,7 @@ class RegionBuilder extends Builder
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Get,
                 OnOfficeResourceType::Regions,
+                ...$this->customParameters,
             );
         }, $callback, pageSize: $listLimit, offset: $listOffset);
     }

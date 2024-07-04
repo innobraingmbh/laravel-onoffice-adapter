@@ -29,6 +29,7 @@ class FieldBuilder extends Builder
                 OnOfficeResourceType::Fields,
                 parameters: [
                     'modules' => $this->modules,
+                    ...$this->customParameters,
                 ],
             );
         });
@@ -44,6 +45,7 @@ class FieldBuilder extends Builder
             OnOfficeResourceType::Fields,
             parameters: [
                 'modules' => $this->modules,
+                ...$this->customParameters,
             ],
         );
 
@@ -68,6 +70,7 @@ class FieldBuilder extends Builder
                 OnOfficeResourceType::Fields,
                 parameters: [
                     'modules' => $this->modules,
+                    ...$this->customParameters,
                 ],
             );
         }, $callback);

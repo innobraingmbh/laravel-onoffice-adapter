@@ -15,8 +15,6 @@ class AddressBuilder extends Builder
 {
     use RecordIds;
 
-    public array $customParameters = [];
-
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
     ) {}
@@ -99,6 +97,7 @@ class AddressBuilder extends Builder
             $id,
             parameters: [
                 OnOfficeService::DATA => $columns,
+                ...$this->customParameters,
             ]
         );
 

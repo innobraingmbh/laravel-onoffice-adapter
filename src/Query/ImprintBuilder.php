@@ -36,6 +36,7 @@ class ImprintBuilder extends Builder
                 OnOfficeResourceType::Impressum,
                 parameters: [
                     OnOfficeService::DATA => $columns,
+                    ...$this->customParameters,
                 ]
             );
         }, pageSize: $listLimit, offset: $listOffset);
@@ -53,6 +54,7 @@ class ImprintBuilder extends Builder
             OnOfficeResourceType::Impressum,
             parameters: [
                 OnOfficeService::DATA => $columns,
+                ...$this->customParameters,
             ]
         );
 
@@ -72,6 +74,7 @@ class ImprintBuilder extends Builder
             resourceId: $id,
             parameters: [
                 OnOfficeService::DATA => $columns,
+                ...$this->customParameters,
             ]
         );
 

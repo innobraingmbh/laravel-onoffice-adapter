@@ -77,6 +77,7 @@ class UploadBuilder extends Builder
             OnOfficeResourceType::UploadFile,
             parameters: [
                 OnOfficeService::DATA => $fileContent,
+                ...$this->customParameters,
             ]
         );
 

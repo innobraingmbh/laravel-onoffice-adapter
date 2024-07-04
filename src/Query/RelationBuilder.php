@@ -44,6 +44,7 @@ class RelationBuilder extends Builder
                     OnOfficeService::RELATIONTYPE => $this->relationType,
                     OnOfficeService::PARENTIDS => $this->parentIds,
                     OnOfficeService::CHILDIDS => $this->childIds,
+                    ...$this->customParameters,
                 ],
             );
         }, pageSize: $this->limit, offset: $this->offset);

@@ -35,6 +35,7 @@ class EstateFileBuilder extends Builder
                     'estateid' => $this->estateId,
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
+                    ...$this->customParameters,
                 ],
             );
         }, pageSize: $this->limit, offset: $this->offset);
@@ -51,6 +52,7 @@ class EstateFileBuilder extends Builder
             OnOfficeResourceId::Estate,
             parameters: [
                 'estateid' => $this->estateId,
+                ...$this->customParameters,
             ],
         );
 
@@ -69,6 +71,7 @@ class EstateFileBuilder extends Builder
             parameters: [
                 'estateid' => $this->estateId,
                 'fileid' => $id,
+                ...$this->customParameters,
             ],
         );
 
@@ -94,6 +97,7 @@ class EstateFileBuilder extends Builder
                     'estateid' => $this->estateId,
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
+                    ...$this->customParameters,
                 ],
             );
         }, $callback, pageSize: $this->limit, offset: $this->offset);
@@ -131,6 +135,7 @@ class EstateFileBuilder extends Builder
                 'fileId' => $id,
                 'parentid' => $this->estateId,
                 'relationtype' => 'estate',
+                ...$this->customParameters,
             ],
         );
 

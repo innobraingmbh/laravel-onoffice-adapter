@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v.0.8.0
+- Added the parameter helper to all repositories
+
 ## v0.7.7
 - Fixed typo of addressids
 

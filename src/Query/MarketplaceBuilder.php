@@ -34,6 +34,7 @@ class MarketplaceBuilder extends Builder
             parameters: [
                 OnOfficeService::PARAMETERCACHEID => $parameterCacheId,
                 OnOfficeService::EXTENDEDCLAIM => $extendedClaim,
+                ...$this->customParameters,
             ]
         );
 

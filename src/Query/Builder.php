@@ -44,6 +44,11 @@ abstract class Builder
      */
     public int $offset = 0;
 
+    /*
+     * An array of custom parameters.
+     */
+    public array $customParameters = [];
+
     public function select(array|string $columns = ['ID']): static
     {
         $this->columns = Arr::wrap($columns);
@@ -138,6 +143,20 @@ abstract class Builder
                 $column => $direction,
             ];
         })->toArray();
+    }
+
+    public function parameter(string $key, mixed $value): static
+    {
+        $this->customParameters[$key] = $value;
+
+        return $this;
+    }
+
+    public function parameters(array $parameters): static
+    {
+        $this->customParameters = array_replace_recursive($this->customParameters, $parameters);
+
+        return $this;
     }
 
     abstract public function get(): Collection;

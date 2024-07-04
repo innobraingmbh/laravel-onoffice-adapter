@@ -36,6 +36,7 @@ class UserBuilder extends Builder
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
                     OnOfficeService::SORTBY => $orderBy,
+                    ...$this->customParameters,
                 ],
             );
         }, pageSize: $listLimit, offset: $listOffset);
@@ -61,6 +62,7 @@ class UserBuilder extends Builder
                 OnOfficeService::LISTLIMIT => $listLimit,
                 OnOfficeService::LISTOFFSET => $listOffset,
                 OnOfficeService::SORTBY => $orderBy,
+                ...$this->customParameters,
             ]
         );
 
@@ -80,6 +82,7 @@ class UserBuilder extends Builder
             $id,
             parameters: [
                 OnOfficeService::DATA => $columns,
+                ...$this->customParameters,
             ]
         );
 
@@ -106,6 +109,7 @@ class UserBuilder extends Builder
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
                     OnOfficeService::SORTBY => $orderBy,
+                    ...$this->customParameters,
                 ]
             );
         }, $callback, pageSize: $listLimit, offset: $listOffset);

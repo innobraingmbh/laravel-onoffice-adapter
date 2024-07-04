@@ -17,8 +17,6 @@ class ActivityBuilder extends Builder
 
     public string $estateOrAddress = 'estate';
 
-    public array $customParameters = [];
-
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
     ) {}
@@ -91,6 +89,7 @@ class ActivityBuilder extends Builder
             $id,
             parameters: [
                 OnOfficeService::DATA => $this->columns,
+                ...$this->customParameters,
             ]
         );
 
