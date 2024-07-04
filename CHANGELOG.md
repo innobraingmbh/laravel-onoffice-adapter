@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.8.1
+- Added a field repository fake
+
 ## v.0.8.0
 - Added the parameter helper to all repositories
 

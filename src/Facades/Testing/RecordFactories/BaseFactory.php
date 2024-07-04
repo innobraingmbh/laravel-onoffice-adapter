@@ -6,7 +6,7 @@ namespace Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories;
 
 abstract class BaseFactory
 {
-    public int $id = 0;
+    public int|string $id = 0;
 
     public string $type = '';
 
