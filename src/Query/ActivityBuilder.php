@@ -160,7 +160,7 @@ class ActivityBuilder extends Builder
 
     public function address(): static
     {
-        $this->estateOrAddress = 'addressid';
+        $this->estateOrAddress = 'addressids';
 
         return $this;
     }

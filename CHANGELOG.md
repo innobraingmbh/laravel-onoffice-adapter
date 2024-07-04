@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.7.7
+- Fixed typo of addressids
+
 ## v0.7.6
 - Added address creation to the address repository
 
