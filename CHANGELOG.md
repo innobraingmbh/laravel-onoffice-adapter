@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.8.3
+- Added search criteria factory
+
 ## v0.8.2
 - Added search criteria repository
 
