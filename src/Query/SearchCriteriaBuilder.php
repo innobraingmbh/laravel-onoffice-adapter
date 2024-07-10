@@ -50,7 +50,7 @@ class SearchCriteriaBuilder extends Builder
             ],
         );
 
-        return $response->json('response.results.0.data.records');
+        return $response->json('response.results.0.data.records.0', []);
     }
 
     /**
