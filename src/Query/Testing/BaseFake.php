@@ -34,7 +34,7 @@ class BaseFake extends Builder
      */
     public function first(): array
     {
-        return $this->get()->first();
+        return $this->get()->first() ?? [];
     }
 
     /**
@@ -43,7 +43,7 @@ class BaseFake extends Builder
     public function find(int $id): array
     {
         return $this->get()
-            ->first(fn (array $record) => $record['id'] === $id);
+            ->first(fn (array $record) => $record['id'] === $id) ?? [];
     }
 
     /**

@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.8.4
+- Added a fallback to empty responses on first and find in fake context
+
 ## v0.8.3
 - Added search criteria factory
 
