@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.8.2
+- Added search criteria repository
+
 ## v0.8.1
 - Added a field repository fake
 

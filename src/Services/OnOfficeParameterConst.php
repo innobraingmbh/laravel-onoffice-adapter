@@ -32,4 +32,8 @@ trait OnOfficeParameterConst
     public const PARAMETERCACHEID = 'parameterCacheId';
 
     public const EXTENDEDCLAIM = 'extendedclaim';
+
+    public const MODE = 'mode';
+
+    public const IDS = 'ids';
 }

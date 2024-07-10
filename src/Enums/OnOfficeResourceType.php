@@ -19,4 +19,5 @@ enum OnOfficeResourceType: string
     case FileRelation = 'fileRelation';
     case Impressum = 'impressum';
     case Activity = 'agentslog';
+    case SearchCriteria = 'searchcriterias';
 }
