@@ -6,6 +6,7 @@ namespace Katalam\OnOfficeAdapter\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use Katalam\OnOfficeAdapter\Facades\Testing\SettingRepositoryFake;
+use Katalam\OnOfficeAdapter\Query\ActionBuilder;
 use Katalam\OnOfficeAdapter\Query\ImprintBuilder;
 use Katalam\OnOfficeAdapter\Query\RegionBuilder;
 use Katalam\OnOfficeAdapter\Query\UserBuilder;
@@ -16,6 +17,7 @@ use Katalam\OnOfficeAdapter\Query\UserBuilder;
  * @method static UserBuilder users()
  * @method static RegionBuilder regions()
  * @method static ImprintBuilder imprint()
+ * @method static ActionBuilder actions()
  */
 class SettingRepository extends Facade
 {
