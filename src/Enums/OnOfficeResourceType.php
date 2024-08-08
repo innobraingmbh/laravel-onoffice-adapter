@@ -20,4 +20,5 @@ enum OnOfficeResourceType: string
     case Impressum = 'impressum';
     case Activity = 'agentslog';
     case SearchCriteria = 'searchcriterias';
+    case ActionTypes = 'actionkindtypes';
 }

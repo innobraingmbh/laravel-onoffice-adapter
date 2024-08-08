@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Katalam\OnOfficeAdapter\Repositories;
 
+use Katalam\OnOfficeAdapter\Query\ActionBuilder;
 use Katalam\OnOfficeAdapter\Query\ImprintBuilder;
 use Katalam\OnOfficeAdapter\Query\RegionBuilder;
 use Katalam\OnOfficeAdapter\Query\UserBuilder;
@@ -37,5 +38,13 @@ class SettingRepository
     public function imprint(): ImprintBuilder
     {
         return new ImprintBuilder($this->onOfficeService);
+    }
+
+    /*
+     * Returns a new actions builder instance.
+     */
+    public function actions(): ActionBuilder
+    {
+        return new ActionBuilder($this->onOfficeService);
     }
 }

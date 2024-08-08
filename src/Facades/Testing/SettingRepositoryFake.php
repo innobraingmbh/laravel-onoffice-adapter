@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Katalam\OnOfficeAdapter\Facades\Testing;
 
+use Katalam\OnOfficeAdapter\Query\Testing\ActionBuilderFake;
 use Katalam\OnOfficeAdapter\Query\Testing\ImprintBuilderFake;
 use Katalam\OnOfficeAdapter\Query\Testing\RegionBuilderFake;
 use Katalam\OnOfficeAdapter\Query\Testing\UserBuilderFake;
@@ -34,5 +35,13 @@ class SettingRepositoryFake
     public function imprint(): ImprintBuilderFake
     {
         return new ImprintBuilderFake($this->fakeResponses);
+    }
+
+    /**
+     * Returns a new fake actions builder instance.
+     */
+    public function actions(): ActionBuilderFake
+    {
+        return new ActionBuilderFake($this->fakeResponses);
     }
 }
