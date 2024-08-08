@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.8.5
+- Added action query to settings repository
+
 ## v0.8.4
 - Added a fallback to empty responses on first and find in fake context
 
