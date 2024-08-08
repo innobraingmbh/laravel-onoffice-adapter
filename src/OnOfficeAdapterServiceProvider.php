@@ -31,7 +31,7 @@ class OnOfficeAdapterServiceProvider extends PackageServiceProvider
         });
 
         $this->app->scoped(OnOfficeService::class, function () {
-            return new OnOfficeService();
+            return new OnOfficeService;
         });
     }
 }

@@ -9,7 +9,7 @@ class Builder extends AbstractBuilder
 {
     public function get(): Collection
     {
-        return new Collection();
+        return new Collection;
     }
 
     public function first(): array
@@ -32,7 +32,7 @@ class Builder extends AbstractBuilder
 
 describe('select', function () {
     it('should set the columns property to the given columns', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->select(['ID', 'Name']);
 
@@ -40,7 +40,7 @@ describe('select', function () {
     });
 
     it('should wrap the given columns in an array if it is a string', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->select('ID');
 
@@ -48,7 +48,7 @@ describe('select', function () {
     });
 
     it('should return the builder instance', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $result = $builder->select('ID');
 
@@ -56,7 +56,7 @@ describe('select', function () {
     });
 
     it('should add the given column to the columns property', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->select('ID');
         $builder->addSelect('Name');
@@ -65,7 +65,7 @@ describe('select', function () {
     });
 
     it('should wrap the given column in an array if it is a string', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->select('ID');
         $builder->addSelect('Name');
@@ -76,7 +76,7 @@ describe('select', function () {
 
 describe('modifies', function () {
     it('should return the builder instance', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $result = $builder->addModify('Name', 'Foo');
 
@@ -84,7 +84,7 @@ describe('modifies', function () {
     });
 
     it('should add modifies parameters', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->addModify('Name', 'Foo');
 
@@ -92,7 +92,7 @@ describe('modifies', function () {
     });
 
     it('should add multiple modifies parameters', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->addModify('Name', 'Foo');
         $builder->addModify('ID', 1);
@@ -101,7 +101,7 @@ describe('modifies', function () {
     });
 
     it('should add multiple modifies parameters with the same key', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->addModify('Name', 'Foo');
         $builder->addModify('Name', 'Bar');
@@ -110,7 +110,7 @@ describe('modifies', function () {
     });
 
     it('should add multiple modifies parameters as array', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->addModify([
             'Name' => 'Foo',
@@ -123,7 +123,7 @@ describe('modifies', function () {
 
 describe('orderBy', function () {
     it('should add the given column and direction to the orderBy property', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->orderBy('ID');
 
@@ -131,7 +131,7 @@ describe('orderBy', function () {
     });
 
     it('should return the builder instance', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $result = $builder->orderBy('ID');
 
@@ -139,7 +139,7 @@ describe('orderBy', function () {
     });
 
     it('should convert the direction to uppercase', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->orderBy('ID', 'desc');
 
@@ -147,7 +147,7 @@ describe('orderBy', function () {
     });
 
     it('should add multiple order by columns', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->orderBy('ID', 'desc');
         $builder->orderBy('Name');
@@ -156,7 +156,7 @@ describe('orderBy', function () {
     });
 
     it('should order desc', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->orderByDesc('ID');
 
@@ -166,7 +166,7 @@ describe('orderBy', function () {
 
 describe('offset', function () {
     it('should set the offset property to the given value', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->offset(10);
 
@@ -174,7 +174,7 @@ describe('offset', function () {
     });
 
     it('should return the builder instance', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $result = $builder->offset(10);
 
@@ -182,7 +182,7 @@ describe('offset', function () {
     });
 
     it('should not allow negative values', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->offset(-10);
 
@@ -192,7 +192,7 @@ describe('offset', function () {
 
 describe('limit', function () {
     it('should set the limit property to the given value', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->limit(10);
 
@@ -200,7 +200,7 @@ describe('limit', function () {
     });
 
     it('should return the builder instance', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $result = $builder->limit(10);
 
@@ -208,7 +208,7 @@ describe('limit', function () {
     });
 
     it('should not allow negative values', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->limit(-10);
 
@@ -218,7 +218,7 @@ describe('limit', function () {
 
 describe('where', function () {
     it('should add the given filter to the filters property', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->where('ID', '=', 1);
 
@@ -230,7 +230,7 @@ describe('where', function () {
     });
 
     it('should return the builder instance', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $result = $builder->where('ID', '=', 1);
 
@@ -238,7 +238,7 @@ describe('where', function () {
     });
 
     it('should add multiple filters', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->where('ID', '=', 1);
         $builder->where('Name', '=', 'John');
@@ -254,7 +254,7 @@ describe('where', function () {
     });
 
     it('should add multiple filters with different operators', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->where('ID', '=', 1);
         $builder->where('Name', 'LIKE', 'John');
@@ -270,7 +270,7 @@ describe('where', function () {
     });
 
     it('should default the operator to equality', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->where('ID', 1);
 
@@ -284,7 +284,7 @@ describe('where', function () {
 
 describe('getFilters', function () {
     it('should return the filters property', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->where('ID', '=', 1);
 
@@ -303,7 +303,7 @@ describe('getFilters', function () {
     });
 
     it('should return the filters property with multiple filters', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->where('ID', '=', 1);
         $builder->where('Name', 'LIKE', 'John');
@@ -331,7 +331,7 @@ describe('getFilters', function () {
 
 describe('getOrderBy', function () {
     it('should return the orderBy property', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->orderBy('ID', 'desc');
 
@@ -345,7 +345,7 @@ describe('getOrderBy', function () {
     });
 
     it('should return the orderBy property with multiple columns', function () {
-        $builder = new Builder();
+        $builder = new Builder;
 
         $builder->orderBy('ID', 'desc');
         $builder->orderBy('Name');

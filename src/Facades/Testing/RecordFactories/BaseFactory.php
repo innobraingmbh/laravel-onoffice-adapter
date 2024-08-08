@@ -47,7 +47,7 @@ abstract class BaseFactory
 
     public static function make(): static
     {
-        return new static();
+        return new static;
     }
 
     public static function times(int $times = 1): array
