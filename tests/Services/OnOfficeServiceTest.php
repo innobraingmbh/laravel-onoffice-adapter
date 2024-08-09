@@ -10,6 +10,7 @@ use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Katalam\OnOfficeAdapter\Tests\Stubs\InvalidHmacResponse;
 
 it('can use the config token and secret', function () {
     $token = Str::random();
@@ -46,6 +47,22 @@ describe('requestApi', function () {
     })
         ->throws(OnOfficeException::class)
         ->with([300, 301, 400, 401, 500, 501]);
+
+    it('throws an exception on failed request inside response', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => InvalidHmacResponse::make(),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $onOfficeService->requestApi(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+    })
+        ->throws(OnOfficeException::class);
+
 });
 
 describe('requestAll', function () {

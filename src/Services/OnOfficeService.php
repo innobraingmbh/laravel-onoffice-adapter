@@ -114,8 +114,8 @@ class OnOfficeService
                 ],
             ]);
 
-        if ($this->responseIsFailed($response)) {
-            throw new OnOfficeException($response->json('status.message', ''));
+        if (($message = $this->responseIsFailed($response)) !== '') {
+            throw new OnOfficeException($message);
         }
 
         return $response;
@@ -213,10 +213,20 @@ class OnOfficeService
      * Returns true if the response has a status code greater than 300
      * inside the status dot code key in the response.
      */
-    private function responseIsFailed(Response $response): bool
+    private function responseIsFailed(Response $response): string
     {
         $statusCode = $response->json('status.code', 500);
+        $responseStatusCode = $response->json('response.results.0.status.errorcode', 0);
 
-        return $statusCode >= 300;
+        $errorMessage = $response->json('status.message', '');
+        if ($errorMessage === '') {
+            $errorMessage = "Status code: $statusCode";
+        }
+
+        return match (true) {
+            $statusCode >= 300 => $errorMessage,
+            $responseStatusCode > 0 => $response->json('response.results.0.status.message', ''),
+            default => '',
+        };
     }
 }
