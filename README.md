@@ -81,6 +81,25 @@ $success = FileRepository::upload()->link($tmpUploadId, [
     'relatedRecordId' => '12345',
 ]);
 ```
+
+```php
+ActivityRepository::query()
+    ->recordIds($recordIds)
+    ->recordIdsAsAddress()
+    ->create([
+        'datetime' => $event->getDateFormatted(),
+        'actionkind' => 'Newsletter',
+        'actiontype' => 'Hard Bounce',
+        'note' => $message,
+    ]);
+```
+
+```php
+Config::set('onoffice.token', 'token');
+Config::set('onoffice.secret', 'secret');
+Config::set('onoffice.api_claim', 'api_claim');
+```
+
 ### Usage in tests
 ```php
 EstateRepository::fake([ // First request
