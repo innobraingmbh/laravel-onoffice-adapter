@@ -81,8 +81,8 @@ class OnOfficeService
         string|int $identifier = '',
         array $parameters = [],
     ): Response {
-        if (! empty($this->apiClaim)) {
-            $parameters = array_replace([self::EXTENDEDCLAIM => $this->apiClaim], $parameters);
+        if (! empty($this->getApiClaim())) {
+            $parameters = array_replace([self::EXTENDEDCLAIM => $this->getApiClaim()], $parameters);
         }
 
         $response = Http::onOffice()
