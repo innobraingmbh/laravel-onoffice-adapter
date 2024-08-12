@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.9.0
+- Added a direct config access for onOffice credentials
+
 ## v0.8.5
 - Added action query to settings repository
 
