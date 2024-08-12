@@ -12,19 +12,48 @@ use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 use Katalam\OnOfficeAdapter\Tests\Stubs\InvalidHmacResponse;
 
-it('can use the config token and secret', function () {
-    $token = Str::random();
-    $secret = Str::random();
+describe('credentials', function () {
+    it('can use the config once', function () {
+        $token = Str::random();
+        $secret = Str::random();
+        $apiClaim = Str::random();
 
-    config([
-        'onoffice.token' => $token,
-        'onoffice.secret' => $secret,
-    ]);
+        config([
+            'onoffice.token' => $token,
+            'onoffice.secret' => $secret,
+            'onoffice.api_claim' => $apiClaim,
+        ]);
 
-    $onOfficeService = app(OnOfficeService::class);
+        $onOfficeService = app(OnOfficeService::class);
 
-    expect($onOfficeService->getToken())->toBe($token)
-        ->and($onOfficeService->getSecret())->toBe($secret);
+        expect($onOfficeService->getToken())->toBe($token)
+            ->and($onOfficeService->getSecret())->toBe($secret)
+            ->and($onOfficeService->getApiClaim())->toBe($apiClaim);
+    });
+
+    it('can use the config twice', function () {
+        $token = Str::random();
+        $secret = Str::random();
+        $apiClaim = Str::random();
+
+        config([
+            'onoffice.token' => 'old-token',
+            'onoffice.secret' => 'old-secret',
+            'onoffice.api_claim' => 'old-claim',
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        config([
+            'onoffice.token' => $token,
+            'onoffice.secret' => $secret,
+            'onoffice.api_claim' => $apiClaim,
+        ]);
+
+        expect($onOfficeService->getToken())->toBe($token)
+            ->and($onOfficeService->getSecret())->toBe($secret)
+            ->and($onOfficeService->getApiClaim())->toBe($apiClaim);
+    });
 });
 
 describe('requestApi', function () {

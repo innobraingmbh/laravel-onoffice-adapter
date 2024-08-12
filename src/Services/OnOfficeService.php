@@ -7,6 +7,7 @@ namespace Katalam\OnOfficeAdapter\Services;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
@@ -18,32 +19,21 @@ class OnOfficeService
 {
     use OnOfficeParameterConst;
 
-    private string $token;
-
-    private string $secret;
-
-    private string $apiClaim;
-
-    public function __construct()
-    {
-        $this->token = config('onoffice.token', '') ?? '';
-        $this->secret = config('onoffice.secret', '') ?? '';
-        $this->apiClaim = config('onoffice.api_claim', '') ?? '';
-    }
+    public function __construct() {}
 
     public function getToken(): string
     {
-        return $this->token;
+        return Config::get('onoffice.token', '') ?? '';
     }
 
     public function getSecret(): string
     {
-        return $this->secret;
+        return Config::get('onoffice.secret', '') ?? '';
     }
 
     public function getApiClaim(): string
     {
-        return $this->apiClaim;
+        return Config::get('onoffice.api_claim', '') ?? '';
     }
 
     /*
@@ -64,12 +54,12 @@ class OnOfficeService
                     '',
                     [
                         'timestamp' => Carbon::now()->timestamp,
-                        'token' => $this->token,
+                        'token' => $this->getToken(),
                         'resourcetype' => $resourceType->value,
                         'actionid' => $actionId->value,
                     ]
                 ),
-                $this->secret,
+                $this->getSecret(),
                 true
             )
         );
@@ -97,7 +87,7 @@ class OnOfficeService
 
         $response = Http::onOffice()
             ->post('/', [
-                'token' => $this->token,
+                'token' => $this->getToken(),
                 'request' => [
                     'actions' => [
                         [
