@@ -206,6 +206,7 @@ class OnOfficeService
     private function throwIfResponseIsFailed(Response $response): void
     {
         $statusCode = $response->json('status.code', 500);
+        $statusErrorCode = $response->json('status.errorcode', 0);
         $responseStatusCode = $response->json('response.results.0.status.errorcode', 0);
 
         $errorMessage = $response->json('status.message', '');
@@ -218,7 +219,8 @@ class OnOfficeService
         }
 
         match (true) {
-            $statusCode >= 300 => throw new OnOfficeException($errorMessage, $statusCode),
+            $statusCode >= 300 && $statusErrorCode > 0 => throw new OnOfficeException($errorMessage, $statusErrorCode, isResponseError: true),
+            $statusCode >= 300 && $statusErrorCode <= 0 => throw new OnOfficeException($errorMessage, $statusCode),
             $responseStatusCode > 0 => throw new OnOfficeException($responseErrorMessage, $responseStatusCode, isResponseError: true),
             default => null,
         };

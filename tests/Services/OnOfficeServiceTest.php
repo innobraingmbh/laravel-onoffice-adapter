@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
+use Katalam\OnOfficeAdapter\Enums\OnOfficeError;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
@@ -56,8 +57,8 @@ describe('credentials', function () {
     });
 });
 
-describe('requestApi', function () {
-    it('throws an exception on failed request', function (int $statusCode) {
+describe('exceptions', function () {
+    it('throws an exception on status code', function (int $statusCode) {
         Http::preventStrayRequests();
         Http::fake([
             '*' => Http::response([
@@ -77,6 +78,28 @@ describe('requestApi', function () {
         ->throws(OnOfficeException::class)
         ->with([300, 301, 400, 401, 500, 501]);
 
+    it('throws an exception on status error code', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => 500,
+                    'errorcode' => 41,
+                    'message' => 'Customer unknown!',
+                ],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        expect(
+            fn () => $onOfficeService->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Estate,
+            )
+        )->toThrow(OnOfficeException::class, 'Customer unknown!');
+    });
+
     it('throws an exception on failed request inside response', function () {
         Http::preventStrayRequests();
         Http::fake([
@@ -85,13 +108,31 @@ describe('requestApi', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        $onOfficeService->requestApi(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Estate,
-        );
-    })
-        ->throws(OnOfficeException::class);
+        expect(
+            fn () => $onOfficeService->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Estate,
+            )
+        )->toThrow(OnOfficeException::class, 'The HMAC is invalid');
+    });
 
+    it('can return an error', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => InvalidHmacResponse::make(),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        try {
+            $onOfficeService->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Estate,
+            );
+        } catch (OnOfficeException $exception) {
+            expect($exception->getError())->toBe(OnOfficeError::HMAC_INVALID);
+        }
+    });
 });
 
 describe('requestAll', function () {

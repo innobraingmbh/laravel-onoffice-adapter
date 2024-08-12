@@ -6,7 +6,12 @@ namespace Katalam\OnOfficeAdapter\Enums;
 
 enum OnOfficeError: int
 {
+    // error codes
+    case CUSTOMER_UNKNOWN = 41;
+
+    // result error codes
     case NOT_AUTHENTICATED = 22;
+    case HMAC_INVALID = 137;
     case EXTENDED_CLAIM_MISSING_EMPTY_OR_INVALID = 193;
     case UNKNOWN = 999;
 
@@ -19,6 +24,8 @@ enum OnOfficeError: int
     {
         return [
             self::NOT_AUTHENTICATED->value => 'not authenticated',
+            self::CUSTOMER_UNKNOWN->value => 'Customer unknown!',
+            self::HMAC_INVALID->value => 'The HMAC is invalid',
             self::EXTENDED_CLAIM_MISSING_EMPTY_OR_INVALID->value => 'parameter extendedclaim is required, but missing, empty or invalid',
             self::UNKNOWN->value => 'unknown error',
         ];
