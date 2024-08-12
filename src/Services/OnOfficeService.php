@@ -219,7 +219,7 @@ class OnOfficeService
 
         match (true) {
             $statusCode >= 300 => throw new OnOfficeException($errorMessage, $statusCode),
-            $responseStatusCode > 0 => throw new OnOfficeException($responseErrorMessage, $responseStatusCode),
+            $responseStatusCode > 0 => throw new OnOfficeException($responseErrorMessage, $responseStatusCode, isResponseError: true),
             default => null,
         };
     }
