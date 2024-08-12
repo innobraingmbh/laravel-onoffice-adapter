@@ -104,9 +104,7 @@ class OnOfficeService
                 ],
             ]);
 
-        if (($message = $this->responseIsFailed($response)) !== '') {
-            throw new OnOfficeException($message);
-        }
+        $this->throwIfResponseIsFailed($response);
 
         return $response;
     }
@@ -130,7 +128,7 @@ class OnOfficeService
             try {
                 $response = $request($pageSize, $offset);
             } catch (OnOfficeException $exception) {
-                Log::error($exception->getMessage());
+                Log::error("{$exception->getMessage()} - {$exception->getCode()}");
 
                 return $data;
             }
@@ -178,7 +176,7 @@ class OnOfficeService
             try {
                 $response = $request($pageSize, $offset);
             } catch (OnOfficeException $exception) {
-                Log::error($exception->getMessage());
+                Log::error("{$exception->getMessage()} - {$exception->getCode()}");
 
                 return;
             }
@@ -202,8 +200,10 @@ class OnOfficeService
     /**
      * Returns true if the response has a status code greater than 300
      * inside the status dot code key in the response.
+     *
+     * @throws OnOfficeException
      */
-    private function responseIsFailed(Response $response): string
+    private function throwIfResponseIsFailed(Response $response): void
     {
         $statusCode = $response->json('status.code', 500);
         $responseStatusCode = $response->json('response.results.0.status.errorcode', 0);
@@ -212,11 +212,15 @@ class OnOfficeService
         if ($errorMessage === '') {
             $errorMessage = "Status code: $statusCode";
         }
+        $responseErrorMessage = $response->json('response.results.0.status.message', '');
+        if ($responseErrorMessage === '') {
+            $responseErrorMessage = "Status code: $responseStatusCode";
+        }
 
-        return match (true) {
-            $statusCode >= 300 => $errorMessage,
-            $responseStatusCode > 0 => $response->json('response.results.0.status.message', ''),
-            default => '',
+        match (true) {
+            $statusCode >= 300 => throw new OnOfficeException($errorMessage, $statusCode),
+            $responseStatusCode > 0 => throw new OnOfficeException($responseErrorMessage, $responseStatusCode),
+            default => null,
         };
     }
 }

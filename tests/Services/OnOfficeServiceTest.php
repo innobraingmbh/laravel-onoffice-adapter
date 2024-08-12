@@ -98,7 +98,7 @@ describe('requestAll', function () {
     it('logs the request error', function (int $statusCode) {
         Log::shouldReceive('error')
             ->once()
-            ->with('Error message');
+            ->with("Error message - $statusCode");
 
         Http::preventStrayRequests();
         Http::fake([
@@ -159,7 +159,7 @@ describe('requestAllChunked', function () {
     it('logs the request error', function (int $statusCode) {
         Log::shouldReceive('error')
             ->once()
-            ->with('Error message');
+            ->with("Error message - $statusCode");
 
         Http::preventStrayRequests();
         Http::fake([
