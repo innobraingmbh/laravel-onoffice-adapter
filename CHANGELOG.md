@@ -1,5 +1,7 @@
 # Changelog
 ## main
+
+## v0.10.0
 - Added error code to on office exception
 - Added a method to get the error from the on office exception
 - Added a stringify method to an office error
