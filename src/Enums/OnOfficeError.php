@@ -23,4 +23,9 @@ enum OnOfficeError: int
             self::UNKNOWN->value => 'unknown error',
         ];
     }
+
+    public function toString(): string
+    {
+        return data_get(self::errorTexts(), $this->value, 'unknown error');
+    }
 }

@@ -2,6 +2,7 @@
 ## main
 - Added error code to on office exception
 - Added a method to get the error from the on office exception
+- Added a stringify method to an office error
 
 ## v0.9.1
 - Added the api claim back to the request factory
