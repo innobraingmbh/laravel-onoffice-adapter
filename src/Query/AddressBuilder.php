@@ -92,7 +92,7 @@ class AddressBuilder extends Builder
         $columns = $this->columns;
 
         $response = $this->onOfficeService->requestApi(
-            OnOfficeAction::Get,
+            OnOfficeAction::Read,
             OnOfficeResourceType::Address,
             $id,
             parameters: [

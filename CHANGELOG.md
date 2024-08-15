@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.10.1
+- Fixed the action for find address
+
 ## v0.10.0
 - Added error code to on office exception
 - Added a method to get the error from the on office exception
