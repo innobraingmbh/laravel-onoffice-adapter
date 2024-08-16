@@ -130,7 +130,7 @@ describe('exceptions', function () {
                 OnOfficeResourceType::Estate,
             );
         } catch (OnOfficeException $exception) {
-            expect($exception->getError())->toBe(OnOfficeError::HMAC_INVALID);
+            expect($exception->getError())->toBe(OnOfficeError::The_HMAC_Is_Invalid);
         }
     });
 });

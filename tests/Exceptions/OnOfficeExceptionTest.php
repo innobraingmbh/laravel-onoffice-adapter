@@ -27,10 +27,4 @@ describe('get error', function () {
 
         expect($exception->getError())->toBe(OnOfficeError::UNKNOWN);
     });
-
-    it('will return unknown if status error', function (int $errorCode) {
-        $exception = new OnOfficeException('Test message', $errorCode);
-
-        expect($exception->getError())->toBe(OnOfficeError::UNKNOWN);
-    })->with(OnOfficeError::values());
 });

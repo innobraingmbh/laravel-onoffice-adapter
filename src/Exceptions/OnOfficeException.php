@@ -26,10 +26,6 @@ class OnOfficeException extends Exception
 
     public function getError(): OnOfficeError
     {
-        if (! $this->isResponseError) {
-            return OnOfficeError::UNKNOWN;
-        }
-
         return OnOfficeError::tryFrom($this->getCode()) ?? OnOfficeError::UNKNOWN;
     }
 }
