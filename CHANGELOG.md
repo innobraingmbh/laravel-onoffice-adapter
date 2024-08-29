@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.11.0
+- Fixed the upload builder fake implementation to match the real implementation
+
 ## v0.10.3
 - Added previously added upload in chunks method to fake builder
 

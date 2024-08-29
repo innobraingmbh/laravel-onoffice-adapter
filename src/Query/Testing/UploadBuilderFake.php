@@ -35,17 +35,15 @@ class UploadBuilderFake extends BaseFake
     /**
      * @throws Throwable
      */
-    public function link(string $tmpUploadId, array $data = []): bool
+    public function link(string $tmpUploadId, array $data = []): array
     {
-        $record = $this->get()->first();
-
-        return data_get($record, 'elements.success') === 'success';
+        return $this->get()->first();
     }
 
     /**
      * @throws Throwable
      */
-    public function saveAndLink(string $fileContent, array $data = []): bool
+    public function saveAndLink(string $fileContent, array $data = []): array
     {
         $tmpUploadId = $this->save($fileContent);
 

@@ -70,9 +70,9 @@ describe('link', function () {
             ],
         ]);
 
-        $success = FileRepository::upload()->link('a17ebec0-48f9-44cc-8629-f49ccc68f2d2');
+        $file = FileRepository::upload()->link('a17ebec0-48f9-44cc-8629-f49ccc68f2d2');
 
-        expect($success)->toBeTrue();
+        expect($file['elements']['success'])->toBe('success');
     });
 
     it('can get multiple fake responses', function () {
@@ -88,11 +88,13 @@ describe('link', function () {
             ],
         ]);
 
-        $tmpUploadId = FileRepository::upload()->link('a17ebec0-48f9-44cc-8629-f49ccc68f2d2');
-        $tmpUploadId2 = FileRepository::upload()->link('a17ebec0-48f9-44cc-8629-f49ccc68f2d3');
+        $tmpUpload = FileRepository::upload()->link('a17ebec0-48f9-44cc-8629-f49ccc68f2d2');
+        $tmpUpload2 = FileRepository::upload()->link('a17ebec0-48f9-44cc-8629-f49ccc68f2d3');
 
-        expect($tmpUploadId)->toBeTrue()
-            ->and($tmpUploadId2)->toBeFalse();
+        expect($tmpUpload)->toBeArray()
+            ->and($tmpUpload['elements']['success'])->toBe('success')
+            ->and($tmpUpload2)->toBeArray()
+            ->and($tmpUpload2['elements']['success'])->not->toBe('success');
     });
 
     it('throws an exception when no more fake responses are available', function () {
