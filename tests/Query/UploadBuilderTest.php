@@ -24,6 +24,27 @@ describe('work', function () {
         expect($tmpUploadId)->toBe('a17ebec0-48f9-44cc-8629-f49ccc68f2d2');
     });
 
+    it('can save in chunks', function () {
+        Http::preventStrayRequests();
+
+        Http::fake([
+            '*' => Http::sequence([
+                UploadFileResponse::make(),
+                UploadFileResponse::make(),
+            ]),
+        ]);
+
+        $builder = new UploadBuilder(app(OnOfficeService::class));
+
+        $tmpUploadId = $builder
+            ->uploadInBlocks(4) // test as base64 string has 8 characters
+            ->save(base64_encode('test'));
+
+        expect($tmpUploadId)->toBe('a17ebec0-48f9-44cc-8629-f49ccc68f2d2');
+
+        Http::assertSequencesAreEmpty();
+    });
+
     it('can link', function () {
         Http::preventStrayRequests();
 

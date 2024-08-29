@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.10.2
+- Added a upload in chunks method to the file repository
+
 ## v0.10.1
 - Fixed the action for find address
 

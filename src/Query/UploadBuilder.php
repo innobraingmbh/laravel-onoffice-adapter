@@ -20,6 +20,8 @@ class UploadBuilder extends Builder
     use NonOrderable;
     use NonSelectable;
 
+    private int $uploadInBlocks = 0;
+
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
     ) {}
@@ -72,16 +74,35 @@ class UploadBuilder extends Builder
      */
     public function save(string $fileContent): string
     {
-        $response = $this->onOfficeService->requestApi(
-            OnOfficeAction::Do,
-            OnOfficeResourceType::UploadFile,
-            parameters: [
-                OnOfficeService::DATA => $fileContent,
-                ...$this->customParameters,
-            ]
-        );
+        if ($this->uploadInBlocks > 0) {
+            $fileContentSplit = str_split($fileContent, $this->uploadInBlocks);
+        } else {
+            $fileContentSplit = [$fileContent];
+        }
 
-        return $response->json('response.results.0.data.records.0.elements.tmpUploadId');
+        $tmpUploadId = null;
+
+        collect($fileContentSplit)
+            ->each(function (string $fileContent) use (&$tmpUploadId) {
+                $continueData = [];
+                if ($tmpUploadId) {
+                    $continueData = ['tmpUploadId' => $tmpUploadId];
+                }
+
+                $response = $this->onOfficeService->requestApi(
+                    OnOfficeAction::Do,
+                    OnOfficeResourceType::UploadFile,
+                    parameters: [
+                        OnOfficeService::DATA => $fileContent,
+                        ...$continueData,
+                        ...$this->customParameters,
+                    ],
+                );
+
+                $tmpUploadId = $response->json('response.results.0.data.records.0.elements.tmpUploadId');
+            });
+
+        return $tmpUploadId;
     }
 
     /**
@@ -115,5 +136,12 @@ class UploadBuilder extends Builder
         $tmpUploadId = $this->save($fileContent);
 
         return $this->link($tmpUploadId, $data);
+    }
+
+    public function uploadInBlocks(int $blocks = 5120): self
+    {
+        $this->uploadInBlocks = $blocks;
+
+        return $this;
     }
 }
