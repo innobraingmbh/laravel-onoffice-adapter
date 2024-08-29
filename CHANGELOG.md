@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.10.3
+- Added previously added upload in chunks method to fake builder
+
 ## v0.10.2
 - Added a upload in chunks method to the file repository
 
