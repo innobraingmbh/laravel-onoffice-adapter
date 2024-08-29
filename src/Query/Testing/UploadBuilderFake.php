@@ -4,16 +4,30 @@ declare(strict_types=1);
 
 namespace Katalam\OnOfficeAdapter\Query\Testing;
 
+use Katalam\OnOfficeAdapter\Query\Concerns\UploadInBlocks;
 use Throwable;
 
 class UploadBuilderFake extends BaseFake
 {
+    use UploadInBlocks;
+
     /**
      * @throws Throwable
      */
     public function save(string $fileContent): string
     {
-        $record = $this->get()->first();
+        $record = null;
+
+        if ($this->uploadInBlocks > 0) {
+            $blocks = str_split($fileContent, $this->uploadInBlocks);
+
+            $iMax = count($blocks);
+            for ($i = 0; $i < $iMax; $i++) {
+                $record = $this->get()->first();
+            }
+        } else {
+            $record = $this->get()->first();
+        }
 
         return data_get($record, 'elements.tmpUploadId');
     }

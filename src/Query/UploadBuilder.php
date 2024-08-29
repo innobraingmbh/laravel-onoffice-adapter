@@ -11,6 +11,7 @@ use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Query\Concerns\NonFilterable;
 use Katalam\OnOfficeAdapter\Query\Concerns\NonOrderable;
 use Katalam\OnOfficeAdapter\Query\Concerns\NonSelectable;
+use Katalam\OnOfficeAdapter\Query\Concerns\UploadInBlocks;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
 class UploadBuilder extends Builder
@@ -19,8 +20,7 @@ class UploadBuilder extends Builder
     use NonFilterable;
     use NonOrderable;
     use NonSelectable;
-
-    private int $uploadInBlocks = 0;
+    use UploadInBlocks;
 
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
@@ -136,12 +136,5 @@ class UploadBuilder extends Builder
         $tmpUploadId = $this->save($fileContent);
 
         return $this->link($tmpUploadId, $data);
-    }
-
-    public function uploadInBlocks(int $blocks = 5120): self
-    {
-        $this->uploadInBlocks = $blocks;
-
-        return $this;
     }
 }
