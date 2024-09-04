@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.12.2
+- Added estate create to estate builder
+
 ## v0.12.1
 - Added nullable faker factory
 

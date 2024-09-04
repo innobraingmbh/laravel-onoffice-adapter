@@ -129,4 +129,18 @@ class EstateBuilder extends Builder
 
         return true;
     }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function create(array $data): int
+    {
+        $response = $this->onOfficeService->requestApi(
+            OnOfficeAction::Create,
+            OnOfficeResourceType::Estate,
+            parameters: $data,
+        );
+
+        return $response->json('response.results.0.data.records.0');
+    }
 }

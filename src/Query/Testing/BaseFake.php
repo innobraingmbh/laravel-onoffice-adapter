@@ -21,7 +21,7 @@ class BaseFake extends Builder
      */
     public function get(): Collection
     {
-        throw_if($this->fakeResponses->isEmpty(), new Exception('No fake responses'));
+        throw_if($this->fakeResponses->isEmpty(), new Exception('No more fake responses'));
 
         $nextRequest = $this->fakeResponses->shift();
 
@@ -52,7 +52,7 @@ class BaseFake extends Builder
      */
     public function each(callable $callback): void
     {
-        throw_if($this->fakeResponses->isEmpty(), new Exception('No fake responses'));
+        throw_if($this->fakeResponses->isEmpty(), new Exception('No more fake responses'));
 
         $nextRequest = $this->fakeResponses->shift();
 
@@ -71,7 +71,7 @@ class BaseFake extends Builder
      */
     public function modify(int $id): bool
     {
-        throw_if($this->fakeResponses->isEmpty(), new Exception('No fake responses'));
+        throw_if($this->fakeResponses->isEmpty(), new Exception('No more fake responses'));
 
         $nextRequest = $this->fakeResponses->shift();
 
