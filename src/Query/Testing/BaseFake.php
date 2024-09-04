@@ -27,7 +27,7 @@ class BaseFake extends Builder
 
         return collect($nextRequest)
             ->flatten()
-            ->map(fn (BaseFactory|null $factory) => $factory?->toArray());
+            ->map(fn (?BaseFactory $factory) => $factory?->toArray());
     }
 
     /**
@@ -59,7 +59,7 @@ class BaseFake extends Builder
         collect($nextRequest)
             ->each(function (array $factories) use ($callback) {
                 $records = collect($factories)
-                    ->map(fn (BaseFactory|null $factory) => $factory?->toArray())
+                    ->map(fn (?BaseFactory $factory) => $factory?->toArray())
                     ->toArray();
 
                 $callback($records);
