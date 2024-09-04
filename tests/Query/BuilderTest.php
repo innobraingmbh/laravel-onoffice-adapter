@@ -12,7 +12,7 @@ class Builder extends AbstractBuilder
         return new Collection;
     }
 
-    public function first(): array
+    public function first(): ?array
     {
         return [];
     }

@@ -52,7 +52,7 @@ class ActivityBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function first(): array
+    public function first(): ?array
     {
         $filter = $this->getFilters();
         $orderBy = $this->getOrderBy();

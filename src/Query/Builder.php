@@ -161,7 +161,7 @@ abstract class Builder
 
     abstract public function get(): Collection;
 
-    abstract public function first(): array;
+    abstract public function first(): ?array;
 
     abstract public function find(int $id): array;
 

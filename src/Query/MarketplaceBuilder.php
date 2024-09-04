@@ -44,7 +44,7 @@ class MarketplaceBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function first(): array
+    public function first(): ?array
     {
         throw new OnOfficeException('Method not implemented yet');
     }

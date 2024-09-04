@@ -30,7 +30,7 @@ class SearchCriteriaBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function first(): array
+    public function first(): ?array
     {
         throw new OnOfficeException('Not implemented');
     }

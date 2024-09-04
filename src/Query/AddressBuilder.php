@@ -54,7 +54,7 @@ class AddressBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function first(): array
+    public function first(): ?array
     {
         $recordIds = $this->recordIds;
         $columns = $this->columns;

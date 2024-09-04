@@ -45,7 +45,7 @@ class EstateBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function first(): array
+    public function first(): ?array
     {
         $columns = $this->columns;
         $filter = $this->getFilters();

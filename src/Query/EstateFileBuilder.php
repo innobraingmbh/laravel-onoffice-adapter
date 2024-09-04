@@ -44,7 +44,7 @@ class EstateFileBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function first(): array
+    public function first(): ?array
     {
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Get,

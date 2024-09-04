@@ -32,9 +32,9 @@ class BaseFake extends Builder
     /**
      * @throws Throwable
      */
-    public function first(): array
+    public function first(): ?array
     {
-        return $this->get()->first() ?? [];
+        return $this->get()->first();
     }
 
     /**
