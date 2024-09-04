@@ -48,7 +48,7 @@ describe('fake a exception', function () {
         AddressRepository::fake([
             [
                 new OnOfficeException('foo', 1),
-            ]
+            ],
         ]);
 
         AddressRepository::query()
