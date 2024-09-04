@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.12.0
+- Added nullable first method
+
 ## v0.11.0
 - Fixed the upload builder fake implementation to match the real implementation
 
