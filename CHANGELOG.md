@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.12.1
+- Added nullable faker factory
+
 ## v0.12.0
 - Added nullable first method
 

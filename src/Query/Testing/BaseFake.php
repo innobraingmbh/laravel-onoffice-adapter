@@ -21,12 +21,13 @@ class BaseFake extends Builder
      */
     public function get(): Collection
     {
+        throw_if($this->fakeResponses->isEmpty(), new Exception('No fake responses'));
+
         $nextRequest = $this->fakeResponses->shift();
-        throw_if($nextRequest === null, new Exception('No more fake responses'));
 
         return collect($nextRequest)
             ->flatten()
-            ->map(fn (BaseFactory $factory) => $factory->toArray());
+            ->map(fn (BaseFactory|null $factory) => $factory?->toArray());
     }
 
     /**
@@ -51,13 +52,14 @@ class BaseFake extends Builder
      */
     public function each(callable $callback): void
     {
+        throw_if($this->fakeResponses->isEmpty(), new Exception('No fake responses'));
+
         $nextRequest = $this->fakeResponses->shift();
-        throw_if($nextRequest === null, new Exception('No more fake responses'));
 
         collect($nextRequest)
             ->each(function (array $factories) use ($callback) {
                 $records = collect($factories)
-                    ->map(fn (BaseFactory $factory) => $factory->toArray())
+                    ->map(fn (BaseFactory|null $factory) => $factory?->toArray())
                     ->toArray();
 
                 $callback($records);
@@ -69,8 +71,9 @@ class BaseFake extends Builder
      */
     public function modify(int $id): bool
     {
+        throw_if($this->fakeResponses->isEmpty(), new Exception('No fake responses'));
+
         $nextRequest = $this->fakeResponses->shift();
-        throw_if($nextRequest === null, new Exception('No more fake responses'));
 
         return collect($nextRequest)
             ->flatten()
