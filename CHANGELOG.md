@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.13.1
+- Added real support of fake relation repository
+
 ## v0.13.0
 - Added a exception fake implementation
 - Added relation create to relation builder
