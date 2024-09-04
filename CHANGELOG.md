@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.12.4
+- Added estate create fake method to estate repository
+
 ## v0.12.3
 - Fix estate create should return array
 
