@@ -133,7 +133,7 @@ class EstateBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function create(array $data): int
+    public function create(array $data): array
     {
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Create,

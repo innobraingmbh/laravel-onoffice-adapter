@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.12.3
+- Fix estate create should return array
+
 ## v0.12.2
 - Added estate create to estate builder
 
