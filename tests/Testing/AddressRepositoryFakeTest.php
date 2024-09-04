@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Facades\AddressRepository;
 use Katalam\OnOfficeAdapter\Facades\Testing\AddressRepositoryFake;
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
@@ -40,4 +41,17 @@ describe('nullable first', function () {
 
         expect($fake)->toBeNull();
     });
+});
+
+describe('fake a exception', function () {
+    it('can fake a exception', function () {
+        AddressRepository::fake([
+            [
+                new OnOfficeException('foo', 1),
+            ]
+        ]);
+
+        AddressRepository::query()
+            ->first();
+    })->throws(OnOfficeException::class);
 });

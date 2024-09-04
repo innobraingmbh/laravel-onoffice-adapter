@@ -118,4 +118,23 @@ class RelationBuilder extends Builder
     {
         throw new OnOfficeException('Not implemented');
     }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function create(): array
+    {
+        $response = $this->onOfficeService->requestApi(
+            OnOfficeAction::Create,
+            OnOfficeResourceType::Relation,
+            parameters: [
+                OnOfficeService::RELATIONTYPE => $this->relationType,
+                OnOfficeService::PARENTIDS => $this->parentIds,
+                OnOfficeService::CHILDIDS => $this->childIds,
+                ...$this->customParameters,
+            ],
+        );
+
+        return $response->json('response.results.0.data.records.0');
+    }
 }

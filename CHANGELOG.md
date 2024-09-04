@@ -1,6 +1,10 @@
 # Changelog
 ## main
 
+## v0.13.0
+- Added a exception fake implementation
+- Added relation create to relation builder
+
 ## v0.12.4
 - Added estate create fake method to estate repository
 

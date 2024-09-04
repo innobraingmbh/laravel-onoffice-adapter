@@ -6,6 +6,7 @@ namespace Katalam\OnOfficeAdapter\Query\Testing;
 
 use Exception;
 use Illuminate\Support\Collection;
+use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
 use Katalam\OnOfficeAdapter\Query\Builder;
 use Throwable;
@@ -27,7 +28,13 @@ class BaseFake extends Builder
 
         return collect($nextRequest)
             ->flatten()
-            ->map(fn (?BaseFactory $factory) => $factory?->toArray());
+            ->map(function (BaseFactory|OnOfficeException|null $factory) {
+                if ($factory instanceof OnOfficeException) {
+                    throw $factory;
+                }
+
+                return $factory?->toArray();
+            });
     }
 
     /**
@@ -59,7 +66,13 @@ class BaseFake extends Builder
         collect($nextRequest)
             ->each(function (array $factories) use ($callback) {
                 $records = collect($factories)
-                    ->map(fn (?BaseFactory $factory) => $factory?->toArray())
+                    ->map(function (BaseFactory|OnOfficeException|null $factory) {
+                        if ($factory instanceof OnOfficeException) {
+                            throw $factory;
+                        }
+
+                        return $factory?->toArray();
+                    })
                     ->toArray();
 
                 $callback($records);
@@ -75,8 +88,14 @@ class BaseFake extends Builder
 
         $nextRequest = $this->fakeResponses->shift();
 
-        return collect($nextRequest)
+        $first = collect($nextRequest)
             ->flatten()
             ->first();
+
+        if ($first instanceof OnOfficeException) {
+            throw $first;
+        }
+
+        return $first;
     }
 }
