@@ -11,8 +11,8 @@ use Throwable;
 
 class AddressBuilderFake extends BaseFake
 {
-    use RecordIds;
     use Input;
+    use RecordIds;
 
     /**
      * @throws Throwable

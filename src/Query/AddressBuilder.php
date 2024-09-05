@@ -15,8 +15,8 @@ use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
 class AddressBuilder extends Builder
 {
-    use RecordIds;
     use Input;
+    use RecordIds;
 
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
