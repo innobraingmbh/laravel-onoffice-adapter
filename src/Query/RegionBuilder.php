@@ -26,9 +26,6 @@ class RegionBuilder extends Builder
 
     public function get(): Collection
     {
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
-
         return $this->onOfficeService->requestAll(/**
          * @throws OnOfficeException
          */ function () {
@@ -37,7 +34,7 @@ class RegionBuilder extends Builder
                 OnOfficeResourceType::Regions,
                 ...$this->customParameters,
             );
-        }, pageSize: $listLimit, offset: $listOffset);
+        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**
@@ -64,9 +61,6 @@ class RegionBuilder extends Builder
 
     public function each(callable $callback): void
     {
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
-
         $this->onOfficeService->requestAllChunked(/**
          * @throws OnOfficeException
          */ function () {
@@ -75,7 +69,7 @@ class RegionBuilder extends Builder
                 OnOfficeResourceType::Regions,
                 ...$this->customParameters,
             );
-        }, $callback, pageSize: $listLimit, offset: $listOffset);
+        }, $callback, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**

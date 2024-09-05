@@ -24,6 +24,9 @@ class MarketplaceBuilder extends Builder
         throw new OnOfficeException('Method not implemented yet');
     }
 
+    /**
+     * @throws OnOfficeException
+     */
     public function unlockProvider(
         string $parameterCacheId,
         string $extendedClaim,

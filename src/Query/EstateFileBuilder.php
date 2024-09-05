@@ -38,7 +38,7 @@ class EstateFileBuilder extends Builder
                     ...$this->customParameters,
                 ],
             );
-        }, pageSize: $this->limit, offset: $this->offset);
+        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**
@@ -100,7 +100,7 @@ class EstateFileBuilder extends Builder
                     ...$this->customParameters,
                 ],
             );
-        }, $callback, pageSize: $this->limit, offset: $this->offset);
+        }, $callback, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**

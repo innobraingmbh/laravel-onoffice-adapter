@@ -23,7 +23,6 @@ class ActivityBuilder extends Builder
 
     public function get(): Collection
     {
-        $filter = $this->getFilters();
         $orderBy = $this->getOrderBy();
 
         $sortBy = data_get(array_keys($orderBy), 0);
@@ -31,14 +30,14 @@ class ActivityBuilder extends Builder
 
         return $this->onOfficeService->requestAll(/**
          * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy, $filter) {
+         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy) {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
                 OnOfficeResourceType::Activity,
                 parameters: [
                     $this->estateOrAddress => $this->recordIds,
                     OnOfficeService::DATA => $this->columns,
-                    OnOfficeService::FILTER => $filter,
+                    OnOfficeService::FILTER => $this->getFilters(),
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
                     OnOfficeService::SORTBY => $sortBy,
@@ -46,7 +45,7 @@ class ActivityBuilder extends Builder
                     ...$this->customParameters,
                 ]
             );
-        }, pageSize: $this->limit, offset: $this->offset);
+        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**
@@ -54,7 +53,6 @@ class ActivityBuilder extends Builder
      */
     public function first(): ?array
     {
-        $filter = $this->getFilters();
         $orderBy = $this->getOrderBy();
 
         $sortBy = data_get(array_keys($orderBy), 0);
@@ -66,7 +64,7 @@ class ActivityBuilder extends Builder
             parameters: [
                 $this->estateOrAddress => $this->recordIds,
                 OnOfficeService::DATA => $this->columns,
-                OnOfficeService::FILTER => $filter,
+                OnOfficeService::FILTER => $this->getFilters(),
                 OnOfficeService::LISTLIMIT => $this->limit,
                 OnOfficeService::LISTOFFSET => $this->offset,
                 OnOfficeService::SORTBY => $sortBy,
@@ -98,7 +96,6 @@ class ActivityBuilder extends Builder
 
     public function each(callable $callback): void
     {
-        $filter = $this->getFilters();
         $orderBy = $this->getOrderBy();
 
         $sortBy = data_get(array_keys($orderBy), 0);
@@ -106,14 +103,14 @@ class ActivityBuilder extends Builder
 
         $this->onOfficeService->requestAllChunked(/**
          * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy, $filter) {
+         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy) {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
                 OnOfficeResourceType::Activity,
                 parameters: [
                     $this->estateOrAddress => $this->recordIds,
                     OnOfficeService::DATA => $this->columns,
-                    OnOfficeService::FILTER => $filter,
+                    OnOfficeService::FILTER => $this->getFilters(),
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
                     OnOfficeService::SORTBY => $sortBy,
@@ -121,7 +118,7 @@ class ActivityBuilder extends Builder
                     ...$this->customParameters,
                 ]
             );
-        }, $callback, pageSize: $this->limit, offset: $this->offset);
+        }, $callback, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**

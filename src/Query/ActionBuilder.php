@@ -34,7 +34,7 @@ class ActionBuilder extends Builder
                     ...$this->customParameters,
                 ]
             );
-        }, pageSize: $this->limit, offset: $this->offset);
+        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**

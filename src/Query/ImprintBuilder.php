@@ -24,22 +24,18 @@ class ImprintBuilder extends Builder
 
     public function get(): Collection
     {
-        $columns = $this->columns;
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
-
         return $this->onOfficeService->requestAll(/**
          * @throws OnOfficeException
-         */ function () use ($columns) {
+         */ function () {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
                 OnOfficeResourceType::Impressum,
                 parameters: [
-                    OnOfficeService::DATA => $columns,
+                    OnOfficeService::DATA => $this->columns,
                     ...$this->customParameters,
                 ]
             );
-        }, pageSize: $listLimit, offset: $listOffset);
+        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**
@@ -47,13 +43,11 @@ class ImprintBuilder extends Builder
      */
     public function first(): ?array
     {
-        $columns = $this->columns;
-
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Read,
             OnOfficeResourceType::Impressum,
             parameters: [
-                OnOfficeService::DATA => $columns,
+                OnOfficeService::DATA => $this->columns,
                 ...$this->customParameters,
             ]
         );
@@ -66,14 +60,12 @@ class ImprintBuilder extends Builder
      */
     public function find(int $id): array
     {
-        $columns = $this->columns;
-
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Read,
             OnOfficeResourceType::Impressum,
             resourceId: $id,
             parameters: [
-                OnOfficeService::DATA => $columns,
+                OnOfficeService::DATA => $this->columns,
                 ...$this->customParameters,
             ]
         );

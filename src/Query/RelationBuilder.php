@@ -41,7 +41,7 @@ class RelationBuilder extends Builder
                     ...$this->customParameters,
                 ],
             );
-        }, pageSize: $this->limit, offset: $this->offset);
+        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
 
         // $records is always an array containing a single element
         return collect(data_get($records->first(), 'elements'));

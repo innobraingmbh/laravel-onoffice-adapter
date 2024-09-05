@@ -24,11 +24,6 @@ class AddressBuilder extends Builder
 
     public function get(): Collection
     {
-        $recordIds = $this->recordIds;
-        $columns = $this->columns;
-        $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
         $orderBy = $this->getOrderBy();
 
         $sortBy = data_get(array_keys($orderBy), 0);
@@ -36,14 +31,14 @@ class AddressBuilder extends Builder
 
         return $this->onOfficeService->requestAll(/**
          * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($recordIds, $sortOrder, $sortBy, $filter, $columns) {
+         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy) {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
                 OnOfficeResourceType::Address,
                 parameters: [
-                    OnOfficeService::RECORDIDS => $recordIds,
-                    OnOfficeService::DATA => $columns,
-                    OnOfficeService::FILTER => $filter,
+                    OnOfficeService::RECORDIDS => $this->recordIds,
+                    OnOfficeService::DATA => $this->columns,
+                    OnOfficeService::FILTER => $this->getFilters(),
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
                     OnOfficeService::SORTBY => $sortBy,
@@ -51,7 +46,7 @@ class AddressBuilder extends Builder
                     ...$this->customParameters,
                 ]
             );
-        }, pageSize: $listLimit, offset: $listOffset);
+        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**
@@ -59,11 +54,6 @@ class AddressBuilder extends Builder
      */
     public function first(): ?array
     {
-        $recordIds = $this->recordIds;
-        $columns = $this->columns;
-        $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
         $orderBy = $this->getOrderBy();
 
         $sortBy = data_get(array_keys($orderBy), 0);
@@ -73,11 +63,11 @@ class AddressBuilder extends Builder
             OnOfficeAction::Read,
             OnOfficeResourceType::Address,
             parameters: [
-                OnOfficeService::RECORDIDS => $recordIds,
-                OnOfficeService::DATA => $columns,
-                OnOfficeService::FILTER => $filter,
-                OnOfficeService::LISTLIMIT => $listLimit,
-                OnOfficeService::LISTOFFSET => $listOffset,
+                OnOfficeService::RECORDIDS => $this->recordIds,
+                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::LISTLIMIT => $this->limit,
+                OnOfficeService::LISTOFFSET => $this->offset,
                 OnOfficeService::SORTBY => $sortBy,
                 OnOfficeService::SORTORDER => $sortOrder,
                 ...$this->customParameters,
@@ -92,14 +82,12 @@ class AddressBuilder extends Builder
      */
     public function find(int $id): array
     {
-        $columns = $this->columns;
-
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Read,
             OnOfficeResourceType::Address,
             $id,
             parameters: [
-                OnOfficeService::DATA => $columns,
+                OnOfficeService::DATA => $this->columns,
                 ...$this->customParameters,
             ]
         );
@@ -109,11 +97,6 @@ class AddressBuilder extends Builder
 
     public function each(callable $callback): void
     {
-        $recordIds = $this->recordIds;
-        $columns = $this->columns;
-        $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
         $orderBy = $this->getOrderBy();
 
         $sortBy = data_get(array_keys($orderBy), 0);
@@ -121,14 +104,14 @@ class AddressBuilder extends Builder
 
         $this->onOfficeService->requestAllChunked(/**
          * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($recordIds, $sortOrder, $sortBy, $filter, $columns) {
+         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy) {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
                 OnOfficeResourceType::Address,
                 parameters: [
-                    OnOfficeService::RECORDIDS => $recordIds,
-                    OnOfficeService::DATA => $columns,
-                    OnOfficeService::FILTER => $filter,
+                    OnOfficeService::RECORDIDS => $this->recordIds,
+                    OnOfficeService::DATA => $this->columns,
+                    OnOfficeService::FILTER => $this->getFilters(),
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
                     OnOfficeService::SORTBY => $sortBy,
@@ -136,7 +119,7 @@ class AddressBuilder extends Builder
                     ...$this->customParameters,
                 ]
             );
-        }, $callback, pageSize: $listLimit, offset: $listOffset);
+        }, $callback, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**
@@ -154,13 +137,11 @@ class AddressBuilder extends Builder
         return true;
     }
 
+    /**
+     * @throws OnOfficeException
+     */
     public function count(): int
     {
-        $recordIds = $this->recordIds;
-        $columns = $this->columns;
-        $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
         $orderBy = $this->getOrderBy();
 
         $sortBy = data_get(array_keys($orderBy), 0);
@@ -170,11 +151,11 @@ class AddressBuilder extends Builder
             OnOfficeAction::Read,
             OnOfficeResourceType::Address,
             parameters: [
-                OnOfficeService::RECORDIDS => $recordIds,
-                OnOfficeService::DATA => $columns,
-                OnOfficeService::FILTER => $filter,
-                OnOfficeService::LISTLIMIT => $listLimit,
-                OnOfficeService::LISTOFFSET => $listOffset,
+                OnOfficeService::RECORDIDS => $this->recordIds,
+                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::LISTLIMIT => $this->limit,
+                OnOfficeService::LISTOFFSET => $this->offset,
                 OnOfficeService::SORTBY => $sortBy,
                 OnOfficeService::SORTORDER => $sortOrder,
                 ...$this->customParameters,
@@ -223,6 +204,6 @@ class AddressBuilder extends Builder
                     ...$this->customParameters,
                 ],
             );
-        }, pageSize: $this->limit, offset: $this->offset);
+        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 }

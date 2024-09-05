@@ -18,28 +18,22 @@ class EstateBuilder extends Builder
 
     public function get(): Collection
     {
-        $columns = $this->columns;
-        $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
-        $orderBy = $this->getOrderBy();
-
         return $this->onOfficeService->requestAll(/**
          * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($filter, $orderBy, $columns) {
+         */ function (int $pageSize, int $offset) {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
                 OnOfficeResourceType::Estate,
                 parameters: [
-                    OnOfficeService::DATA => $columns,
-                    OnOfficeService::FILTER => $filter,
+                    OnOfficeService::DATA => $this->columns,
+                    OnOfficeService::FILTER => $this->getFilters(),
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
-                    OnOfficeService::SORTBY => $orderBy,
+                    OnOfficeService::SORTBY => $this->getOrderBy(),
                     ...$this->customParameters,
                 ]
             );
-        }, pageSize: $listLimit, offset: $listOffset);
+        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**
@@ -47,21 +41,15 @@ class EstateBuilder extends Builder
      */
     public function first(): ?array
     {
-        $columns = $this->columns;
-        $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
-        $orderBy = $this->getOrderBy();
-
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Read,
             OnOfficeResourceType::Estate,
             parameters: [
-                OnOfficeService::DATA => $columns,
-                OnOfficeService::FILTER => $filter,
-                OnOfficeService::LISTLIMIT => $listLimit,
-                OnOfficeService::LISTOFFSET => $listOffset,
-                OnOfficeService::SORTBY => $orderBy,
+                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::LISTLIMIT => $this->limit,
+                OnOfficeService::LISTOFFSET => $this->offset,
+                OnOfficeService::SORTBY => $this->getOrderBy(),
                 ...$this->customParameters,
             ]
         );
@@ -74,14 +62,12 @@ class EstateBuilder extends Builder
      */
     public function find(int $id): array
     {
-        $columns = $this->columns;
-
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Get,
             OnOfficeResourceType::Estate,
             $id,
             parameters: [
-                OnOfficeService::DATA => $columns,
+                OnOfficeService::DATA => $this->columns,
                 ...$this->customParameters,
             ]
         );
@@ -91,28 +77,22 @@ class EstateBuilder extends Builder
 
     public function each(callable $callback): void
     {
-        $columns = $this->columns;
-        $filter = $this->getFilters();
-        $listLimit = $this->limit;
-        $listOffset = $this->offset;
-        $orderBy = $this->getOrderBy();
-
         $this->onOfficeService->requestAllChunked(/**
          * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($filter, $orderBy, $columns) {
+         */ function (int $pageSize, int $offset) {
             return $this->onOfficeService->requestApi(
                 OnOfficeAction::Read,
                 OnOfficeResourceType::Estate,
                 parameters: [
-                    OnOfficeService::DATA => $columns,
-                    OnOfficeService::FILTER => $filter,
+                    OnOfficeService::DATA => $this->columns,
+                    OnOfficeService::FILTER => $this->getFilters(),
                     OnOfficeService::LISTLIMIT => $pageSize,
                     OnOfficeService::LISTOFFSET => $offset,
-                    OnOfficeService::SORTBY => $orderBy,
+                    OnOfficeService::SORTBY => $this->getOrderBy(),
                     ...$this->customParameters,
                 ]
             );
-        }, $callback, pageSize: $listLimit, offset: $listOffset);
+        }, $callback, pageSize: $this->limit, offset: $this->offset, take: $this->take);
     }
 
     /**
