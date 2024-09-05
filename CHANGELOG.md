@@ -1,5 +1,6 @@
 # Changelog
 ## main
+- Added a take method to limit the number of records returned
 
 ## v0.13.3
 - Changed the search implementation to use the full page size
