@@ -120,7 +120,8 @@ class OnOfficeService
         string $resultPath = 'response.results.0.data.records',
         string $countPath = 'response.results.0.data.meta.cntabsolute',
         int $pageSize = 500,
-        int $offset = 0
+        int $offset = 0,
+        int $take = -1,
     ): Collection {
         $maxPage = 0;
         $data = collect();
@@ -147,6 +148,15 @@ class OnOfficeService
                 $data->push(...$responseResult);
             }
 
+            // if the take parameter is set,
+            // and we have more records than the take parameter,
+            // we break the loop and return the data except the
+            // records that are more than the take parameter
+            if ($take > -1 && $data->count() > $take) {
+                $data = $data->take($take);
+                break;
+            }
+
             $offset += $pageSize;
             $currentPage = $offset / $pageSize;
         } while ($maxPage > $currentPage);
@@ -169,9 +179,11 @@ class OnOfficeService
         string $resultPath = 'response.results.0.data.records',
         string $countPath = 'response.results.0.data.meta.cntabsolute',
         int $pageSize = 500,
-        int $offset = 0
+        int $offset = 0,
+        int $take = -1,
     ): void {
         $maxPage = 0;
+        $elementCount = 0;
         do {
             try {
                 $response = $request($pageSize, $offset);
@@ -187,10 +199,29 @@ class OnOfficeService
             // the first time we get the response from the API
             if ($maxPage === 0) {
                 $countAbsolute = $response->json($countPath, 0);
+
+                // if the take parameter is set,
+                // and we have more records than the take parameter,
+                // we set the countAbsolute to the take parameter
+                if ($take > -1 && $countAbsolute > $take) {
+                    $countAbsolute = $take;
+                }
+
                 $maxPage = ceil($countAbsolute / $pageSize);
             }
 
-            $callback($response->json($resultPath));
+            // If the take parameter is set,
+            // and we have more records than the take parameter.
+            // We break the loop and return the sliced records
+            // because it is not guaranteed that the record page size
+            // will be the same as the take parameter
+            $elements = $response->json($resultPath);
+            $elementCount += count($elements);
+            if ($take > -1 && $elementCount > $take) {
+                $elements = array_slice($elements, 0, $elementCount - $take);
+            }
+
+            $callback($elements);
 
             $offset += $pageSize;
             $currentPage = $offset / $pageSize;

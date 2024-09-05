@@ -34,6 +34,11 @@ abstract class Builder
     public int $limit = 500;
 
     /**
+     * The take for the number of results.
+     */
+    public int $take = -1;
+
+    /**
      * An array of columns to order by.
      * Each element should be an array with the column name and the direction.
      */
@@ -99,9 +104,25 @@ abstract class Builder
         return $this;
     }
 
+    /**
+     * Be aware that the limit is capped at 500.
+     * Be aware that the limit will change the page size of the result.
+     * Not the number of results.
+     */
     public function limit(int $value): static
     {
         $this->limit = max(0, $value);
+
+        return $this;
+    }
+
+    /**
+     * Be aware that the take will change the number of results.
+     * Be aware that the take will not change the page size of the result.
+     */
+    public function take(int $value): static
+    {
+        $this->take = max(-1, $value);
 
         return $this;
     }

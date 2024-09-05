@@ -194,6 +194,51 @@ describe('requestAll', function () {
         expect($response)->toBeInstanceOf(Collection::class)
             ->toBeEmpty();
     });
+
+    it('will stop with take amount', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => [
+                                    'cntabsolute' => 50,
+                                ],
+                                'records' => [
+                                    [
+                                        'id' => 1,
+                                    ],
+                                    [
+                                        'id' => 2,
+                                    ],
+                                    [
+                                        'id' => 3,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $response = $onOfficeService->requestAll(function () {
+            return app(OnOfficeService::class)->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Estate,
+            );
+        }, take: 1);
+
+        expect($response)->toBeInstanceOf(Collection::class)
+            ->toHaveCount(1);
+    });
 });
 
 describe('requestAllChunked', function () {
@@ -219,7 +264,8 @@ describe('requestAllChunked', function () {
                 OnOfficeAction::Get,
                 OnOfficeResourceType::Estate,
             );
-        }, function () {});
+        }, function () {
+        });
     })->with([300, 301, 400, 401, 500, 501]);
 
     it('will call the callback', function () {
@@ -244,5 +290,122 @@ describe('requestAllChunked', function () {
         }, function () use ($callback) {
             $callback->call();
         });
+    });
+
+    it('will stop with take amount', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => [
+                                    'cntabsolute' => 50,
+                                ],
+                                'records' => [
+                                    [
+                                        'id' => 1,
+                                    ],
+                                    [
+                                        'id' => 2,
+                                    ],
+                                    [
+                                        'id' => 3,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $count = 0;
+        $onOfficeService->requestAllChunked(function () {
+            return app(OnOfficeService::class)->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Estate,
+            );
+        }, function ($elements) use (&$count) {
+            $count += count($elements);
+        }, take: 1);
+
+        expect($count)->toBe(1);
+    });
+
+    it('will stop with take amount on different pages', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::sequence([
+                Http::response([
+                    'status' => [
+                        'code' => 200,
+                    ],
+                    'response' => [
+                        'results' => [
+                            [
+                                'data' => [
+                                    'meta' => [
+                                        'cntabsolute' => 4,
+                                    ],
+                                    'records' => [
+                                        [
+                                            'id' => 1,
+                                        ],
+                                        [
+                                            'id' => 2,
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]),
+                Http::response([
+                    'status' => [
+                        'code' => 200,
+                    ],
+                    'response' => [
+                        'results' => [
+                            [
+                                'data' => [
+                                    'meta' => [
+                                        'cntabsolute' => 4,
+                                    ],
+                                    'records' => [
+                                        [
+                                            'id' => 3,
+                                        ],
+                                        [
+                                            'id' => 4,
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]),
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $count = 0;
+        $onOfficeService->requestAllChunked(function () {
+            return app(OnOfficeService::class)->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Estate,
+            );
+        }, function ($elements) use (&$count) {
+            $count += count($elements);
+        }, pageSize: 2, take: 3);
+
+        expect($count)->toBe(3);
     });
 });

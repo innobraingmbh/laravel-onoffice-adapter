@@ -216,6 +216,32 @@ describe('limit', function () {
     });
 });
 
+describe('take', function () {
+    it('should set the take property to the given value', function () {
+        $builder = new Builder;
+
+        $builder->take(10);
+
+        expect($builder->take)->toBe(10);
+    });
+
+    it('should return the builder instance', function () {
+        $builder = new Builder;
+
+        $result = $builder->take(10);
+
+        expect($result)->toBeInstanceOf(Builder::class);
+    });
+
+    it('should not allow negative values', function () {
+        $builder = new Builder;
+
+        $builder->take(-10);
+
+        expect($builder->take)->toBe(-1);
+    });
+});
+
 describe('where', function () {
     it('should add the given filter to the filters property', function () {
         $builder = new Builder;
