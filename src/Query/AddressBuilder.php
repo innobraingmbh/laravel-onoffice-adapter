@@ -205,24 +205,24 @@ class AddressBuilder extends Builder
         return $response->json('response.results.0.data.records.0');
     }
 
-    /**
-     * @throws OnOfficeException
-     */
-    public function search(): array
+    public function search(): Collection
     {
-        $response = $this->onOfficeService->requestApi(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Search,
-            OnOfficeResourceId::Address,
-            parameters: [
-                OnOfficeService::INPUT => $this->input,
-                OnOfficeService::LISTLIMIT => $this->limit,
-                OnOfficeService::SORTBY => data_get(array_keys($this->orderBy), 0),
-                OnOfficeService::SORTORDER => data_get($this->orderBy, 0),
-                ...$this->customParameters,
-            ],
-        );
-
-        return $response->json('response.results.0.data.records.0');
+        return $this->onOfficeService->requestAll(/**
+         * @throws OnOfficeException
+         */ function (int $pageSize, int $offset) {
+            return $this->onOfficeService->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Search,
+                OnOfficeResourceId::Address,
+                parameters: [
+                    OnOfficeService::INPUT => $this->input,
+                    OnOfficeService::SORTBY => data_get(array_keys($this->orderBy), 0),
+                    OnOfficeService::SORTORDER => data_get($this->orderBy, 0),
+                    OnOfficeService::LISTLIMIT => $pageSize,
+                    OnOfficeService::LISTOFFSET => $offset,
+                    ...$this->customParameters,
+                ],
+            );
+        }, pageSize: $this->limit, offset: $this->offset);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Katalam\OnOfficeAdapter\Query\Testing;
 
 use Exception;
+use Illuminate\Support\Collection;
 use Katalam\OnOfficeAdapter\Query\Concerns\Input;
 use Katalam\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Throwable;
@@ -41,8 +42,8 @@ class AddressBuilderFake extends BaseFake
     /**
      * @throws Throwable
      */
-    public function search()
+    public function search(): Collection
     {
-        return $this->get()->first();
+        return $this->get();
     }
 }

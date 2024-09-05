@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.13.3
+- Changed the search implementation to use the full page size
+
 ## v0.13.2
 - Added a search implementation to the address repository
 
