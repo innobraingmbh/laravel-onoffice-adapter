@@ -7,5 +7,6 @@ namespace Katalam\OnOfficeAdapter\Enums;
 enum OnOfficeResourceId: string
 {
     case Estate = 'estate';
+    case Address = 'address';
     case None = '';
 }

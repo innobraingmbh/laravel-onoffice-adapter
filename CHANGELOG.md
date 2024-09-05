@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.13.2
+- Added a search implementation to the address repository
+
 ## v0.13.1
 - Added real support of fake relation repository
 

@@ -6,14 +6,17 @@ namespace Katalam\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Collection;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
+use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Katalam\OnOfficeAdapter\Query\Concerns\Input;
 use Katalam\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
 class AddressBuilder extends Builder
 {
     use RecordIds;
+    use Input;
 
     public function __construct(
         private readonly OnOfficeService $onOfficeService,
@@ -197,6 +200,27 @@ class AddressBuilder extends Builder
             OnOfficeAction::Create,
             OnOfficeResourceType::Address,
             parameters: $data,
+        );
+
+        return $response->json('response.results.0.data.records.0');
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function search(): array
+    {
+        $response = $this->onOfficeService->requestApi(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Search,
+            OnOfficeResourceId::Address,
+            parameters: [
+                OnOfficeService::INPUT => $this->input,
+                OnOfficeService::LISTLIMIT => $this->limit,
+                OnOfficeService::SORTBY => data_get(array_keys($this->orderBy), 0),
+                OnOfficeService::SORTORDER => data_get($this->orderBy, 0),
+                ...$this->customParameters,
+            ],
         );
 
         return $response->json('response.results.0.data.records.0');

@@ -22,4 +22,5 @@ enum OnOfficeResourceType: string
     case SearchCriteria = 'searchcriterias';
     case ActionTypes = 'actionkindtypes';
     case Relation = 'relation';
+    case Search = 'search';
 }

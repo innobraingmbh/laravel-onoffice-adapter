@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Katalam\OnOfficeAdapter\Query\Testing;
 
 use Exception;
+use Katalam\OnOfficeAdapter\Query\Concerns\Input;
 use Katalam\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Throwable;
 
 class AddressBuilderFake extends BaseFake
 {
     use RecordIds;
+    use Input;
 
     /**
      * @throws Throwable
@@ -32,6 +34,14 @@ class AddressBuilderFake extends BaseFake
      * @throws Throwable
      */
     public function create(array $data): array
+    {
+        return $this->get()->first();
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function search()
     {
         return $this->get()->first();
     }
