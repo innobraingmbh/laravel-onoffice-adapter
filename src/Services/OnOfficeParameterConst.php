@@ -25,7 +25,11 @@ trait OnOfficeParameterConst
 
     public const PARENTIDS = 'parentids';
 
+    public const PARENTID = 'parentid';
+
     public const CHILDIDS = 'childids';
+
+    public const CHILDID = 'childid';
 
     public const RECORDIDS = 'recordids';
 

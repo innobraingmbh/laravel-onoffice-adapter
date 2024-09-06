@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.13.6
+- Fixed typo on relation create
+
 ## v0.13.5
 - Fixed estate find method
 

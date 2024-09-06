@@ -88,8 +88,8 @@ class RelationBuilder extends Builder
             OnOfficeResourceType::Relation,
             parameters: [
                 OnOfficeService::RELATIONTYPE => $this->relationType,
-                OnOfficeService::PARENTIDS => $this->parentIds,
-                OnOfficeService::CHILDIDS => $this->childIds,
+                OnOfficeService::PARENTID => $this->parentIds,
+                OnOfficeService::CHILDID => $this->childIds,
                 ...$this->customParameters,
             ],
         );
