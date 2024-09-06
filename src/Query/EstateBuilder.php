@@ -104,7 +104,9 @@ class EstateBuilder extends Builder
             OnOfficeAction::Modify,
             OnOfficeResourceType::Estate,
             $id,
-            parameters: $this->modifies,
+            parameters: [
+                OnOfficeService::DATA => $this->modifies,
+            ],
         );
 
         return true;
@@ -118,7 +120,9 @@ class EstateBuilder extends Builder
         $response = $this->onOfficeService->requestApi(
             OnOfficeAction::Create,
             OnOfficeResourceType::Estate,
-            parameters: $data,
+            parameters: [
+                OnOfficeService::DATA => $data,
+            ],
         );
 
         return $response->json('response.results.0.data.records.0');
