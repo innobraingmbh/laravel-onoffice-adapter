@@ -63,7 +63,7 @@ class EstateBuilder extends Builder
     public function find(int $id): array
     {
         $response = $this->onOfficeService->requestApi(
-            OnOfficeAction::Get,
+            OnOfficeAction::Read,
             OnOfficeResourceType::Estate,
             $id,
             parameters: [

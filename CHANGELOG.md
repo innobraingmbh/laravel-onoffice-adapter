@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.13.5
+- Fixed estate find method
+
 ## v0.13.4
 - Added a take method to limit the number of records returned
 
