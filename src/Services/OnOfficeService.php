@@ -216,9 +216,9 @@ class OnOfficeService
             // because it is not guaranteed that the record page size
             // will be the same as the take parameter
             $elements = $response->json($resultPath);
-            $elementCount += count($elements);
+            $elementCount += count($elements ?? []);
             if ($take > -1 && $elementCount > $take) {
-                $elements = array_slice($elements, 0, $elementCount - $take);
+                $elements = array_slice($elements, 0, $take - $elementCount);
             }
 
             $callback($elements);
