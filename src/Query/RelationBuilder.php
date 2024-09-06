@@ -81,9 +81,9 @@ class RelationBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function create(): array
+    public function create(): bool
     {
-        $response = $this->onOfficeService->requestApi(
+        $this->onOfficeService->requestApi(
             OnOfficeAction::Create,
             OnOfficeResourceType::Relation,
             parameters: [
@@ -94,6 +94,6 @@ class RelationBuilder extends Builder
             ],
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return true;
     }
 }
