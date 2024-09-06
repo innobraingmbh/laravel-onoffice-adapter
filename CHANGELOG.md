@@ -1,5 +1,7 @@
 # Changelog
 ## main
+
+## v0.13.4
 - Added a take method to limit the number of records returned
 
 ## v0.13.3
