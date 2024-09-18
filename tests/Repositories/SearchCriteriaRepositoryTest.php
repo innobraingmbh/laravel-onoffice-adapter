@@ -3,16 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\ActivityRepository;
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
 use Katalam\OnOfficeAdapter\Facades\SearchCriteriaRepository;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\SearchCriteriaFactory;
 use Katalam\OnOfficeAdapter\Tests\Stubs\GetSearchCriteriaResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadActivityResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadAddressResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadEstateResponse;
 
 describe('fake responses', function () {
     test('get', function () {

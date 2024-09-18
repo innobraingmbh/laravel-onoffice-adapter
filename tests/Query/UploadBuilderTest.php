@@ -6,7 +6,6 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Query\UploadBuilder;
 use Katalam\OnOfficeAdapter\Repositories\FileRepository;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 use Katalam\OnOfficeAdapter\Tests\Stubs\LinkDataResponse;
 use Katalam\OnOfficeAdapter\Tests\Stubs\UploadFileResponse;
 

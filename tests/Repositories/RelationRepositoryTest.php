@@ -4,28 +4,21 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeRelationType;
-use Katalam\OnOfficeAdapter\Facades\ActivityRepository;
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
 use Katalam\OnOfficeAdapter\Facades\RelationRepository;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\RelationFactory;
 use Katalam\OnOfficeAdapter\Tests\Stubs\GetEstateAgentsResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadActivityResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadAddressResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadEstateResponse;
 
 describe('fake responses', function () {
     test('get', function () {
         RelationRepository::fake(RelationRepository::response([
             RelationRepository::page(recordFactories: [
                 RelationFactory::make()
-                ->data([
-                    5779 => [
-                        '2169',
-                        '2205',
-                    ],
-                ]),
+                    ->data([
+                        5779 => [
+                            '2169',
+                            '2205',
+                        ],
+                    ]),
             ]),
         ]));
 

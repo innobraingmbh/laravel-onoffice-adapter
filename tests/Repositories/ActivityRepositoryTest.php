@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Facades\ActivityRepository;
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Katalam\OnOfficeAdapter\Tests\Stubs\ReadActivityResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadAddressResponse;
 
 describe('fake responses', function () {
     test('get', function () {

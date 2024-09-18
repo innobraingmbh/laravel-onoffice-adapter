@@ -2,11 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Query\FieldBuilder;
 use Katalam\OnOfficeAdapter\Repositories\FieldRepository;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
-use Katalam\OnOfficeAdapter\Tests\Stubs\GetFieldsResponse;
 
 describe('withModules', function () {
     it('should set the modules property to the given modules', function () {

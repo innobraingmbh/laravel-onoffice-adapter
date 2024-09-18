@@ -10,7 +10,6 @@ use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class EstateFileBuilder extends Builder
@@ -145,6 +144,6 @@ class EstateFileBuilder extends Builder
         );
 
         return $this->requestApi($request)
-                ->json('response.results.0.data.records.0.elements.success') === 'success';
+            ->json('response.results.0.data.records.0.elements.success') === 'success';
     }
 }

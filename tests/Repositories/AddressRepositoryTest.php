@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Facades\AddressRepository;
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
 use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Katalam\OnOfficeAdapter\Tests\Stubs\ReadAddressResponse;
 

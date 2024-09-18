@@ -2,13 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
 use Katalam\OnOfficeAdapter\Query\AddressBuilder;
 use Katalam\OnOfficeAdapter\Repositories\AddressRepository;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
-use Katalam\OnOfficeAdapter\Tests\Stubs\CreateAddressResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadAddressResponse;
 
 describe('recordIds', function () {
     it('should set the recordIds property to the given recordIds', function () {

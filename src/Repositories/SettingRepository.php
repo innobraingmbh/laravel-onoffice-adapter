@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Katalam\OnOfficeAdapter\Repositories;
 
 use Katalam\OnOfficeAdapter\Query\ActionBuilder;
-use Katalam\OnOfficeAdapter\Query\Builder;
 use Katalam\OnOfficeAdapter\Query\ImprintBuilder;
 use Katalam\OnOfficeAdapter\Query\RegionBuilder;
 use Katalam\OnOfficeAdapter\Query\UserBuilder;

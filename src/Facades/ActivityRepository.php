@@ -6,8 +6,8 @@ namespace Katalam\OnOfficeAdapter\Facades;
 
 use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
-use Katalam\OnOfficeAdapter\Repositories\ActivityRepository as RootRepository;
 use Katalam\OnOfficeAdapter\Query\ActivityBuilder;
+use Katalam\OnOfficeAdapter\Repositories\ActivityRepository as RootRepository;
 
 /**
  * @see RootRepository

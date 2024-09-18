@@ -209,7 +209,7 @@ describe('request', function () {
             'https://api.onoffice.de/api/stable/api.php/' => Http::response([
                 'status' => [
                     'code' => 200,
-                ]
+                ],
             ]),
         ]);
 
@@ -228,7 +228,7 @@ describe('request', function () {
             'https://api.onoffice.de/api/stable/api.php/' => Http::response([
                 'status' => [
                     'code' => 200,
-                ]
+                ],
             ]),
         ]);
 
@@ -247,7 +247,7 @@ describe('request', function () {
             'https://api.onoffice.de/api/stable/api.php/' => Http::response([
                 'status' => [
                     'code' => 200,
-                ]
+                ],
             ]),
         ]);
 

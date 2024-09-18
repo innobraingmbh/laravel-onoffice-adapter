@@ -14,7 +14,6 @@ use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Query\Builder;
 use PHPUnit\Framework\Assert as PHPUnit;
-use RuntimeException;
 
 class BaseRepository
 {
