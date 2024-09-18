@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
@@ -198,5 +199,66 @@ describe('assert', function () {
         $builder->recordRequestResponsePair(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate), ['response']);
 
         $builder->assertSentCount(2);
+    });
+});
+
+describe('request', function () {
+    it('will call once', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ]
+            ]),
+        ]);
+
+        $builder = new BaseRepository;
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        $builder->query()->once($request);
+
+        Http::assertSentCount(1);
+    });
+
+    it('will call call', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ]
+            ]),
+        ]);
+
+        $builder = new BaseRepository;
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        $builder->query()->call($request);
+
+        Http::assertSentCount(1);
+    });
+
+    it('will call chunked', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ]
+            ]),
+        ]);
+
+        $builder = new BaseRepository;
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        $builder->query()->chunked($request, function () {
+            return true;
+        });
+
+        Http::assertSentCount(1);
     });
 });

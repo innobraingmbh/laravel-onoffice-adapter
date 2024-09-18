@@ -126,33 +126,7 @@ class BaseRepository
 
     protected function createBuilder(): Builder
     {
-        return new class extends Builder
-        {
-            public function get(): Collection
-            {
-                throw new RuntimeException('Not implemented');
-            }
-
-            public function first(): ?array
-            {
-                throw new RuntimeException('Not implemented');
-            }
-
-            public function find(int $id): array
-            {
-                throw new RuntimeException('Not implemented');
-            }
-
-            public function each(callable $callback): void
-            {
-                throw new RuntimeException('Not implemented');
-            }
-
-            public function modify(int $id): bool
-            {
-                throw new RuntimeException('Not implemented');
-            }
-        };
+        return new Builder;
     }
 
     /**

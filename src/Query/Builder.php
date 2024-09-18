@@ -20,7 +20,7 @@ use Katalam\OnOfficeAdapter\Repositories\BaseRepository;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
-abstract class Builder implements BuilderInterface
+class Builder implements BuilderInterface
 {
     use Conditionable;
 
@@ -325,5 +325,69 @@ abstract class Builder implements BuilderInterface
         $this->customParameters = array_replace_recursive($this->customParameters, $parameters);
 
         return $this;
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function get(): Collection
+    {
+        throw new OnOfficeException('Not implemented');
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function call(OnOfficeRequest $request): Collection
+    {
+        return $this->requestAll($request);
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function first(): ?array
+    {
+        throw new OnOfficeException('Not implemented');
+    }
+
+    /**
+     * @throws Throwable<OnOfficeException>
+     */
+    public function once(OnOfficeRequest $request): Response
+    {
+        return $this->requestApi($request);
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function find(int $id): array
+    {
+        throw new OnOfficeException('Not implemented');
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function each(callable $callback): void
+    {
+        throw new OnOfficeException('Not implemented');
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function chunked(OnOfficeRequest $request, callable $callback): void
+    {
+        $this->requestAllChunked($request, $callback);
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function modify(int $id): bool
+    {
+        throw new OnOfficeException('Not implemented');
     }
 }

@@ -2,33 +2,7 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Query\Builder as AbstractBuilder;
-
-class Builder extends AbstractBuilder
-{
-    public function get(): Collection
-    {
-        return new Collection;
-    }
-
-    public function first(): ?array
-    {
-        return [];
-    }
-
-    public function find(int $id): array
-    {
-        return [];
-    }
-
-    public function each(callable $callback): void {}
-
-    public function modify(int $id): bool
-    {
-        return true;
-    }
-}
+use Katalam\OnOfficeAdapter\Query\Builder;
 
 describe('select', function () {
     it('should set the columns property to the given columns', function () {
