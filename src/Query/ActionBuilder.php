@@ -33,36 +33,4 @@ class ActionBuilder extends Builder
 
         return $this->requestAll($request);
     }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function first(): ?array
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function find(int $id): array
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
-    }
 }

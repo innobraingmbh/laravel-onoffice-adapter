@@ -53,14 +53,6 @@ class RegionBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function find(int $id): array
-    {
-        throw new OnOfficeException('Method not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
     public function each(callable $callback): void
     {
         $request = new OnOfficeRequest(
@@ -72,11 +64,4 @@ class RegionBuilder extends Builder
         $this->requestAllChunked($request, $callback);
     }
 
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
-    }
 }

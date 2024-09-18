@@ -25,46 +25,6 @@ class UploadBuilder extends Builder
     use UploadInBlocks;
 
     /**
-     * @throws OnOfficeException
-     */
-    public function get(): Collection
-    {
-        throw new OnOfficeException('Method not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function first(): ?array
-    {
-        throw new OnOfficeException('Method not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function find(int $id): array
-    {
-        throw new OnOfficeException('Method not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        throw new OnOfficeException('Method not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
      * File content as base64-encoded binary data.
      * Returns the temporary upload id.
      *

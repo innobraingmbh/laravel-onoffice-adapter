@@ -52,14 +52,6 @@ class FieldBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function find(int $id): array
-    {
-        throw new OnOfficeException('Not implemented in onOffice');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
     public function each(callable $callback): void
     {
         $request = new OnOfficeRequest(
@@ -79,13 +71,5 @@ class FieldBuilder extends Builder
         $this->modules = array_merge($this->modules, Arr::wrap($modules));
 
         return $this;
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
     }
 }

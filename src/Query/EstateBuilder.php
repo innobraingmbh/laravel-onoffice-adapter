@@ -10,6 +10,7 @@ use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Throwable;
 
 class EstateBuilder extends Builder
 {
@@ -54,21 +55,22 @@ class EstateBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function find(int $id): array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Estate,
             $id,
             parameters: [
                 OnOfficeService::DATA => $this->columns,
                 ...$this->customParameters,
-            ]
+            ],
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 
     /**
@@ -91,11 +93,11 @@ class EstateBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function modify(int $id): bool
     {
-        $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Modify,
             OnOfficeResourceType::Estate,
             $id,
@@ -104,15 +106,17 @@ class EstateBuilder extends Builder
             ],
         );
 
+        $this->requestApi($request);
+
         return true;
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function create(array $data): array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Create,
             OnOfficeResourceType::Estate,
             parameters: [
@@ -120,6 +124,7 @@ class EstateBuilder extends Builder
             ],
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 }

@@ -49,35 +49,11 @@ class RelationBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function first(): ?array
-    {
-        throw new OnOfficeException('Not implemented in onOffice');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function find(int $id): array
-    {
-        throw new OnOfficeException('Not implemented in onOffice');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
     public function each(callable $callback): void
     {
         $records = $this->get();
 
         $callback($records);
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
     }
 
     /**

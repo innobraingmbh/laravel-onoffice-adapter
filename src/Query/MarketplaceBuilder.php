@@ -15,14 +15,6 @@ use Throwable;
 class MarketplaceBuilder extends Builder
 {
     /**
-     * @throws OnOfficeException
-     */
-    public function get(): Collection
-    {
-        throw new OnOfficeException('Method not implemented yet');
-    }
-
-    /**
      * @throws Throwable<OnOfficeException>
      */
     public function unlockProvider(
@@ -41,37 +33,5 @@ class MarketplaceBuilder extends Builder
 
         return $this->requestApi($request)
             ->json('response.results.0.data.records.0.elements.success') === 'success';
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function first(): ?array
-    {
-        throw new OnOfficeException('Method not implemented yet');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function find(int $id): array
-    {
-        throw new OnOfficeException('Method not implemented yet');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        throw new OnOfficeException('Method not implemented yet');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
     }
 }

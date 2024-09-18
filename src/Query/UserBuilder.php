@@ -93,11 +93,4 @@ class UserBuilder extends Builder
         $this->requestAllChunked($request, $callback);
     }
 
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
-    }
 }

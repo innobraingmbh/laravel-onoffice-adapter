@@ -70,20 +70,4 @@ class ImprintBuilder extends Builder
 
         return $response->json('response.results.0.data.records.0');
     }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
-    }
 }

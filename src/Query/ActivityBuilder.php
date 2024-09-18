@@ -115,14 +115,6 @@ class ActivityBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented yet');
-    }
-
-    /**
      * @throws Throwable<OnOfficeException>
      */
     public function create(array $data): array
