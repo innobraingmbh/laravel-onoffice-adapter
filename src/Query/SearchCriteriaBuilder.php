@@ -6,18 +6,16 @@ namespace Katalam\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Throwable;
 
 class SearchCriteriaBuilder extends Builder
 {
     private string $mode = 'internal';
-
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
 
     /**
      * @throws OnOfficeException
@@ -36,11 +34,11 @@ class SearchCriteriaBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function find(int|array $id): array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::SearchCriteria,
             parameters: [
@@ -50,7 +48,8 @@ class SearchCriteriaBuilder extends Builder
             ],
         );
 
-        return $response->json('response.results.0.data.records.0', []);
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0', []);
     }
 
     /**

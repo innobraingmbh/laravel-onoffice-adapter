@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Katalam\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Collection;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Throwable;
 
 class ActivityBuilder extends Builder
 {
@@ -17,71 +19,62 @@ class ActivityBuilder extends Builder
 
     public string $estateOrAddress = 'estate';
 
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
+    /**
+     * @throws OnOfficeException
+     */
     public function get(): Collection
     {
         $orderBy = $this->getOrderBy();
 
-        $sortBy = data_get(array_keys($orderBy), 0);
-        $sortOrder = data_get($orderBy, 0);
-
-        return $this->onOfficeService->requestAll(/**
-         * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy) {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Read,
-                OnOfficeResourceType::Activity,
-                parameters: [
-                    $this->estateOrAddress => $this->recordIds,
-                    OnOfficeService::DATA => $this->columns,
-                    OnOfficeService::FILTER => $this->getFilters(),
-                    OnOfficeService::LISTLIMIT => $pageSize,
-                    OnOfficeService::LISTOFFSET => $offset,
-                    OnOfficeService::SORTBY => $sortBy,
-                    OnOfficeService::SORTORDER => $sortOrder,
-                    ...$this->customParameters,
-                ]
-            );
-        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function first(): ?array
-    {
-        $orderBy = $this->getOrderBy();
-
-        $sortBy = data_get(array_keys($orderBy), 0);
-        $sortOrder = data_get($orderBy, 0);
-
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Activity,
             parameters: [
                 $this->estateOrAddress => $this->recordIds,
                 OnOfficeService::DATA => $this->columns,
                 OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::LISTLIMIT => $this->limit,
-                OnOfficeService::LISTOFFSET => $this->offset,
-                OnOfficeService::SORTBY => $sortBy,
-                OnOfficeService::SORTORDER => $sortOrder,
+                OnOfficeService::SORTBY => data_get(array_keys($orderBy), 0),
+                OnOfficeService::SORTORDER => data_get($orderBy, 0),
                 ...$this->customParameters,
             ]
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestAll($request);
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
+     */
+    public function first(): ?array
+    {
+        $orderBy = $this->getOrderBy();
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Activity,
+            parameters: [
+                $this->estateOrAddress => $this->recordIds,
+                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::LISTLIMIT => $this->limit > 0 ? $this->limit : $this->pageSize,
+                OnOfficeService::LISTOFFSET => $this->offset,
+                OnOfficeService::SORTBY => data_get(array_keys($orderBy), 0),
+                OnOfficeService::SORTORDER => data_get($orderBy, 0),
+                ...$this->customParameters,
+            ]
+        );
+
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
+
+    }
+
+    /**
+     * @throws Throwable<OnOfficeException>
      */
     public function find(int $id): array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Activity,
             $id,
@@ -91,9 +84,13 @@ class ActivityBuilder extends Builder
             ]
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 
+    /**
+     * @throws OnOfficeException
+     */
     public function each(callable $callback): void
     {
         $orderBy = $this->getOrderBy();
@@ -101,24 +98,20 @@ class ActivityBuilder extends Builder
         $sortBy = data_get(array_keys($orderBy), 0);
         $sortOrder = data_get($orderBy, 0);
 
-        $this->onOfficeService->requestAllChunked(/**
-         * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) use ($sortOrder, $sortBy) {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Read,
-                OnOfficeResourceType::Activity,
-                parameters: [
-                    $this->estateOrAddress => $this->recordIds,
-                    OnOfficeService::DATA => $this->columns,
-                    OnOfficeService::FILTER => $this->getFilters(),
-                    OnOfficeService::LISTLIMIT => $pageSize,
-                    OnOfficeService::LISTOFFSET => $offset,
-                    OnOfficeService::SORTBY => $sortBy,
-                    OnOfficeService::SORTORDER => $sortOrder,
-                    ...$this->customParameters,
-                ]
-            );
-        }, $callback, pageSize: $this->limit, offset: $this->offset, take: $this->take);
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Activity,
+            parameters: [
+                $this->estateOrAddress => $this->recordIds,
+                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::SORTBY => $sortBy,
+                OnOfficeService::SORTORDER => $sortOrder,
+                ...$this->customParameters,
+            ],
+        );
+
+        $this->requestAllChunked($request, $callback);
     }
 
     /**
@@ -130,7 +123,7 @@ class ActivityBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function create(array $data): array
     {
@@ -138,13 +131,14 @@ class ActivityBuilder extends Builder
             $this->estateOrAddress => $this->recordIds,
         ]);
 
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Create,
             OnOfficeResourceType::Activity,
             parameters: $data,
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 
     public function estate(): static

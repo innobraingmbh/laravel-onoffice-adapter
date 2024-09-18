@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Katalam\OnOfficeAdapter\Query\UploadBuilder;
+use Katalam\OnOfficeAdapter\Repositories\FileRepository;
 use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 use Katalam\OnOfficeAdapter\Tests\Stubs\LinkDataResponse;
 use Katalam\OnOfficeAdapter\Tests\Stubs\UploadFileResponse;
@@ -17,7 +18,8 @@ describe('work', function () {
             '*' => UploadFileResponse::make(),
         ]);
 
-        $builder = new UploadBuilder(app(OnOfficeService::class));
+        $builder = new UploadBuilder;
+        $builder->setRepository(app(FileRepository::class));
 
         $tmpUploadId = $builder->save(base64_encode('test'));
 
@@ -34,7 +36,8 @@ describe('work', function () {
             ]),
         ]);
 
-        $builder = new UploadBuilder(app(OnOfficeService::class));
+        $builder = new UploadBuilder;
+        $builder->setRepository(app(FileRepository::class));
 
         $tmpUploadId = $builder
             ->uploadInBlocks(4) // test as base64 string has 8 characters
@@ -52,7 +55,8 @@ describe('work', function () {
             '*' => LinkDataResponse::make(),
         ]);
 
-        $builder = new UploadBuilder(app(OnOfficeService::class));
+        $builder = new UploadBuilder;
+        $builder->setRepository(app(FileRepository::class));
 
         $builder->link('a17ebec0-48f9-44cc-8629-f49ccc68f2d2', [
             'module' => 'estate',
@@ -76,7 +80,8 @@ describe('work', function () {
             ]),
         ]);
 
-        $builder = new UploadBuilder(app(OnOfficeService::class));
+        $builder = new UploadBuilder;
+        $builder->setRepository(app(FileRepository::class));
 
         $builder->saveAndLink(base64_encode('test'), [
             'module' => 'estate',

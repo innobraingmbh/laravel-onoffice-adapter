@@ -4,12 +4,23 @@ declare(strict_types=1);
 
 namespace Katalam\OnOfficeAdapter\Query;
 
+use GuzzleHttp\Psr7\Response as Psr7Response;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
+use JsonException;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Katalam\OnOfficeAdapter\Exceptions\StrayRequestException;
+use Katalam\OnOfficeAdapter\Query\Concerns\BuilderInterface;
+use Katalam\OnOfficeAdapter\Repositories\BaseRepository;
+use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Throwable;
 
-abstract class Builder
+abstract class Builder implements BuilderInterface
 {
     use Conditionable;
 
@@ -29,14 +40,14 @@ abstract class Builder
     public array $modifies = [];
 
     /**
-     * The limit for the query.
+     * The limit for the result.
      */
-    public int $limit = 500;
+    public int $limit = -1;
 
     /**
-     * The take for the number of results.
+     * The page size for the result.
      */
-    public int $take = -1;
+    public int $pageSize = 500;
 
     /**
      * An array of columns to order by.
@@ -49,10 +60,148 @@ abstract class Builder
      */
     public int $offset = 0;
 
-    /*
+    /**
      * An array of custom parameters.
      */
     public array $customParameters = [];
+
+    /**
+     * The stub callables that will be used to fake the responses.
+     */
+    protected Collection $stubCallables;
+
+    /**
+     * Indicates that an exception should be thrown
+     * if a request is made without a stub callable.
+     */
+    protected bool $preventStrayRequests = false;
+
+    /**
+     * The OnOffice service.
+     */
+    protected OnOfficeService $onOfficeService;
+
+    /**
+     * The repository that created the builder.
+     */
+    protected BaseRepository $repository;
+
+    public function __construct() {}
+
+    protected function getOnOfficeService(): OnOfficeService
+    {
+        return $this->onOfficeService ?? $this->createOnOfficeService();
+    }
+
+    protected function createOnOfficeService(): OnOfficeService
+    {
+        return app(OnOfficeService::class);
+    }
+
+    public function setRepository(BaseRepository $repository): static
+    {
+        $this->repository = $repository;
+
+        return $this;
+    }
+
+    public function stub(Collection $stubCallable): self
+    {
+        $this->stubCallables = $stubCallable;
+
+        return $this;
+    }
+
+    public function preventStrayRequests(bool $value = true): static
+    {
+        $this->preventStrayRequests = $value;
+
+        return $this;
+    }
+
+    /**
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    public function requestApi(OnOfficeRequest $request): Response
+    {
+        $response = $this->getStubCallable($request);
+
+        if (is_null($response)) {
+            throw_if($this->preventStrayRequests, new StrayRequestException(request: $request));
+
+            $response = $this->getOnOfficeService()->requestApi(
+                $request->actionId,
+                $request->resourceType,
+                $request->resourceId,
+                $request->identifier,
+                $request->parameters,
+            );
+        }
+
+        $this->repository->recordRequestResponsePair($request, $response->json());
+
+        return $response;
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    protected function requestAll(OnOfficeRequest $request): Collection
+    {
+        return $this->getOnOfficeService()->requestAll(/**
+         * @throws OnOfficeException
+         * @throws Throwable
+         */ function (int $pageSize, int $offset) use ($request) {
+            $parameter = $request->parameters;
+            data_set($parameter, OnOfficeService::LISTLIMIT, $pageSize);
+            data_set($parameter, OnOfficeService::LISTOFFSET, $offset);
+
+            return $this->requestApi($request);
+        }, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit);
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    protected function requestAllChunked(OnOfficeRequest $request, callable $callback): void
+    {
+        $this->getOnOfficeService()->requestAllChunked(/**
+         * @throws OnOfficeException
+         * @throws Throwable
+         */ function (int $pageSize, int $offset) use ($request) {
+            $parameter = $request->parameters;
+            data_set($parameter, OnOfficeService::LISTLIMIT, $pageSize);
+            data_set($parameter, OnOfficeService::LISTOFFSET, $offset);
+
+            return $this->requestApi($request);
+        }, $callback, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    protected function getStubCallable(OnOfficeRequest $request): ?Response
+    {
+        $response = ($this->stubCallables ?? collect())->first();
+
+        ($this->stubCallables ?? collect())->shift();
+
+        if (is_null($response)) {
+            return null;
+        }
+
+        /** @var OnOfficeResponse $response */
+        if ($response->isEmpty()) {
+            return null;
+        }
+
+        $response = $response->shift()->toResponse();
+
+        $response = new Psr7Response(200, [], json_encode($response, JSON_THROW_ON_ERROR));
+
+        return new Response($response);
+    }
 
     public function select(array|string $columns = ['ID']): static
     {
@@ -106,23 +255,21 @@ abstract class Builder
 
     /**
      * Be aware that the limit is capped at 500.
-     * Be aware that the limit will change the page size of the result.
-     * Not the number of results.
      */
     public function limit(int $value): static
     {
-        $this->limit = max(0, $value);
+        $this->limit = max(-1, $value);
 
         return $this;
     }
 
     /**
-     * Be aware that the take will change the number of results.
-     * Be aware that the take will not change the page size of the result.
+     * Be aware that the page size is capped at 500.
      */
-    public function take(int $value): static
+    public function pageSize(int $value): static
     {
-        $this->take = max(-1, $value);
+        $this->pageSize = min(500, $value);
+        $this->pageSize = max(1, $this->pageSize);
 
         return $this;
     }
@@ -179,14 +326,4 @@ abstract class Builder
 
         return $this;
     }
-
-    abstract public function get(): Collection;
-
-    abstract public function first(): ?array;
-
-    abstract public function find(int $id): array;
-
-    abstract public function each(callable $callback): void;
-
-    abstract public function modify(int $id): bool;
 }

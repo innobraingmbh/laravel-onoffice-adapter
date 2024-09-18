@@ -1,0 +1,243 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Katalam\OnOfficeAdapter\Repositories;
+
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
+use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
+use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Katalam\OnOfficeAdapter\Query\Builder;
+use PHPUnit\Framework\Assert as PHPUnit;
+use RuntimeException;
+
+class BaseRepository
+{
+    /**
+     * The stub callables that will be used to fake the responses.
+     */
+    protected Collection $stubCallables;
+
+    /**
+     * Indicates that an exception should be thrown
+     * if a request is made without a stub callable.
+     */
+    protected bool $preventStrayRequests = false;
+
+    /**
+     * Indicates that the requests should be recorded.
+     */
+    protected bool $recording = false;
+
+    /**
+     * The recorded requests.
+     */
+    protected array $recorded = [];
+
+    public function __construct()
+    {
+        $this->stubCallables = new Collection;
+    }
+
+    public function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $responses): static
+    {
+        $this->record();
+
+        if (is_null($responses)) {
+            $responses = $this->response();
+        }
+
+        if (is_array($responses)) {
+            foreach ($responses as $fake) {
+                if ($fake instanceof OnOfficeResponse) {
+                    $this->stubCallables->push($fake);
+                } elseif ($fake instanceof OnOfficeResponsePage || is_array($fake)) {
+                    $this->stubCallables->push(new OnOfficeResponse(collect(Arr::wrap($fake))));
+                }
+            }
+
+            return $this;
+        }
+
+        if ($responses instanceof OnOfficeResponse) {
+            $this->stubCallables->push($responses);
+        }
+
+        if ($responses instanceof OnOfficeResponsePage) {
+            $this->stubCallables->push(new OnOfficeResponse(collect([$responses])));
+        }
+
+        return $this;
+    }
+
+    public function response(array $pages = []): OnOfficeResponse
+    {
+        if ($pages === []) {
+            $pages = [$this->page()];
+        }
+
+        return new OnOfficeResponse(collect($pages));
+    }
+
+    public function page(
+        OnOfficeAction $actionId = OnOfficeAction::Read,
+        OnOfficeResourceType|string $resourceType = OnOfficeResourceType::Estate,
+        array $recordFactories = [],
+        int $status = 200,
+        int $errorCode = 0,
+        string $message = 'OK',
+        OnOfficeResourceId|string|int $resourceId = OnOfficeResourceId::None,
+        bool $cacheable = true,
+        string|int $identifier = '',
+        int $countAbsolute = 0,
+        int $errorCodeResult = 0,
+        string $messageResult = 'OK',
+    ): OnOfficeResponsePage {
+        return new OnOfficeResponsePage(
+            $actionId,
+            $resourceType,
+            collect($recordFactories),
+            $status,
+            $errorCode,
+            $message,
+            $resourceId,
+            $cacheable,
+            $identifier,
+            $countAbsolute,
+            $errorCodeResult,
+            $messageResult,
+        );
+    }
+
+    public function query(): Builder
+    {
+        return tap($this->createBuilder(), function (Builder $builder) {
+            $builder
+                ->stub($this->stubCallables)
+                ->preventStrayRequests($this->preventStrayRequests)
+                ->setRepository($this);
+        });
+    }
+
+    protected function createBuilder(): Builder
+    {
+        return new class extends Builder
+        {
+            public function get(): Collection
+            {
+                throw new RuntimeException('Not implemented');
+            }
+
+            public function first(): ?array
+            {
+                throw new RuntimeException('Not implemented');
+            }
+
+            public function find(int $id): array
+            {
+                throw new RuntimeException('Not implemented');
+            }
+
+            public function each(callable $callback): void
+            {
+                throw new RuntimeException('Not implemented');
+            }
+
+            public function modify(int $id): bool
+            {
+                throw new RuntimeException('Not implemented');
+            }
+        };
+    }
+
+    /**
+     * Create a new builder instance from the given class.
+     * The parameters will be passed to the builder's constructor.
+     */
+    protected function createBuilderFromClass(string $class, ...$parameter): Builder
+    {
+        return tap(new $class(...$parameter), function (Builder $builder) {
+            $builder
+                ->stub($this->stubCallables)
+                ->preventStrayRequests($this->preventStrayRequests)
+                ->setRepository($this);
+        });
+    }
+
+    public function preventStrayRequests(bool $value = true): static
+    {
+        $this->preventStrayRequests = $value;
+
+        return $this;
+    }
+
+    public function allowStrayRequests(): static
+    {
+        return $this->preventStrayRequests(false);
+    }
+
+    public function record(bool $recording = true): static
+    {
+        $this->recording = $recording;
+
+        return $this;
+    }
+
+    public function stopRecording(): static
+    {
+        return $this->record(false);
+    }
+
+    public function recordRequestResponsePair(OnOfficeRequest $request, array $response): static
+    {
+        if ($this->recording) {
+            $this->recorded[] = [$request, $response];
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get a collection of the request / response pairs matching the given truth test.
+     */
+    public function recorded(?callable $callback = null): Collection
+    {
+        if (empty($this->recorded)) {
+            return collect();
+        }
+
+        $callback = $callback ?: static function () {
+            return true;
+        };
+
+        return collect($this->recorded)->filter(function (array $pair) use ($callback) {
+            return $callback($pair[0], $pair[1]);
+        });
+    }
+
+    public function assertSent(?callable $callback = null): void
+    {
+        PHPUnit::assertTrue(
+            $this->recorded($callback)->isNotEmpty(),
+            'An expected request was not recorded.'
+        );
+    }
+
+    public function assertNotSent(?callable $callback = null): void
+    {
+        PHPUnit::assertTrue(
+            $this->recorded($callback)->isEmpty(),
+            'An unexpected request was recorded.'
+        );
+    }
+
+    public function assertSentCount(int $count): void
+    {
+        PHPUnit::assertCount($count, $this->recorded());
+    }
+}

@@ -6,33 +6,30 @@ namespace Katalam\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
 class FieldBuilder extends Builder
 {
     public array $modules = [];
 
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
+    /**
+     * @throws OnOfficeException
+     */
     public function get(): Collection
     {
-        return $this->onOfficeService->requestAll(/**
-         * @throws OnOfficeException
-         */ function () {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Fields,
-                parameters: [
-                    'modules' => $this->modules,
-                    ...$this->customParameters,
-                ],
-            );
-        });
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Fields,
+            parameters: [
+                'modules' => $this->modules,
+                ...$this->customParameters,
+            ],
+        );
+
+        return $this->requestAll($request);
     }
 
     /**
@@ -60,20 +57,21 @@ class FieldBuilder extends Builder
         throw new OnOfficeException('Not implemented in onOffice');
     }
 
+    /**
+     * @throws OnOfficeException
+     */
     public function each(callable $callback): void
     {
-        $this->onOfficeService->requestAllChunked(/**
-         * @throws OnOfficeException
-         */ function () {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Fields,
-                parameters: [
-                    'modules' => $this->modules,
-                    ...$this->customParameters,
-                ],
-            );
-        }, $callback);
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Fields,
+            parameters: [
+                'modules' => $this->modules,
+                ...$this->customParameters,
+            ],
+        );
+
+        $this->requestAllChunked($request, $callback);
     }
 
     public function withModules(array|string $modules): static

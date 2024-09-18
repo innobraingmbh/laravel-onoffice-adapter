@@ -5,19 +5,11 @@ declare(strict_types=1);
 namespace Katalam\OnOfficeAdapter\Repositories;
 
 use Katalam\OnOfficeAdapter\Query\AddressBuilder;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
-class AddressRepository
+class AddressRepository extends BaseRepository
 {
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
-    /**
-     * Returns a new address builder instance.
-     */
-    public function query(): AddressBuilder
+    protected function createBuilder(): AddressBuilder
     {
-        return new AddressBuilder($this->onOfficeService);
+        return new AddressBuilder;
     }
 }

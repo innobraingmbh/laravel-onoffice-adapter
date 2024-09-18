@@ -5,23 +5,20 @@ declare(strict_types=1);
 namespace Katalam\OnOfficeAdapter\Repositories;
 
 use Katalam\OnOfficeAdapter\Query\ActionBuilder;
+use Katalam\OnOfficeAdapter\Query\Builder;
 use Katalam\OnOfficeAdapter\Query\ImprintBuilder;
 use Katalam\OnOfficeAdapter\Query\RegionBuilder;
 use Katalam\OnOfficeAdapter\Query\UserBuilder;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
 
-class SettingRepository
+class SettingRepository extends BaseRepository
 {
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
     /**
      * Returns a new user builder instance.
      */
     public function users(): UserBuilder
     {
-        return new UserBuilder($this->onOfficeService);
+        /** @var UserBuilder */
+        return $this->createBuilderFromClass(UserBuilder::class);
     }
 
     /**
@@ -29,7 +26,8 @@ class SettingRepository
      */
     public function regions(): RegionBuilder
     {
-        return new RegionBuilder($this->onOfficeService);
+        /** @var RegionBuilder */
+        return $this->createBuilderFromClass(RegionBuilder::class);
     }
 
     /*
@@ -37,7 +35,8 @@ class SettingRepository
      */
     public function imprint(): ImprintBuilder
     {
-        return new ImprintBuilder($this->onOfficeService);
+        /** @var ImprintBuilder */
+        return $this->createBuilderFromClass(ImprintBuilder::class);
     }
 
     /*
@@ -45,6 +44,7 @@ class SettingRepository
      */
     public function actions(): ActionBuilder
     {
-        return new ActionBuilder($this->onOfficeService);
+        /** @var ActionBuilder */
+        return $this->createBuilderFromClass(ActionBuilder::class);
     }
 }

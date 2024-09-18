@@ -4,26 +4,27 @@ declare(strict_types=1);
 
 namespace Katalam\OnOfficeAdapter\Facades;
 
-use Illuminate\Support\Facades\Facade;
-use Katalam\OnOfficeAdapter\Facades\Testing\FileRepositoryFake;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Katalam\OnOfficeAdapter\Query\UploadBuilder;
+use Katalam\OnOfficeAdapter\Repositories\FileRepository as RootRepository;
 
 /**
- * @see \Katalam\OnOfficeAdapter\Repositories\SettingRepository
+ * @see RootRepository
  *
- * @method static UploadBuilder upload()
+ * @method static UploadBuilder query()
  */
-class FileRepository extends Facade
+class FileRepository extends BaseRepository
 {
-    public static function fake(array ...$fakeResponses): FileRepositoryFake
+    public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {
-        static::swap($fake = new FileRepositoryFake(...$fakeResponses));
-
-        return $fake;
+        return tap(static::getFacadeRoot(), static function (RootRepository $fake) use ($stubCallables) {
+            $fake->fake($stubCallables);
+        });
     }
 
     protected static function getFacadeAccessor(): string
     {
-        return \Katalam\OnOfficeAdapter\Repositories\FileRepository::class;
+        return RootRepository::class;
     }
 }

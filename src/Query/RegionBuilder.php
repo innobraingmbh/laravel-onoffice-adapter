@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Katalam\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Collection;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Katalam\OnOfficeAdapter\Query\Concerns\NonFilterable;
 use Katalam\OnOfficeAdapter\Query\Concerns\NonOrderable;
 use Katalam\OnOfficeAdapter\Query\Concerns\NonSelectable;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Throwable;
 
 class RegionBuilder extends Builder
 {
@@ -20,35 +21,33 @@ class RegionBuilder extends Builder
     use NonOrderable;
     use NonSelectable;
 
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
-    public function get(): Collection
-    {
-        return $this->onOfficeService->requestAll(/**
-         * @throws OnOfficeException
-         */ function () {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Regions,
-                ...$this->customParameters,
-            );
-        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
-    }
-
     /**
      * @throws OnOfficeException
      */
-    public function first(): ?array
+    public function get(): Collection
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Regions,
             ...$this->customParameters,
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestAll($request);
+    }
+
+    /**
+     * @throws Throwable<OnOfficeException>
+     */
+    public function first(): ?array
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Regions,
+            ...$this->customParameters,
+        );
+
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 
     /**
@@ -59,17 +58,18 @@ class RegionBuilder extends Builder
         throw new OnOfficeException('Method not implemented');
     }
 
+    /**
+     * @throws OnOfficeException
+     */
     public function each(callable $callback): void
     {
-        $this->onOfficeService->requestAllChunked(/**
-         * @throws OnOfficeException
-         */ function () {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Regions,
-                ...$this->customParameters,
-            );
-        }, $callback, pageSize: $this->limit, offset: $this->offset, take: $this->take);
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Regions,
+            ...$this->customParameters,
+        );
+
+        $this->requestAllChunked($request, $callback);
     }
 
     /**

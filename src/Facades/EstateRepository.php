@@ -4,28 +4,29 @@ declare(strict_types=1);
 
 namespace Katalam\OnOfficeAdapter\Facades;
 
-use Illuminate\Support\Facades\Facade;
-use Katalam\OnOfficeAdapter\Facades\Testing\EstateRepositoryFake;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Katalam\OnOfficeAdapter\Query\EstateBuilder;
 use Katalam\OnOfficeAdapter\Query\EstateFileBuilder;
+use Katalam\OnOfficeAdapter\Repositories\EstateRepository as RootRepository;
 
 /**
- * @see \Katalam\OnOfficeAdapter\Repositories\EstateRepository
+ * @see RootRepository
  *
  * @method static EstateBuilder query()
  * @method static EstateFileBuilder files(int $estateId)
  */
-class EstateRepository extends Facade
+class EstateRepository extends BaseRepository
 {
-    public static function fake(array ...$fakeResponses): EstateRepositoryFake
+    public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {
-        static::swap($fake = new EstateRepositoryFake(...$fakeResponses));
-
-        return $fake;
+        return tap(static::getFacadeRoot(), static function (RootRepository $fake) use ($stubCallables) {
+            $fake->fake($stubCallables);
+        });
     }
 
     protected static function getFacadeAccessor(): string
     {
-        return \Katalam\OnOfficeAdapter\Repositories\EstateRepository::class;
+        return RootRepository::class;
     }
 }
