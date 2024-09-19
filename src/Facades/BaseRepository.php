@@ -10,12 +10,13 @@ use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Katalam\OnOfficeAdapter\Query\Builder;
 use Katalam\OnOfficeAdapter\Repositories\BaseRepository as RootRepository;
 
 /**
  * @see RootRepository
  *
- * @method static RootRepository query()
+ * @method static Builder query()
  */
 class BaseRepository extends Facade
 {

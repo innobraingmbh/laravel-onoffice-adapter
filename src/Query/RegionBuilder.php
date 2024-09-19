@@ -63,5 +63,4 @@ class RegionBuilder extends Builder
 
         $this->requestAllChunked($request, $callback);
     }
-
 }

@@ -92,5 +92,4 @@ class UserBuilder extends Builder
 
         $this->requestAllChunked($request, $callback);
     }
-
 }
