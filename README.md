@@ -124,33 +124,86 @@ Config::set('onoffice.api_claim', 'api_claim');
 
 ### Usage in tests
 ```php
-EstateRepository::fake([ // First request
-    [ // First page of first request
-        EstateFactory::make() // First record of first page of first request
-            ->id(1)
-            ->set('foo', 'bar'),
-    ],
-], [ // Second request
-    [ // First page of second request
-        EstateFactory::make() // First record of first page of second request
-            ->id(2)
-            ->set('foo', 'baz'),
-        EstateFactory::make() // Second record of first page of second request
-            ->id(3),
-    ],
+use Katalam\OnOfficeAdapter\Facades\EstateRepository;
+
+EstateRepository::fake(EstateRepository::response([
+    EstateRepository::page(recordFactories: [
+        EstateFactory::make()
+            ->id(1),
+    ]),
+]));
+
+$response = EstateRepository::query()->get();
+
+expect($response->count())->toBe(1)
+    ->and($response->first()['id'])->toBe(1);
+
+EstateRepository::assertSentCount(1);
+```
+```php
+use Katalam\OnOfficeAdapter\Facades\EstateRepository;
+
+EstateRepository::fake(EstateRepository::response([
+    EstateRepository::page(recordFactories: [
+        EstateFactory::make()
+            ->id(1),
+    ]),
+    EstateRepository::page(recordFactories: [
+        EstateFactory::make()
+            ->id(2),
+    ]),
+]));
+
+$response = EstateRepository::query()->get();
+
+expect($response->count())->toBe(2)
+    ->and($response->first()['id'])->toBe(1)
+    ->and($response->last()['id'])->toBe(2);
+
+EstateRepository::assertSentCount(2);
+```
+```php
+use Katalam\OnOfficeAdapter\Facades\EstateRepository;
+
+EstateRepository::preventStrayRequests();
+EstateRepository::fake([
+    EstateRepository::response([
+        EstateRepository::page(recordFactories: [
+            EstateFactory::make()
+                ->id(1),
+        ]),
+        EstateRepository::page(recordFactories: [
+            EstateFactory::make()
+                ->id(2),
+        ]),
+    ]),
+    EstateRepository::response([
+        EstateRepository::page(recordFactories: [
+            EstateFactory::make()
+                ->id(3),
+        ]),
+        EstateRepository::page(recordFactories: [
+            EstateFactory::make()
+                ->id(4),
+        ]),
+    ]),
 ]);
 
-// request as normal
-$estates = EstateRepository::query()->get();
+$response = EstateRepository::query()->get();
 
-expect($estates)->toHaveCount(1)
-    ->and($estates->first()['id'])->toBe(1);
+expect($response->count())->toBe(2)
+    ->and($response->first()['id'])->toBe(1)
+    ->and($response->last()['id'])->toBe(2);
+    
+$response = EstateRepository::query()->get();
 
-$estates = EstateRepository::query()->get();
+expect($response->count())->toBe(2)
+    ->and($response->first()['id'])->toBe(3)
+    ->and($response->last()['id'])->toBe(4);
 
-expect($estates)->toHaveCount(2)
-    ->and($estates->first()['id'])->toBe(2)
-    ->and($estates->last()['id'])->toBe(3);
+EstateRepository::assertSentCount(4);
+
+$response = EstateRepository::query()->get(); // throws StrayRequestException
 ```
 
 ## Testing
