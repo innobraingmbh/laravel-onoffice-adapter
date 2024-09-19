@@ -10,7 +10,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
-use JsonException;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
@@ -18,6 +17,7 @@ use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\BuilderInterface;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use JsonException;
 use Throwable;
 
 class Builder implements BuilderInterface
