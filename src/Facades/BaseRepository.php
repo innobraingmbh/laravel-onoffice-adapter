@@ -47,7 +47,7 @@ class BaseRepository extends Facade
         OnOfficeResourceId|string|int $resourceId = OnOfficeResourceId::None,
         bool $cacheable = true,
         string|int $identifier = '',
-        int $countAbsolute = 0,
+        int $countAbsolute = -1,
         int $errorCodeResult = 0,
         string $messageResult = 'OK',
     ): OnOfficeResponsePage {
