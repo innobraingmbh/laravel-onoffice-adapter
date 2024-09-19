@@ -50,6 +50,18 @@ return [
 
 ## Usage
 
+### Repositories
+* ActivityRepository
+* AddressRepository
+* EstateRepository
+* FieldRepository
+* FileRepository
+* MarketplaceRepository
+* RelationRepository
+* SearchCriteriaRepository
+* SettingRepository
+
+### Syntax for typical queries
 ```php
 $estates = EstateRepository::query()
     ->select('Id')
@@ -58,9 +70,6 @@ $estates = EstateRepository::query()
     ->orderBy('kaufpreis')
     ->orderByDesc('warmmiete')
     ->get();
-
-$success = MarketplaceRepository::query()
-    ->unlockProvider($parameterCacheId, $extendedClaim);
 
 $users = UserRepository::query()
     ->select([
@@ -72,16 +81,29 @@ $users = UserRepository::query()
     ->where('Nr', $this->userId)
     ->get();
 ```
+
+### Unusual queries
+```php
+$success = MarketplaceRepository::query()
+    ->unlockProvider($parameterCacheId, $extendedClaim);
+```
 ```php
 $tmpUploadId = FileRepository::upload()
     ->save(base64_encode($fileContent));
-
 $success = FileRepository::upload()->link($tmpUploadId, [
     'module' => 'estate',
     'relatedRecordId' => '12345',
 ]);
-```
 
+// or
+
+$success = FileRepository::upload()
+    ->uploadInBlocks()
+    ->saveAndLink(base64_encode($fileContent), [
+        'module' => 'estate',
+        'relatedRecordId' => '12345',
+    ]);
+```
 ```php
 ActivityRepository::query()
     ->recordIds($recordIds)
