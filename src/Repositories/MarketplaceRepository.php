@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\MarketplaceBuilder;
+use Innobrain\OnOfficeAdapter\Query\MarketplaceBuilder;
 
 class MarketplaceRepository extends BaseRepository
 {

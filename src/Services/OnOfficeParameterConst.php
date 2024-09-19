@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Services;
+namespace Innobrain\OnOfficeAdapter\Services;
 
 trait OnOfficeParameterConst
 {

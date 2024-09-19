@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeRelationType;
-use Katalam\OnOfficeAdapter\Facades\RelationRepository;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\RelationFactory;
-use Katalam\OnOfficeAdapter\Tests\Stubs\GetEstateAgentsResponse;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeRelationType;
+use Innobrain\OnOfficeAdapter\Facades\RelationRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\RelationFactory;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\GetEstateAgentsResponse;
 
 describe('fake responses', function () {
     test('get', function () {

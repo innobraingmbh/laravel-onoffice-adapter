@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\ActionBuilder;
-use Katalam\OnOfficeAdapter\Query\ImprintBuilder;
-use Katalam\OnOfficeAdapter\Query\RegionBuilder;
-use Katalam\OnOfficeAdapter\Query\UserBuilder;
+use Innobrain\OnOfficeAdapter\Query\ActionBuilder;
+use Innobrain\OnOfficeAdapter\Query\ImprintBuilder;
+use Innobrain\OnOfficeAdapter\Query\RegionBuilder;
+use Innobrain\OnOfficeAdapter\Query\UserBuilder;
 
 class SettingRepository extends BaseRepository
 {

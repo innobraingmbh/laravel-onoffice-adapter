@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\MarketplaceRepository;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\MarketPlaceUnlockProviderFactory;
-use Katalam\OnOfficeAdapter\Tests\Stubs\DoUnlockProviderResponse;
+use Innobrain\OnOfficeAdapter\Facades\MarketplaceRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\MarketPlaceUnlockProviderFactory;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\DoUnlockProviderResponse;
 
 describe('fake responses', function () {
     test('get', function () {

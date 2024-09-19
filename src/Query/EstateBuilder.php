@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query;
+namespace Innobrain\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class EstateBuilder extends Builder

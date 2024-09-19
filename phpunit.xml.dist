@@ -16,7 +16,7 @@
     backupStaticProperties="false"
 >
     <testsuites>
-        <testsuite name="Katalam Test Suite">
+        <testsuite name="Innobrain Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

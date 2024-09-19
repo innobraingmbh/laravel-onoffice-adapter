@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades;
+namespace Innobrain\OnOfficeAdapter\Facades;
 
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
-use Katalam\OnOfficeAdapter\Query\FieldBuilder;
-use Katalam\OnOfficeAdapter\Repositories\FieldRepository as RootRepository;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Query\FieldBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\FieldRepository as RootRepository;
 
 /**
  * @see RootRepository

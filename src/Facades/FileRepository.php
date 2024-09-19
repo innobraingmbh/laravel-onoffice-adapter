@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades;
+namespace Innobrain\OnOfficeAdapter\Facades;
 
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
-use Katalam\OnOfficeAdapter\Query\UploadBuilder;
-use Katalam\OnOfficeAdapter\Repositories\FileRepository as RootRepository;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Query\UploadBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\FileRepository as RootRepository;
 
 /**
  * @see RootRepository

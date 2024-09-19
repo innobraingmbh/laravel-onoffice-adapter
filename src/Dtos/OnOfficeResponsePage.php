@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Dtos;
+namespace Innobrain\OnOfficeAdapter\Dtos;
 
 use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
 
 readonly class OnOfficeResponsePage
 {

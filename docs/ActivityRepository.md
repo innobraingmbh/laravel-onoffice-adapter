@@ -2,7 +2,7 @@
 
 ## Estates
 ```php
-use Katalam\OnOfficeAdapter\Facades\ActivityRepository;
+use Innobrain\OnOfficeAdapter\Facades\ActivityRepository;
 
 $activities = ActivityRepository::query()
     ->recordIdsAsAddress()

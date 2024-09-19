@@ -2,6 +2,6 @@
 
 declare(strict_types=1);
 
-use Katalam\OnOfficeAdapter\Tests\TestCase;
+use Innobrain\OnOfficeAdapter\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);

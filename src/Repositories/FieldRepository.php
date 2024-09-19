@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\FieldBuilder;
+use Innobrain\OnOfficeAdapter\Query\FieldBuilder;
 
 class FieldRepository extends BaseRepository
 {

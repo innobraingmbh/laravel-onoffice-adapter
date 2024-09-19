@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\AddressBuilder;
+use Innobrain\OnOfficeAdapter\Query\AddressBuilder;
 
 class AddressRepository extends BaseRepository
 {

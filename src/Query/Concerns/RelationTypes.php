@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query\Concerns;
+namespace Innobrain\OnOfficeAdapter\Query\Concerns;
 
 use Illuminate\Support\Arr;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeRelationType;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeRelationType;
 
 trait RelationTypes
 {

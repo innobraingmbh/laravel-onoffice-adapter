@@ -1,7 +1,7 @@
 # File Repository
 
 ```php
-use Katalam\OnOfficeAdapter\Facades\FileRepository;
+use Innobrain\OnOfficeAdapter\Facades\FileRepository;
 
 $tmpUploadId = FileRepository::query()
     ->uploadInBlocks(5120)

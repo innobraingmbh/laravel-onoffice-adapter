@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\SearchCriteriaRepository;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\SearchCriteriaFactory;
-use Katalam\OnOfficeAdapter\Tests\Stubs\GetSearchCriteriaResponse;
+use Innobrain\OnOfficeAdapter\Facades\SearchCriteriaRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\SearchCriteriaFactory;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\GetSearchCriteriaResponse;
 
 describe('fake responses', function () {
     test('get', function () {

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades;
+namespace Innobrain\OnOfficeAdapter\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Query\Builder;
-use Katalam\OnOfficeAdapter\Repositories\BaseRepository as RootRepository;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Query\Builder;
+use Innobrain\OnOfficeAdapter\Repositories\BaseRepository as RootRepository;
 
 /**
  * @see RootRepository

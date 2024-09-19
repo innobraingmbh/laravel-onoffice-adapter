@@ -2,7 +2,7 @@
 
 ## Estates
 ```php
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 
 $estates = EstateRepository::query()
     ->get();
@@ -30,7 +30,7 @@ $estate = EstateRepository::query()
 
 ## Estate Files
 ```php
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 
 $files = EstateRepository::files(1)
     ->get();

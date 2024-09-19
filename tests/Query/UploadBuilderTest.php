@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Query\UploadBuilder;
-use Katalam\OnOfficeAdapter\Repositories\FileRepository;
-use Katalam\OnOfficeAdapter\Tests\Stubs\LinkDataResponse;
-use Katalam\OnOfficeAdapter\Tests\Stubs\UploadFileResponse;
+use Innobrain\OnOfficeAdapter\Query\UploadBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\FileRepository;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\LinkDataResponse;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\UploadFileResponse;
 
 describe('work', function () {
     it('can save', function () {

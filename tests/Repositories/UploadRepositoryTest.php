@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\FileRepository;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\FileFactory;
-use Katalam\OnOfficeAdapter\Tests\Stubs\UploadFileResponse;
+use Innobrain\OnOfficeAdapter\Facades\FileRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\FileFactory;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\UploadFileResponse;
 
 describe('fake responses', function () {
     test('get', function () {

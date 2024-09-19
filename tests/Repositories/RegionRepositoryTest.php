@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\SettingRepository;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\RegionFactory;
-use Katalam\OnOfficeAdapter\Tests\Stubs\GetRegionsResponse;
+use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\RegionFactory;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\GetRegionsResponse;
 
 describe('fake responses', function () {
     test('get', function () {

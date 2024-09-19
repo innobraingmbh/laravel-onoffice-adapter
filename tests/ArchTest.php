@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 arch('strict types')
-    ->expect('Katalam\OnOfficeAdapter')
+    ->expect('Innobrain\OnOfficeAdapter')
     ->toUseStrictTypes();
 
 arch('it will not use debugging functions')

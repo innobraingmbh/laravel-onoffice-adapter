@@ -2,7 +2,7 @@
 
 ## Users
 ```php
-use Katalam\OnOfficeAdapter\Facades\SettingRepository;
+use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 
 $settings = SettingRepository::users()
     ->get();
@@ -21,7 +21,7 @@ SettingRepository::users()
 
 ## Regions
 ```php
-use Katalam\OnOfficeAdapter\Facades\SettingRepository;
+use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 
 $settings = SettingRepository::regions()
     ->get();
@@ -29,7 +29,7 @@ $settings = SettingRepository::regions()
 
 ## Imprint
 ```php
-use Katalam\OnOfficeAdapter\Facades\SettingRepository;
+use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 
 $settings = SettingRepository::imprint()
     ->get();
@@ -37,7 +37,7 @@ $settings = SettingRepository::imprint()
 
 ## Actions
 ```php
-use Katalam\OnOfficeAdapter\Facades\SettingRepository;
+use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 
 $settings = SettingRepository::actions()
     ->get();

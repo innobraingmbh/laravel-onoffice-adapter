@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Katalam\OnOfficeAdapter\Query\AddressBuilder;
-use Katalam\OnOfficeAdapter\Repositories\AddressRepository;
+use Innobrain\OnOfficeAdapter\Query\AddressBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\AddressRepository;
 
 describe('recordIds', function () {
     it('should set the recordIds property to the given recordIds', function () {

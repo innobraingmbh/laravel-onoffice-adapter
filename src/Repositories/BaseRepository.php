@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Query\Builder;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Query\Builder;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class BaseRepository

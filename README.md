@@ -1,9 +1,9 @@
 # onOffice Adapter for Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/katalam/laravel-onoffice-adapter.svg?style=flat-square)](https://packagist.org/packages/katalam/laravel-onoffice-adapter)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/katalam/laravel-onoffice-adapter/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/katalam/laravel-onoffice-adapter/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/katalam/laravel-onoffice-adapter/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/katalam/laravel-onoffice-adapter/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/katalam/laravel-onoffice-adapter.svg?style=flat-square)](https://packagist.org/packages/katalam/laravel-onoffice-adapter)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/innobrain/laravel-onoffice-adapter.svg?style=flat-square)](https://packagist.org/packages/innobrain/laravel-onoffice-adapter)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/innobrain/laravel-onoffice-adapter/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/innobrain/laravel-onoffice-adapter/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/innobrain/laravel-onoffice-adapter/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/innobrain/laravel-onoffice-adapter/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/innobrain/laravel-onoffice-adapter.svg?style=flat-square)](https://packagist.org/packages/innobrain/laravel-onoffice-adapter)
 
 An onOffice adapter for Laravel
 
@@ -12,7 +12,7 @@ An onOffice adapter for Laravel
 You can install the package via composer:
 
 ```bash
-composer require katalam/laravel-onoffice-adapter
+composer require innobrain/laravel-onoffice-adapter
 ```
 
 You can publish the config file with:
@@ -124,7 +124,7 @@ Config::set('onoffice.api_claim', 'api_claim');
 
 ### Usage in tests
 ```php
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 
 EstateRepository::fake(EstateRepository::response([
     EstateRepository::page(recordFactories: [
@@ -141,7 +141,7 @@ expect($response->count())->toBe(1)
 EstateRepository::assertSentCount(1);
 ```
 ```php
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 
 EstateRepository::fake(EstateRepository::response([
     EstateRepository::page(recordFactories: [
@@ -163,7 +163,7 @@ expect($response->count())->toBe(2)
 EstateRepository::assertSentCount(2);
 ```
 ```php
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 
 EstateRepository::preventStrayRequests();
 EstateRepository::fake([
@@ -222,7 +222,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Bruno Görß](https://github.com/Katalam)
+- [Bruno Görß](https://github.com/Innobrain)
 - [All Contributors](../../contributors)
 
 ## License

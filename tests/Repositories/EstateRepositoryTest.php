@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\EstateRepository;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadEstateResponse;
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadEstateResponse;
 
 describe('fake responses', function () {
     test('get', function () {

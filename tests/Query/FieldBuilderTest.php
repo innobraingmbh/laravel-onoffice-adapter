@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Katalam\OnOfficeAdapter\Query\FieldBuilder;
-use Katalam\OnOfficeAdapter\Repositories\FieldRepository;
+use Innobrain\OnOfficeAdapter\Query\FieldBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\FieldRepository;
 
 describe('withModules', function () {
     it('should set the modules property to the given modules', function () {

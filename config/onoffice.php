@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// config for Katalam/OnOfficeAdapter
+// config for Innobrain/OnOfficeAdapter
 return [
     /**
      * The base URL of the OnOffice API.

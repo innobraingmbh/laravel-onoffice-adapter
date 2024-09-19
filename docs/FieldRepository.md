@@ -1,7 +1,7 @@
 # Field Repository
 
 ```php
-use Katalam\OnOfficeAdapter\Facades\FieldRepository;
+use Innobrain\OnOfficeAdapter\Facades\FieldRepository;
 
 $fields = FieldRepository::query()
     ->withModules(['estate'])

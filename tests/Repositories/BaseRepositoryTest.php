@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Repositories\BaseRepository;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
 
 describe('stray requests', function () {
     it('will set the preventStrayRequests property when calling preventStrayRequests default', function () {

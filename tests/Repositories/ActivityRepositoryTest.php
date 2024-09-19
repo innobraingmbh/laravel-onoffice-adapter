@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\ActivityRepository;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
-use Katalam\OnOfficeAdapter\Tests\Stubs\ReadActivityResponse;
+use Innobrain\OnOfficeAdapter\Facades\ActivityRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadActivityResponse;
 
 describe('fake responses', function () {
     test('get', function () {

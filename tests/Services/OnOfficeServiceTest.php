@@ -6,12 +6,12 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeError;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
-use Katalam\OnOfficeAdapter\Tests\Stubs\InvalidHmacResponse;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\InvalidHmacResponse;
 
 describe('credentials', function () {
     it('can use the config once', function () {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\Builder;
-use Katalam\OnOfficeAdapter\Query\UploadBuilder;
+use Innobrain\OnOfficeAdapter\Query\Builder;
+use Innobrain\OnOfficeAdapter\Query\UploadBuilder;
 
 class FileRepository extends BaseRepository
 {

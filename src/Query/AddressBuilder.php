@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query;
+namespace Innobrain\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Query\Concerns\Input;
-use Katalam\OnOfficeAdapter\Query\Concerns\RecordIds;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\Input;
+use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class AddressBuilder extends Builder

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\EstateBuilder;
-use Katalam\OnOfficeAdapter\Query\EstateFileBuilder;
+use Innobrain\OnOfficeAdapter\Query\EstateBuilder;
+use Innobrain\OnOfficeAdapter\Query\EstateFileBuilder;
 
 class EstateRepository extends BaseRepository
 {

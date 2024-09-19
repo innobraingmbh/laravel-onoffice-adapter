@@ -1,7 +1,7 @@
 # Marketplace Repository
 
 ```php
-use Katalam\OnOfficeAdapter\Facades\MarketplaceRepository;
+use Innobrain\OnOfficeAdapter\Facades\MarketplaceRepository;
 
 $success = MarketplaceRepository::query()
     ->unlockProvider('123', '456');

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Services;
+namespace Innobrain\OnOfficeAdapter\Services;
 
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Carbon;
@@ -10,10 +10,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 
 class OnOfficeService
 {

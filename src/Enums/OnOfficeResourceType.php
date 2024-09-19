@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Enums;
+namespace Innobrain\OnOfficeAdapter\Enums;
 
 enum OnOfficeResourceType: string
 {

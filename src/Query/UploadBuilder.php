@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query;
+namespace Innobrain\OnOfficeAdapter\Query;
 
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Query\Concerns\NonFilterable;
-use Katalam\OnOfficeAdapter\Query\Concerns\NonOrderable;
-use Katalam\OnOfficeAdapter\Query\Concerns\NonSelectable;
-use Katalam\OnOfficeAdapter\Query\Concerns\UploadInBlocks;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\NonFilterable;
+use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
+use Innobrain\OnOfficeAdapter\Query\Concerns\NonSelectable;
+use Innobrain\OnOfficeAdapter\Query\Concerns\UploadInBlocks;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class UploadBuilder extends Builder

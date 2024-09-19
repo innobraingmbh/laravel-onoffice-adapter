@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Exceptions;
+namespace Innobrain\OnOfficeAdapter\Exceptions;
 
 use Exception;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Throwable;
 
 class StrayRequestException extends Exception

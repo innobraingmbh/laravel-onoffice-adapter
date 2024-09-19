@@ -1,8 +1,8 @@
 # Relation Repository
 
 ```php
-use Katalam\OnOfficeAdapter\Enums\OnOfficeRelationType;
-use Katalam\OnOfficeAdapter\Facades\RelationRepository;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeRelationType;
+use Innobrain\OnOfficeAdapter\Facades\RelationRepository;
 
 $relations = RelationRepository::query()
     ->parentIds([1, 2, 3])

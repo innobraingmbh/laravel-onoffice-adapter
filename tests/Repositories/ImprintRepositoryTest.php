@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\SettingRepository;
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\ImprintFactory;
-use Katalam\OnOfficeAdapter\Tests\Stubs\GetImprintResponse;
+use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\ImprintFactory;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\GetImprintResponse;
 
 describe('fake responses', function () {
     test('get', function () {

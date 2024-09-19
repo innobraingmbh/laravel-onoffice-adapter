@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Katalam\OnOfficeAdapter\Enums\OnOfficeError;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 
 describe('is response error', function () {
     it('can be created', function () {

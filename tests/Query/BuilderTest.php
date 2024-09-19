@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Katalam\OnOfficeAdapter\Query\Builder;
+use Innobrain\OnOfficeAdapter\Query\Builder;
 
 describe('select', function () {
     it('should set the columns property to the given columns', function () {

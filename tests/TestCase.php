@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Tests;
+namespace Innobrain\OnOfficeAdapter\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Katalam\OnOfficeAdapter\OnOfficeAdapterServiceProvider;
+use Innobrain\OnOfficeAdapter\OnOfficeAdapterServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
@@ -15,7 +15,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Katalam\\OnOfficeAdapter\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Innobrain\\OnOfficeAdapter\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 

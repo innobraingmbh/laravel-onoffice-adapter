@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query;
+namespace Innobrain\OnOfficeAdapter\Query;
 
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Http\Client\Response;
@@ -11,13 +11,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use JsonException;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeRequest;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Exceptions\StrayRequestException;
-use Katalam\OnOfficeAdapter\Query\Concerns\BuilderInterface;
-use Katalam\OnOfficeAdapter\Repositories\BaseRepository;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\BuilderInterface;
+use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class Builder implements BuilderInterface

@@ -2,7 +2,7 @@
 
 ## Estates
 ```php
-use Katalam\OnOfficeAdapter\Facades\AddressRepository;
+use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
 
 $addresses = AddressRepository::query()
     ->addCountryIsoCodeType('DE')

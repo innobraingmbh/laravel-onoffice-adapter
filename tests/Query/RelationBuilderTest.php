@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Katalam\OnOfficeAdapter\Enums\OnOfficeRelationType;
-use Katalam\OnOfficeAdapter\Query\RelationBuilder;
-use Katalam\OnOfficeAdapter\Repositories\RelationRepository;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeRelationType;
+use Innobrain\OnOfficeAdapter\Query\RelationBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\RelationRepository;
 
 describe('childIds', function () {
     it('should set the childIds property to the given childIds', function () {

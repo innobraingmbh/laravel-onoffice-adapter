@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades;
+namespace Innobrain\OnOfficeAdapter\Facades;
 
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponse;
-use Katalam\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
-use Katalam\OnOfficeAdapter\Query\SearchCriteriaBuilder;
-use Katalam\OnOfficeAdapter\Repositories\SearchCriteriaRepository as RootRepository;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Query\SearchCriteriaBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\SearchCriteriaRepository as RootRepository;
 
 /**
  * @see RootRepository
