@@ -1,6 +1,11 @@
 # Changelog
 ## main
 
+## v1.0.0
+- Overhaul of the package to use a new fake implementation
+- Overhaul of the package to remove the fake builder classes
+- Added the ability to call a custom request
+
 ## v0.13.6
 - Fixed typo on relation create
 

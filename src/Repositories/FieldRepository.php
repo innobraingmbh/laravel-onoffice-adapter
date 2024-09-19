@@ -2,22 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\FieldBuilder;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Query\FieldBuilder;
 
-class FieldRepository
+class FieldRepository extends BaseRepository
 {
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
-    /**
-     * Returns a new field builder instance.
-     */
-    public function query(): FieldBuilder
+    protected function createBuilder(): FieldBuilder
     {
-        return new FieldBuilder($this->onOfficeService);
+        return new FieldBuilder;
     }
 }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Exceptions;
+namespace Innobrain\OnOfficeAdapter\Exceptions;
 
 use Exception;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeError;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 use Throwable;
 
 class OnOfficeException extends Exception

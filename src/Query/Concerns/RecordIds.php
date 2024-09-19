@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query\Concerns;
+namespace Innobrain\OnOfficeAdapter\Query\Concerns;
 
 use Illuminate\Support\Arr;
 

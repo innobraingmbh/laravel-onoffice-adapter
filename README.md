@@ -1,9 +1,9 @@
 # onOffice Adapter for Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/katalam/laravel-onoffice-adapter.svg?style=flat-square)](https://packagist.org/packages/katalam/laravel-onoffice-adapter)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/katalam/laravel-onoffice-adapter/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/katalam/laravel-onoffice-adapter/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/katalam/laravel-onoffice-adapter/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/katalam/laravel-onoffice-adapter/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/katalam/laravel-onoffice-adapter.svg?style=flat-square)](https://packagist.org/packages/katalam/laravel-onoffice-adapter)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/innobrain/laravel-onoffice-adapter.svg?style=flat-square)](https://packagist.org/packages/innobrain/laravel-onoffice-adapter)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/innobrain/laravel-onoffice-adapter/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/innobrain/laravel-onoffice-adapter/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/innobrain/laravel-onoffice-adapter/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/innobrain/laravel-onoffice-adapter/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/innobrain/laravel-onoffice-adapter.svg?style=flat-square)](https://packagist.org/packages/innobrain/laravel-onoffice-adapter)
 
 An onOffice adapter for Laravel
 
@@ -12,7 +12,7 @@ An onOffice adapter for Laravel
 You can install the package via composer:
 
 ```bash
-composer require katalam/laravel-onoffice-adapter
+composer require innobrain/laravel-onoffice-adapter
 ```
 
 You can publish the config file with:
@@ -50,6 +50,18 @@ return [
 
 ## Usage
 
+### Repositories
+* ActivityRepository
+* AddressRepository
+* EstateRepository
+* FieldRepository
+* FileRepository
+* MarketplaceRepository
+* RelationRepository
+* SearchCriteriaRepository
+* SettingRepository
+
+### Syntax for typical queries
 ```php
 $estates = EstateRepository::query()
     ->select('Id')
@@ -58,9 +70,6 @@ $estates = EstateRepository::query()
     ->orderBy('kaufpreis')
     ->orderByDesc('warmmiete')
     ->get();
-
-$success = MarketplaceRepository::query()
-    ->unlockProvider($parameterCacheId, $extendedClaim);
 
 $users = UserRepository::query()
     ->select([
@@ -72,16 +81,29 @@ $users = UserRepository::query()
     ->where('Nr', $this->userId)
     ->get();
 ```
+
+### Unusual queries
+```php
+$success = MarketplaceRepository::query()
+    ->unlockProvider($parameterCacheId, $extendedClaim);
+```
 ```php
 $tmpUploadId = FileRepository::upload()
     ->save(base64_encode($fileContent));
-
 $success = FileRepository::upload()->link($tmpUploadId, [
     'module' => 'estate',
     'relatedRecordId' => '12345',
 ]);
-```
 
+// or
+
+$success = FileRepository::upload()
+    ->uploadInBlocks()
+    ->saveAndLink(base64_encode($fileContent), [
+        'module' => 'estate',
+        'relatedRecordId' => '12345',
+    ]);
+```
 ```php
 ActivityRepository::query()
     ->recordIds($recordIds)
@@ -102,33 +124,86 @@ Config::set('onoffice.api_claim', 'api_claim');
 
 ### Usage in tests
 ```php
-EstateRepository::fake([ // First request
-    [ // First page of first request
-        EstateFactory::make() // First record of first page of first request
-            ->id(1)
-            ->set('foo', 'bar'),
-    ],
-], [ // Second request
-    [ // First page of second request
-        EstateFactory::make() // First record of first page of second request
-            ->id(2)
-            ->set('foo', 'baz'),
-        EstateFactory::make() // Second record of first page of second request
-            ->id(3),
-    ],
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+
+EstateRepository::fake(EstateRepository::response([
+    EstateRepository::page(recordFactories: [
+        EstateFactory::make()
+            ->id(1),
+    ]),
+]));
+
+$response = EstateRepository::query()->get();
+
+expect($response->count())->toBe(1)
+    ->and($response->first()['id'])->toBe(1);
+
+EstateRepository::assertSentCount(1);
+```
+```php
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+
+EstateRepository::fake(EstateRepository::response([
+    EstateRepository::page(recordFactories: [
+        EstateFactory::make()
+            ->id(1),
+    ]),
+    EstateRepository::page(recordFactories: [
+        EstateFactory::make()
+            ->id(2),
+    ]),
+]));
+
+$response = EstateRepository::query()->get();
+
+expect($response->count())->toBe(2)
+    ->and($response->first()['id'])->toBe(1)
+    ->and($response->last()['id'])->toBe(2);
+
+EstateRepository::assertSentCount(2);
+```
+```php
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+
+EstateRepository::preventStrayRequests();
+EstateRepository::fake([
+    EstateRepository::response([
+        EstateRepository::page(recordFactories: [
+            EstateFactory::make()
+                ->id(1),
+        ]),
+        EstateRepository::page(recordFactories: [
+            EstateFactory::make()
+                ->id(2),
+        ]),
+    ]),
+    EstateRepository::response([
+        EstateRepository::page(recordFactories: [
+            EstateFactory::make()
+                ->id(3),
+        ]),
+        EstateRepository::page(recordFactories: [
+            EstateFactory::make()
+                ->id(4),
+        ]),
+    ]),
 ]);
 
-// request as normal
-$estates = EstateRepository::query()->get();
+$response = EstateRepository::query()->get();
 
-expect($estates)->toHaveCount(1)
-    ->and($estates->first()['id'])->toBe(1);
+expect($response->count())->toBe(2)
+    ->and($response->first()['id'])->toBe(1)
+    ->and($response->last()['id'])->toBe(2);
+    
+$response = EstateRepository::query()->get();
 
-$estates = EstateRepository::query()->get();
+expect($response->count())->toBe(2)
+    ->and($response->first()['id'])->toBe(3)
+    ->and($response->last()['id'])->toBe(4);
 
-expect($estates)->toHaveCount(2)
-    ->and($estates->first()['id'])->toBe(2)
-    ->and($estates->last()['id'])->toBe(3);
+EstateRepository::assertSentCount(4);
+
+$response = EstateRepository::query()->get(); // throws StrayRequestException
 ```
 
 ## Testing
@@ -147,7 +222,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Bruno Görß](https://github.com/Katalam)
+- [Bruno Görß](https://github.com/Innobrain)
 - [All Contributors](../../contributors)
 
 ## License

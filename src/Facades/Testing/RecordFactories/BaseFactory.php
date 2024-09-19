@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories;
+namespace Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories;
 
-abstract class BaseFactory
+class BaseFactory
 {
     public int|string $id = 0;
 

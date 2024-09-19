@@ -6,12 +6,12 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeError;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
-use Katalam\OnOfficeAdapter\Tests\Stubs\InvalidHmacResponse;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\InvalidHmacResponse;
 
 describe('credentials', function () {
     it('can use the config once', function () {
@@ -159,7 +159,7 @@ describe('requestAll', function () {
                 OnOfficeResourceType::Estate,
             );
         });
-    })->with([300, 301, 400, 401, 500, 501]);
+    })->with([300, 301, 400, 401, 500, 501])->throws(OnOfficeException::class);
 
     it('can handle null in result path', function () {
         Http::preventStrayRequests();
@@ -234,7 +234,7 @@ describe('requestAll', function () {
                 OnOfficeAction::Get,
                 OnOfficeResourceType::Estate,
             );
-        }, take: 1);
+        }, limit: 1);
 
         expect($response)->toBeInstanceOf(Collection::class)
             ->toHaveCount(1);
@@ -265,7 +265,7 @@ describe('requestAllChunked', function () {
                 OnOfficeResourceType::Estate,
             );
         }, function () {});
-    })->with([300, 301, 400, 401, 500, 501]);
+    })->with([300, 301, 400, 401, 500, 501])->throws(OnOfficeException::class);
 
     it('will call the callback', function () {
         Http::fake([
@@ -333,7 +333,7 @@ describe('requestAllChunked', function () {
             );
         }, function ($elements) use (&$count) {
             $count += count($elements);
-        }, take: 1);
+        }, limit: 1);
 
         expect($count)->toBe(1);
     });
@@ -403,7 +403,7 @@ describe('requestAllChunked', function () {
             );
         }, function ($elements) use (&$count) {
             $count += count($elements);
-        }, pageSize: 2, take: 3);
+        }, pageSize: 2, limit: 3);
 
         expect($count)->toBe(3);
     });

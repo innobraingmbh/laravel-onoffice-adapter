@@ -2,37 +2,34 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query;
+namespace Innobrain\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 
 class FieldBuilder extends Builder
 {
     public array $modules = [];
 
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
+    /**
+     * @throws OnOfficeException
+     */
     public function get(): Collection
     {
-        return $this->onOfficeService->requestAll(/**
-         * @throws OnOfficeException
-         */ function () {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Fields,
-                parameters: [
-                    'modules' => $this->modules,
-                    ...$this->customParameters,
-                ],
-            );
-        });
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Fields,
+            parameters: [
+                'modules' => $this->modules,
+                ...$this->customParameters,
+            ],
+        );
+
+        return $this->requestAll($request);
     }
 
     /**
@@ -55,25 +52,18 @@ class FieldBuilder extends Builder
     /**
      * @throws OnOfficeException
      */
-    public function find(int $id): array
-    {
-        throw new OnOfficeException('Not implemented in onOffice');
-    }
-
     public function each(callable $callback): void
     {
-        $this->onOfficeService->requestAllChunked(/**
-         * @throws OnOfficeException
-         */ function () {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Fields,
-                parameters: [
-                    'modules' => $this->modules,
-                    ...$this->customParameters,
-                ],
-            );
-        }, $callback);
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Fields,
+            parameters: [
+                'modules' => $this->modules,
+                ...$this->customParameters,
+            ],
+        );
+
+        $this->requestAllChunked($request, $callback);
     }
 
     public function withModules(array|string $modules): static
@@ -81,13 +71,5 @@ class FieldBuilder extends Builder
         $this->modules = array_merge($this->modules, Arr::wrap($modules));
 
         return $this;
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
     }
 }

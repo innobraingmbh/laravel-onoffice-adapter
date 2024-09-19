@@ -2,38 +2,35 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query;
+namespace Innobrain\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Throwable;
 
 class EstateBuilder extends Builder
 {
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
+    /**
+     * @throws OnOfficeException
+     */
     public function get(): Collection
     {
-        return $this->onOfficeService->requestAll(/**
-         * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Read,
-                OnOfficeResourceType::Estate,
-                parameters: [
-                    OnOfficeService::DATA => $this->columns,
-                    OnOfficeService::FILTER => $this->getFilters(),
-                    OnOfficeService::LISTLIMIT => $pageSize,
-                    OnOfficeService::LISTOFFSET => $offset,
-                    OnOfficeService::SORTBY => $this->getOrderBy(),
-                    ...$this->customParameters,
-                ]
-            );
-        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Estate,
+            parameters: [
+                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::SORTBY => $this->getOrderBy(),
+                ...$this->customParameters,
+            ]
+        );
+
+        return $this->requestAll($request);
     }
 
     /**
@@ -58,49 +55,49 @@ class EstateBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function find(int $id): array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Estate,
             $id,
             parameters: [
                 OnOfficeService::DATA => $this->columns,
                 ...$this->customParameters,
-            ]
+            ],
         );
 
-        return $response->json('response.results.0.data.records.0');
-    }
-
-    public function each(callable $callback): void
-    {
-        $this->onOfficeService->requestAllChunked(/**
-         * @throws OnOfficeException
-         */ function (int $pageSize, int $offset) {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Read,
-                OnOfficeResourceType::Estate,
-                parameters: [
-                    OnOfficeService::DATA => $this->columns,
-                    OnOfficeService::FILTER => $this->getFilters(),
-                    OnOfficeService::LISTLIMIT => $pageSize,
-                    OnOfficeService::LISTOFFSET => $offset,
-                    OnOfficeService::SORTBY => $this->getOrderBy(),
-                    ...$this->customParameters,
-                ]
-            );
-        }, $callback, pageSize: $this->limit, offset: $this->offset, take: $this->take);
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 
     /**
      * @throws OnOfficeException
      */
+    public function each(callable $callback): void
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Estate,
+            parameters: [
+                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::SORTBY => $this->getOrderBy(),
+                ...$this->customParameters,
+            ]
+        );
+
+        $this->requestAllChunked($request, $callback);
+    }
+
+    /**
+     * @throws Throwable<OnOfficeException>
+     */
     public function modify(int $id): bool
     {
-        $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Modify,
             OnOfficeResourceType::Estate,
             $id,
@@ -109,15 +106,17 @@ class EstateBuilder extends Builder
             ],
         );
 
+        $this->requestApi($request);
+
         return true;
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function create(array $data): array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Create,
             OnOfficeResourceType::Estate,
             parameters: [
@@ -125,6 +124,7 @@ class EstateBuilder extends Builder
             ],
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 }

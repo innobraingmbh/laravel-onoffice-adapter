@@ -2,28 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades;
+namespace Innobrain\OnOfficeAdapter\Facades;
 
-use Illuminate\Support\Facades\Facade;
-use Katalam\OnOfficeAdapter\Facades\Testing\AddressRepositoryFake;
-use Katalam\OnOfficeAdapter\Query\AddressBuilder;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Query\AddressBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\AddressRepository as RootRepository;
 
 /**
- * @see \Katalam\OnOfficeAdapter\Repositories\AddressRepository
+ * @see RootRepository
  *
  * @method static AddressBuilder query()
  */
-class AddressRepository extends Facade
+class AddressRepository extends BaseRepository
 {
-    public static function fake(array ...$fakeResponses): AddressRepositoryFake
+    public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {
-        static::swap($fake = new AddressRepositoryFake(...$fakeResponses));
-
-        return $fake;
+        return tap(static::getFacadeRoot(), static function (RootRepository $fake) use ($stubCallables) {
+            $fake->fake($stubCallables);
+        });
     }
 
     protected static function getFacadeAccessor(): string
     {
-        return \Katalam\OnOfficeAdapter\Repositories\AddressRepository::class;
+        return RootRepository::class;
     }
 }

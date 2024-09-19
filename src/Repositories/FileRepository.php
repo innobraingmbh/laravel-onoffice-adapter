@@ -2,22 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\UploadBuilder;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Query\Builder;
+use Innobrain\OnOfficeAdapter\Query\UploadBuilder;
 
-class FileRepository
+class FileRepository extends BaseRepository
 {
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
-    /**
-     * Returns a new upload builder instance.
-     */
-    public function upload(): UploadBuilder
+    public function upload(): Builder
     {
-        return new UploadBuilder($this->onOfficeService);
+        return $this->query();
+    }
+
+    protected function createBuilder(): UploadBuilder
+    {
+        return new UploadBuilder;
     }
 }

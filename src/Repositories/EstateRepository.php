@@ -2,24 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\EstateBuilder;
-use Katalam\OnOfficeAdapter\Query\EstateFileBuilder;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Query\EstateBuilder;
+use Innobrain\OnOfficeAdapter\Query\EstateFileBuilder;
 
-class EstateRepository
+class EstateRepository extends BaseRepository
 {
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
-    /**
-     * Returns a new estate builder instance.
-     */
-    public function query(): EstateBuilder
+    protected function createBuilder(): EstateBuilder
     {
-        return new EstateBuilder($this->onOfficeService);
+        return new EstateBuilder;
     }
 
     /**
@@ -27,6 +19,7 @@ class EstateRepository
      */
     public function files(int $estateId): EstateFileBuilder
     {
-        return new EstateFileBuilder($this->onOfficeService, $estateId);
+        /** @var EstateFileBuilder */
+        return $this->createBuilderFromClass(EstateFileBuilder::class, $estateId);
     }
 }

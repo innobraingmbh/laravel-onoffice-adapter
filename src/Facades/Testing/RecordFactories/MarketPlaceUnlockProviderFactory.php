@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories;
+namespace Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories;
 
-use Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\Concerns\SuccessTrait;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\Concerns\SuccessTrait;
 
 class MarketPlaceUnlockProviderFactory extends BaseFactory
 {

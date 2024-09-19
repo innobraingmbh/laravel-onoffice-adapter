@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Services;
+namespace Innobrain\OnOfficeAdapter\Services;
 
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Carbon;
@@ -10,10 +10,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 
 class OnOfficeService
 {
@@ -114,6 +114,8 @@ class OnOfficeService
      * With a max page calculation based on
      * the total count of records,
      * of the first request.
+     *
+     * @throws OnOfficeException
      */
     public function requestAll(
         callable $request,
@@ -121,15 +123,19 @@ class OnOfficeService
         string $countPath = 'response.results.0.data.meta.cntabsolute',
         int $pageSize = 500,
         int $offset = 0,
-        int $take = -1,
+        int $limit = -1,
     ): Collection {
         $maxPage = 0;
-        $data = collect();
+        $data = new Collection;
         do {
             try {
                 $response = $request($pageSize, $offset);
             } catch (OnOfficeException $exception) {
                 Log::error("{$exception->getMessage()} - {$exception->getCode()}");
+
+                if ($maxPage === 0) {
+                    throw $exception;
+                }
 
                 return $data;
             }
@@ -152,8 +158,8 @@ class OnOfficeService
             // and we have more records than the take parameter,
             // we break the loop and return the data except the
             // records that are more than the take parameter
-            if ($take > -1 && $data->count() > $take) {
-                $data = $data->take($take);
+            if ($limit > -1 && $data->count() > $limit) {
+                $data = $data->take($limit);
                 break;
             }
 
@@ -172,6 +178,8 @@ class OnOfficeService
      *
      * The request will not return a collection containing the records,
      * but will call the given callback function with the records of each page.
+     *
+     * @throws OnOfficeException
      */
     public function requestAllChunked(
         callable $request,
@@ -180,7 +188,7 @@ class OnOfficeService
         string $countPath = 'response.results.0.data.meta.cntabsolute',
         int $pageSize = 500,
         int $offset = 0,
-        int $take = -1,
+        int $limit = -1,
     ): void {
         $maxPage = 0;
         $elementCount = 0;
@@ -189,6 +197,10 @@ class OnOfficeService
                 $response = $request($pageSize, $offset);
             } catch (OnOfficeException $exception) {
                 Log::error("{$exception->getMessage()} - {$exception->getCode()}");
+
+                if ($maxPage === 0) {
+                    throw $exception;
+                }
 
                 return;
             }
@@ -203,8 +215,8 @@ class OnOfficeService
                 // if the take parameter is set,
                 // and we have more records than the take parameter,
                 // we set the countAbsolute to the take parameter
-                if ($take > -1 && $countAbsolute > $take) {
-                    $countAbsolute = $take;
+                if ($limit > -1 && $countAbsolute > $limit) {
+                    $countAbsolute = $limit;
                 }
 
                 $maxPage = ceil($countAbsolute / $pageSize);
@@ -217,8 +229,8 @@ class OnOfficeService
             // will be the same as the take parameter
             $elements = $response->json($resultPath);
             $elementCount += count($elements ?? []);
-            if ($take > -1 && $elementCount > $take) {
-                $elements = array_slice($elements, 0, $take - $elementCount);
+            if ($limit > -1 && $elementCount > $limit) {
+                $elements = array_slice($elements, 0, $limit - $elementCount);
             }
 
             $callback($elements);

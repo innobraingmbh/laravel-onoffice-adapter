@@ -2,22 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\ActivityBuilder;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Query\ActivityBuilder;
 
-class ActivityRepository
+class ActivityRepository extends BaseRepository
 {
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
-    /**
-     * Returns a new address builder instance.
-     */
-    public function query(): ActivityBuilder
+    protected function createBuilder(): ActivityBuilder
     {
-        return new ActivityBuilder($this->onOfficeService);
+        return new ActivityBuilder;
     }
 }

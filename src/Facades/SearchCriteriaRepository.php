@@ -2,28 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades;
+namespace Innobrain\OnOfficeAdapter\Facades;
 
-use Illuminate\Support\Facades\Facade;
-use Katalam\OnOfficeAdapter\Facades\Testing\SearchCriteriaRepositoryFake;
-use Katalam\OnOfficeAdapter\Query\SearchCriteriaBuilder;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Query\SearchCriteriaBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\SearchCriteriaRepository as RootRepository;
 
 /**
- * @see \Katalam\OnOfficeAdapter\Repositories\SearchCriteriaRepository
+ * @see RootRepository
  *
  * @method static SearchCriteriaBuilder query()
  */
-class SearchCriteriaRepository extends Facade
+class SearchCriteriaRepository extends BaseRepository
 {
-    public static function fake(array ...$fakeResponses): SearchCriteriaRepositoryFake
+    public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {
-        static::swap($fake = new SearchCriteriaRepositoryFake(...$fakeResponses));
-
-        return $fake;
+        return tap(static::getFacadeRoot(), static function (RootRepository $fake) use ($stubCallables) {
+            $fake->fake($stubCallables);
+        });
     }
 
     protected static function getFacadeAccessor(): string
     {
-        return \Katalam\OnOfficeAdapter\Repositories\SearchCriteriaRepository::class;
+        return RootRepository::class;
     }
 }

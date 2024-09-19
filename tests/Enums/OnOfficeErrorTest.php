@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Katalam\OnOfficeAdapter\Enums\OnOfficeError;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 
 describe('to string', function () {
     it('can stringify an error', function (OnOfficeError $error) {

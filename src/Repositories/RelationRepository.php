@@ -2,22 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Repositories;
+namespace Innobrain\OnOfficeAdapter\Repositories;
 
-use Katalam\OnOfficeAdapter\Query\RelationBuilder;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Query\RelationBuilder;
 
-class RelationRepository
+class RelationRepository extends BaseRepository
 {
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
-    /**
-     * Returns a new relation builder instance.
-     */
-    public function query(): RelationBuilder
+    protected function createBuilder(): RelationBuilder
     {
-        return new RelationBuilder($this->onOfficeService);
+        return new RelationBuilder;
     }
 }

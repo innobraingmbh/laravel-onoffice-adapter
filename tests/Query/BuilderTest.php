@@ -2,33 +2,7 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Query\Builder as AbstractBuilder;
-
-class Builder extends AbstractBuilder
-{
-    public function get(): Collection
-    {
-        return new Collection;
-    }
-
-    public function first(): ?array
-    {
-        return [];
-    }
-
-    public function find(int $id): array
-    {
-        return [];
-    }
-
-    public function each(callable $callback): void {}
-
-    public function modify(int $id): bool
-    {
-        return true;
-    }
-}
+use Innobrain\OnOfficeAdapter\Query\Builder;
 
 describe('select', function () {
     it('should set the columns property to the given columns', function () {
@@ -212,33 +186,7 @@ describe('limit', function () {
 
         $builder->limit(-10);
 
-        expect($builder->limit)->toBe(0);
-    });
-});
-
-describe('take', function () {
-    it('should set the take property to the given value', function () {
-        $builder = new Builder;
-
-        $builder->take(10);
-
-        expect($builder->take)->toBe(10);
-    });
-
-    it('should return the builder instance', function () {
-        $builder = new Builder;
-
-        $result = $builder->take(10);
-
-        expect($result)->toBeInstanceOf(Builder::class);
-    });
-
-    it('should not allow negative values', function () {
-        $builder = new Builder;
-
-        $builder->take(-10);
-
-        expect($builder->take)->toBe(-1);
+        expect($builder->limit)->toBe(-1);
     });
 });
 

@@ -2,28 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades;
+namespace Innobrain\OnOfficeAdapter\Facades;
 
-use Illuminate\Support\Facades\Facade;
-use Katalam\OnOfficeAdapter\Facades\Testing\ActivityRepositoryFake;
-use Katalam\OnOfficeAdapter\Query\ActivityBuilder;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Query\ActivityBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\ActivityRepository as RootRepository;
 
 /**
- * @see \Katalam\OnOfficeAdapter\Repositories\ActivityRepository
+ * @see RootRepository
  *
  * @method static ActivityBuilder query()
  */
-class ActivityRepository extends Facade
+class ActivityRepository extends BaseRepository
 {
-    public static function fake(array ...$fakeResponses): ActivityRepositoryFake
+    public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {
-        static::swap($fake = new ActivityRepositoryFake(...$fakeResponses));
-
-        return $fake;
+        return tap(static::getFacadeRoot(), static function (RootRepository $fake) use ($stubCallables) {
+            $fake->fake($stubCallables);
+        });
     }
 
     protected static function getFacadeAccessor(): string
     {
-        return \Katalam\OnOfficeAdapter\Repositories\ActivityRepository::class;
+        return RootRepository::class;
     }
 }

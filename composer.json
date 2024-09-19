@@ -1,12 +1,12 @@
 {
-    "name": "katalam/laravel-onoffice-adapter",
+    "name": "innobrain/laravel-onoffice-adapter",
     "description": "This is my package laravel-onoffice-adapter",
     "keywords": [
         "Katalam",
         "laravel",
         "laravel-onoffice-adapter"
     ],
-    "homepage": "https://github.com/katalam/laravel-onoffice-adapter",
+    "homepage": "https://github.com/innobraingmbh/laravel-onoffice-adapter",
     "license": "MIT",
     "authors": [
         {
@@ -35,13 +35,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Katalam\\OnOfficeAdapter\\": "src/",
-            "Katalam\\OnOfficeAdapter\\Database\\Factories\\": "database/factories/"
+            "Innobrain\\OnOfficeAdapter\\": "src/",
+            "Innobrain\\OnOfficeAdapter\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Katalam\\OnOfficeAdapter\\Tests\\": "tests/"
+            "Innobrain\\OnOfficeAdapter\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -72,7 +72,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Katalam\\OnOfficeAdapter\\OnOfficeAdapterServiceProvider"
+                "Innobrain\\OnOfficeAdapter\\OnOfficeAdapterServiceProvider"
             ]
         }
     },

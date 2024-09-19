@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query;
+namespace Innobrain\OnOfficeAdapter\Query;
 
-use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Query\Concerns\NonFilterable;
-use Katalam\OnOfficeAdapter\Query\Concerns\NonOrderable;
-use Katalam\OnOfficeAdapter\Query\Concerns\NonSelectable;
-use Katalam\OnOfficeAdapter\Query\Concerns\UploadInBlocks;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\NonFilterable;
+use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
+use Innobrain\OnOfficeAdapter\Query\Concerns\NonSelectable;
+use Innobrain\OnOfficeAdapter\Query\Concerns\UploadInBlocks;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Throwable;
 
 class UploadBuilder extends Builder
 {
@@ -22,55 +23,11 @@ class UploadBuilder extends Builder
     use NonSelectable;
     use UploadInBlocks;
 
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function get(): Collection
-    {
-        throw new OnOfficeException('Method not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function first(): ?array
-    {
-        throw new OnOfficeException('Method not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function find(int $id): array
-    {
-        throw new OnOfficeException('Method not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        throw new OnOfficeException('Method not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
     /**
      * File content as base64-encoded binary data.
      * Returns the temporary upload id.
      *
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function save(string $fileContent): string
     {
@@ -89,7 +46,7 @@ class UploadBuilder extends Builder
                     $continueData = ['tmpUploadId' => $tmpUploadId];
                 }
 
-                $response = $this->onOfficeService->requestApi(
+                $request = new OnOfficeRequest(
                     OnOfficeAction::Do,
                     OnOfficeResourceType::UploadFile,
                     parameters: [
@@ -99,7 +56,8 @@ class UploadBuilder extends Builder
                     ],
                 );
 
-                $tmpUploadId = $response->json('response.results.0.data.records.0.elements.tmpUploadId');
+                $tmpUploadId = $this->requestApi($request)
+                    ->json('response.results.0.data.records.0.elements.tmpUploadId');
             });
 
         return $tmpUploadId;
@@ -108,7 +66,7 @@ class UploadBuilder extends Builder
     /**
      * Returns the linked file data.
      *
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function link(string $tmpUploadId, array $data = []): array
     {
@@ -116,20 +74,21 @@ class UploadBuilder extends Builder
             'tmpUploadId' => $tmpUploadId,
         ]);
 
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Do,
             OnOfficeResourceType::UploadFile,
             parameters: $data,
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 
     /**
      * File content as base64-encoded binary data.
      * Returns the linked file data.
      *
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function saveAndLink(string $fileContent, array $data = []): array
     {

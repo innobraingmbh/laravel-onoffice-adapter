@@ -2,45 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query;
+namespace Innobrain\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Throwable;
 
 class SearchCriteriaBuilder extends Builder
 {
     private string $mode = 'internal';
 
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
     /**
-     * @throws OnOfficeException
-     */
-    public function get(): Collection
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function first(): ?array
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function find(int|array $id): array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::SearchCriteria,
             parameters: [
@@ -50,23 +31,8 @@ class SearchCriteriaBuilder extends Builder
             ],
         );
 
-        return $response->json('response.results.0.data.records.0', []);
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0', []);
     }
 
     public function mode(string $mode): self

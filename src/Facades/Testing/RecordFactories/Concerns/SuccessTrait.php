@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades\Testing\RecordFactories\Concerns;
+namespace Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\Concerns;
 
 trait SuccessTrait
 {

@@ -2,28 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades;
+namespace Innobrain\OnOfficeAdapter\Facades;
 
-use Illuminate\Support\Facades\Facade;
-use Katalam\OnOfficeAdapter\Facades\Testing\FieldRepositoryFake;
-use Katalam\OnOfficeAdapter\Query\FieldBuilder;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Query\FieldBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\FieldRepository as RootRepository;
 
 /**
- * @see \Katalam\OnOfficeAdapter\Repositories\FieldRepository
+ * @see RootRepository
  *
  * @method static FieldBuilder query()
  */
-class FieldRepository extends Facade
+class FieldRepository extends BaseRepository
 {
-    public static function fake(array ...$fakeResponses): FieldRepositoryFake
+    public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {
-        static::swap($fake = new FieldRepositoryFake(...$fakeResponses));
-
-        return $fake;
+        return tap(static::getFacadeRoot(), static function (RootRepository $fake) use ($stubCallables) {
+            $fake->fake($stubCallables);
+        });
     }
 
     protected static function getFacadeAccessor(): string
     {
-        return \Katalam\OnOfficeAdapter\Repositories\FieldRepository::class;
+        return RootRepository::class;
     }
 }

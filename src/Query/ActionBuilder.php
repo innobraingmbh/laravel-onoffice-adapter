@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Query;
+namespace Innobrain\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Collection;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
-use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Katalam\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Katalam\OnOfficeAdapter\Query\Concerns\NonFilterable;
-use Katalam\OnOfficeAdapter\Query\Concerns\NonOrderable;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\NonFilterable;
+use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
 
 class ActionBuilder extends Builder
 {
@@ -18,54 +18,19 @@ class ActionBuilder extends Builder
     use NonFilterable;
     use NonOrderable;
 
-    public function __construct(
-        private readonly OnOfficeService $onOfficeService,
-    ) {}
-
+    /**
+     * @throws OnOfficeException
+     */
     public function get(): Collection
     {
-        return $this->onOfficeService->requestAll(/**
-         * @throws OnOfficeException
-         */ function () {
-            return $this->onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::ActionTypes,
-                parameters: [
-                    ...$this->customParameters,
-                ]
-            );
-        }, pageSize: $this->limit, offset: $this->offset, take: $this->take);
-    }
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::ActionTypes,
+            parameters: [
+                ...$this->customParameters,
+            ]
+        );
 
-    /**
-     * @throws OnOfficeException
-     */
-    public function first(): ?array
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function find(int $id): array
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        throw new OnOfficeException('Not implemented');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function modify(int $id): bool
-    {
-        throw new OnOfficeException('Not implemented');
+        return $this->requestAll($request);
     }
 }

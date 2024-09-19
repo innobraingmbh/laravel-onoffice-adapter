@@ -2,30 +2,13 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Http;
-use Katalam\OnOfficeAdapter\Facades\FieldRepository;
-use Katalam\OnOfficeAdapter\Query\FieldBuilder;
-use Katalam\OnOfficeAdapter\Services\OnOfficeService;
-use Katalam\OnOfficeAdapter\Tests\Stubs\GetFieldsResponse;
-
-it('works', function () {
-    Http::preventStrayRequests();
-    Http::fake([
-        '*' => Http::sequence([
-            GetFieldsResponse::make(),
-        ]),
-    ]);
-
-    $fields = FieldRepository::query()
-        ->get();
-
-    expect($fields)
-        ->toHaveCount(13);
-});
+use Innobrain\OnOfficeAdapter\Query\FieldBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\FieldRepository;
 
 describe('withModules', function () {
     it('should set the modules property to the given modules', function () {
-        $builder = new FieldBuilder(app(OnOfficeService::class));
+        $builder = new FieldBuilder;
+        $builder->setRepository(app(FieldRepository::class));
 
         $builder->withModules(['estate']);
 
@@ -33,7 +16,8 @@ describe('withModules', function () {
     });
 
     it('should wrap the given modules in an array if it is a string', function () {
-        $builder = new FieldBuilder(app(OnOfficeService::class));
+        $builder = new FieldBuilder;
+        $builder->setRepository(app(FieldRepository::class));
 
         $builder->withModules('estate');
 
@@ -41,7 +25,8 @@ describe('withModules', function () {
     });
 
     it('should return the builder instance', function () {
-        $builder = new FieldBuilder(app(OnOfficeService::class));
+        $builder = new FieldBuilder;
+        $builder->setRepository(app(FieldRepository::class));
 
         $result = $builder->withModules('estate');
 
@@ -49,7 +34,8 @@ describe('withModules', function () {
     });
 
     it('should add multiple modules to the modules property', function () {
-        $builder = new FieldBuilder(app(OnOfficeService::class));
+        $builder = new FieldBuilder;
+        $builder->setRepository(app(FieldRepository::class));
 
         $builder->withModules('estate');
         $builder->withModules('address');

@@ -2,28 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Katalam\OnOfficeAdapter\Facades;
+namespace Innobrain\OnOfficeAdapter\Facades;
 
-use Illuminate\Support\Facades\Facade;
-use Katalam\OnOfficeAdapter\Facades\Testing\MarketplaceRepositoryFake;
-use Katalam\OnOfficeAdapter\Query\MarketplaceBuilder;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Query\MarketplaceBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\MarketplaceRepository as RootRepository;
 
 /**
- * @see \Katalam\OnOfficeAdapter\Repositories\MarketplaceRepository
+ * @see RootRepository
  *
  * @method static MarketplaceBuilder query()
  */
-class MarketplaceRepository extends Facade
+class MarketplaceRepository extends BaseRepository
 {
-    public static function fake(array ...$fakeResponses): MarketplaceRepositoryFake
+    public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {
-        static::swap($fake = new MarketplaceRepositoryFake(...$fakeResponses));
-
-        return $fake;
+        return tap(static::getFacadeRoot(), static function (RootRepository $fake) use ($stubCallables) {
+            $fake->fake($stubCallables);
+        });
     }
 
     protected static function getFacadeAccessor(): string
     {
-        return \Katalam\OnOfficeAdapter\Repositories\MarketplaceRepository::class;
+        return RootRepository::class;
     }
 }
