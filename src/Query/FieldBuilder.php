@@ -47,7 +47,6 @@ class FieldBuilder extends Builder
             ],
         );
 
-
         return $this->requestApi($request)
             ->json('response.results.0.data.records.0');
     }
