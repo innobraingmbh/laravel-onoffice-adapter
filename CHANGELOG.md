@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v1.1.2
+- Allows integer values for elements function in factories
+
 ## v1.1.1
 - Added tipster for relation type enum
 

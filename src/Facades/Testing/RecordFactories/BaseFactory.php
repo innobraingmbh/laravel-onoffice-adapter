@@ -40,7 +40,7 @@ class BaseFactory
 
     public function data(array $data): static
     {
-        $this->elements = array_merge($this->elements, $data);
+        $this->elements = array_replace($this->elements, $data);
 
         return $this;
     }
