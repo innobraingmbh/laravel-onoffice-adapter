@@ -35,4 +35,8 @@
             <directory suffix=".php">./src</directory>
         </include>
     </source>
+    <php>
+        <env name="ON_OFFICE_TOKEN" value="pm45AE0XJabaSlCiNHdYvItQKPlowTfm"/>
+        <env name="ON_OFFICE_SECRET" value="7pq2ukRwujMwOkIeMu1qjeNkq4TefK8narZLaU4SZx5dmMGM4hNC88TGRX0EDLrd"/>
+    </php>
 </phpunit>

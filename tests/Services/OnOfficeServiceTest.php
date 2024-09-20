@@ -15,8 +15,8 @@ use Innobrain\OnOfficeAdapter\Tests\Stubs\InvalidHmacResponse;
 
 describe('credentials', function () {
     it('can use the config once', function () {
-        $token = Str::random();
-        $secret = Str::random();
+        $token = Str::random(32);
+        $secret = Str::random(64);
         $apiClaim = Str::random();
 
         config([
@@ -33,8 +33,8 @@ describe('credentials', function () {
     });
 
     it('can use the config twice', function () {
-        $token = Str::random();
-        $secret = Str::random();
+        $token = Str::random(32);
+        $secret = Str::random(64);
         $apiClaim = Str::random();
 
         config([
@@ -54,6 +54,69 @@ describe('credentials', function () {
         expect($onOfficeService->getToken())->toBe($token)
             ->and($onOfficeService->getSecret())->toBe($secret)
             ->and($onOfficeService->getApiClaim())->toBe($apiClaim);
+    });
+
+    it('throws exception for too short token', function () {
+        $invalidToken = Str::random(31); // Invalid length
+
+        config(['onoffice.token' => $invalidToken]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $onOfficeService->getToken();
+    })->throws(OnOfficeException::class, 'The token is invalid.', 401);
+
+    it('throws exception for too long token', function () {
+        $invalidToken = Str::random(33); // Invalid length
+
+        config(['onoffice.token' => $invalidToken]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $onOfficeService->getToken();
+    })->throws(OnOfficeException::class, 'The token is invalid.', 401);
+
+    it('throws exception for too short secret', function () {
+        $invalidSecret = Str::random(63); // Invalid length
+
+        config(['onoffice.secret' => $invalidSecret]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $onOfficeService->getSecret();
+    })->throws(OnOfficeException::class, 'The secret is invalid.', 401);
+
+    it('throws exception for too long secret', function () {
+        $invalidSecret = Str::random(65); // Invalid length
+
+        config(['onoffice.secret' => $invalidSecret]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $onOfficeService->getSecret();
+    })->throws(OnOfficeException::class, 'The secret is invalid.', 401);
+
+    it('doesn\'t slow down too much due to validation', function () {
+        $token = Str::random(32);
+        $secret = Str::random(64);
+
+        config([
+            'onoffice.token' => $token,
+            'onoffice.secret' => $secret,
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $start = microtime(true);
+        $onOfficeService->getToken();
+        $tokenTime = microtime(true) - $start;
+
+        $start = microtime(true);
+        $onOfficeService->getSecret();
+        $secretTime = microtime(true) - $start;
+
+        expect($tokenTime)->toBeLessThan(0.0001)
+            ->and($secretTime)->toBeLessThan(0.0001);
     });
 });
 
