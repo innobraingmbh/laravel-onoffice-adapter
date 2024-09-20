@@ -119,6 +119,55 @@ describe('credentials', function () {
         expect($tokenTime)->toBeLessThan(0.0001)
             ->and($secretTime)->toBeLessThan(0.0001);
     });
+
+    it('benchmarks getToken and getSecret against direct config retrieval', function () {
+        $token = Str::random(32);
+        $secret = Str::random(64);
+
+        Config::set([
+            'onoffice.token' => $token,
+            'onoffice.secret' => $secret,
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $iterations = 1000;
+
+        // Benchmark getToken
+        $directTokenRetrieval = function () {
+            return Config::get('onoffice.token');
+        };
+        $start = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $onOfficeService->getToken();
+        }
+        $tokenMethodTime = microtime(true) - $start;
+
+        $start = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $directTokenRetrieval();
+        }
+        $tokenDirectTime = microtime(true) - $start;
+
+        // Benchmark getSecret
+        $directSecretRetrieval = function () {
+            return Config::get('onoffice.secret');
+        };
+        $start = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $onOfficeService->getSecret();
+        }
+        $secretMethodTime = microtime(true) - $start;
+
+        $start = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $directSecretRetrieval();
+        }
+        $secretDirectTime = microtime(true) - $start;
+
+        expect($tokenMethodTime)->toBeLessThan($tokenDirectTime + 0.001)
+            ->and($secretMethodTime)->toBeLessThan($secretDirectTime + 0.001);
+    });
 });
 
 describe('exceptions', function () {
