@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -19,7 +20,7 @@ describe('credentials', function () {
         $secret = Str::random(64);
         $apiClaim = Str::random();
 
-        config([
+        Config::set([
             'onoffice.token' => $token,
             'onoffice.secret' => $secret,
             'onoffice.api_claim' => $apiClaim,
@@ -37,7 +38,7 @@ describe('credentials', function () {
         $secret = Str::random(64);
         $apiClaim = Str::random();
 
-        config([
+        Config::set([
             'onoffice.token' => 'old-token',
             'onoffice.secret' => 'old-secret',
             'onoffice.api_claim' => 'old-claim',
@@ -45,7 +46,7 @@ describe('credentials', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        config([
+        Config::set([
             'onoffice.token' => $token,
             'onoffice.secret' => $secret,
             'onoffice.api_claim' => $apiClaim,
@@ -59,7 +60,7 @@ describe('credentials', function () {
     it('throws exception for too short token', function () {
         $invalidToken = Str::random(31); // Invalid length
 
-        config(['onoffice.token' => $invalidToken]);
+        Config::set(['onoffice.token' => $invalidToken]);
 
         $onOfficeService = app(OnOfficeService::class);
 
@@ -69,7 +70,7 @@ describe('credentials', function () {
     it('throws exception for too long token', function () {
         $invalidToken = Str::random(33); // Invalid length
 
-        config(['onoffice.token' => $invalidToken]);
+        Config::set(['onoffice.token' => $invalidToken]);
 
         $onOfficeService = app(OnOfficeService::class);
 
@@ -79,7 +80,7 @@ describe('credentials', function () {
     it('throws exception for too short secret', function () {
         $invalidSecret = Str::random(63); // Invalid length
 
-        config(['onoffice.secret' => $invalidSecret]);
+        Config::set(['onoffice.secret' => $invalidSecret]);
 
         $onOfficeService = app(OnOfficeService::class);
 
@@ -89,7 +90,7 @@ describe('credentials', function () {
     it('throws exception for too long secret', function () {
         $invalidSecret = Str::random(65); // Invalid length
 
-        config(['onoffice.secret' => $invalidSecret]);
+        Config::set(['onoffice.secret' => $invalidSecret]);
 
         $onOfficeService = app(OnOfficeService::class);
 
@@ -100,7 +101,7 @@ describe('credentials', function () {
         $token = Str::random(32);
         $secret = Str::random(64);
 
-        config([
+        Config::set([
             'onoffice.token' => $token,
             'onoffice.secret' => $secret,
         ]);
