@@ -1,6 +1,12 @@
 # Changelog
 ## main
 
+## v1.1.1
+- Added tipster for relation type enum
+
+## v1.1.0
+- Fix on office request for field first
+
 ## v1.0.0
 - Overhaul of the package to use a new fake implementation
 - Overhaul of the package to remove the fake builder classes
