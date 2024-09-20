@@ -10,6 +10,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Throwable;
 
 class FieldBuilder extends Builder
 {
@@ -33,11 +34,11 @@ class FieldBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function first(): ?array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Fields,
             parameters: [
@@ -46,7 +47,9 @@ class FieldBuilder extends Builder
             ],
         );
 
-        return $response->json('response.results.0.data.records.0');
+
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 
     /**
