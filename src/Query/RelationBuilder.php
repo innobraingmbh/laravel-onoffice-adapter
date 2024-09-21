@@ -19,7 +19,6 @@ use Throwable;
 class RelationBuilder extends Builder
 {
     use NonFilterable;
-    use NonFilterable;
     use NonOrderable;
     use NonSelectable;
     use RelationTypes;

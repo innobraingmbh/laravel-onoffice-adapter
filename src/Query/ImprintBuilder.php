@@ -16,7 +16,6 @@ use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 class ImprintBuilder extends Builder
 {
     use NonFilterable;
-    use NonFilterable;
     use NonOrderable;
 
     /**

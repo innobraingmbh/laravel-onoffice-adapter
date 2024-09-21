@@ -18,7 +18,6 @@ use Throwable;
 class UploadBuilder extends Builder
 {
     use NonFilterable;
-    use NonFilterable;
     use NonOrderable;
     use NonSelectable;
     use UploadInBlocks;
