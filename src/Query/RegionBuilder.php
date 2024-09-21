@@ -17,7 +17,6 @@ use Throwable;
 class RegionBuilder extends Builder
 {
     use NonFilterable;
-    use NonFilterable;
     use NonOrderable;
     use NonSelectable;
 

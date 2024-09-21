@@ -15,7 +15,6 @@ use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
 class ActionBuilder extends Builder
 {
     use NonFilterable;
-    use NonFilterable;
     use NonOrderable;
 
     /**
