@@ -109,13 +109,92 @@ describe('exceptions', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        expect(
-            fn () => $onOfficeService->requestApi(
+        expect(/**
+         * @throws OnOfficeException
+         */ static fn () => $onOfficeService->requestApi(
                 OnOfficeAction::Get,
                 OnOfficeResourceType::Estate,
             )
         )->toThrow(OnOfficeException::class, 'The HMAC is invalid');
     });
+
+    it('throws an exception on failed request inside response with validation error for token and secret', function (int $tokenLength, int $secretLength, string $message) {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => InvalidHmacResponse::make(),
+        ]);
+
+        Config::set([
+            'onoffice.token' => Str::random($tokenLength),
+            'onoffice.secret' => Str::random($secretLength),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        expect(/**
+         * @throws OnOfficeException
+         */ static fn () => $onOfficeService->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Estate,
+            )
+        )->toThrow(OnOfficeException::class, $message);
+    })->with([
+        [32, 64, 'The HMAC is invalid'],
+        [31, 64, 'The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.'],
+        [33, 64, 'The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.'],
+        [32, 63, 'The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.'],
+        [32, 65, 'The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.'],
+    ]);
+
+    it('throws an exception on failed request inside response without validation error for token and secret when other error', function (int $tokenLength, int $secretLength) {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => 200,
+                    'errorcode' => 0,
+                    'message' => 'OK',
+                ],
+                'response' => [
+                    'results' => [
+                        [
+                            'actionid' => 'urn:onoffice-de-ns:smart:2.5:smartml:action:get',
+                            'resourceid' => '',
+                            'resourcetype' => 'actionkindtypes',
+                            'cacheable' => false,
+                            'identifier' => '',
+                            'data' => [],
+                            'status' => [
+                                'errorcode' => 9,
+                                'message' => 'Empty request',
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        Config::set([
+            'onoffice.token' => Str::random($tokenLength),
+            'onoffice.secret' => Str::random($secretLength),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        expect(/**
+         * @throws OnOfficeException
+         */ static fn () => $onOfficeService->requestApi(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        )
+        )->toThrow(OnOfficeException::class, 'Empty request');
+    })->with([
+        [32, 64],
+        [31, 64],
+        [33, 64],
+        [32, 63],
+        [32, 65],
+    ]);
 
     it('can return an error', function () {
         Http::preventStrayRequests();

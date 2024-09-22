@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
@@ -259,6 +260,16 @@ class OnOfficeService
         $responseErrorMessage = $response->json('response.results.0.status.message', '');
         if ($responseErrorMessage === '') {
             $responseErrorMessage = "Status code: $responseStatusCode";
+        }
+
+        // Check if the hmac is invalid, due to invalid token or secret
+        if ($responseStatusCode === OnOfficeError::The_HMAC_Is_Invalid->value) {
+            $token = $this->getToken();
+            $secret = $this->getSecret();
+
+            if (strlen($token) !== 32 || strlen($secret) !== 64) {
+                throw new OnOfficeException('The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.', $statusErrorCode, isResponseError: true);
+            }
         }
 
         match (true) {
