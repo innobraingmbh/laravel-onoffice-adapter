@@ -112,9 +112,9 @@ describe('exceptions', function () {
         expect(/**
          * @throws OnOfficeException
          */ static fn () => $onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            )
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        )
         )->toThrow(OnOfficeException::class, 'The HMAC is invalid');
     });
 
@@ -134,9 +134,9 @@ describe('exceptions', function () {
         expect(/**
          * @throws OnOfficeException
          */ static fn () => $onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            )
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        )
         )->toThrow(OnOfficeException::class, $message);
     })->with([
         [32, 64, 'The HMAC is invalid'],
