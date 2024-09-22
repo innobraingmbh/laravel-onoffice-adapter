@@ -21,32 +21,14 @@ class OnOfficeService
 
     public function __construct() {}
 
-    /**
-     * @throws OnOfficeException
-     */
     public function getToken(): string
     {
-        $token = Config::get('onoffice.token', '') ?? '';
-
-        if (strlen($token) !== 32) {
-            throw new OnOfficeException('The token is invalid.', 401);
-        }
-
-        return $token;
+        return Config::get('onoffice.token', '') ?? '';
     }
 
-    /**
-     * @throws OnOfficeException
-     */
     public function getSecret(): string
     {
-        $secret = Config::get('onoffice.secret', '') ?? '';
-
-        if (strlen($secret) !== 64) {
-            throw new OnOfficeException('The secret is invalid.', 401);
-        }
-
-        return $secret;
+        return Config::get('onoffice.secret', '') ?? '';
     }
 
     public function getApiClaim(): string
