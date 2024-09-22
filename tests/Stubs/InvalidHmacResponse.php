@@ -16,7 +16,7 @@ class InvalidHmacResponse
 
     private static function getBody(array $data): array
     {
-        return array_merge_recursive([
+        return array_replace_recursive([
             'status' => [
                 'code' => 200,
                 'errorcode' => 0,
