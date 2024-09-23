@@ -12,6 +12,7 @@ use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonFilterable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Throwable;
 
 class ImprintBuilder extends Builder
 {
@@ -36,11 +37,11 @@ class ImprintBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function first(): ?array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Impressum,
             parameters: [
@@ -49,7 +50,8 @@ class ImprintBuilder extends Builder
             ]
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 
     /**
