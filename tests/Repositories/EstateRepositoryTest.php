@@ -23,6 +23,24 @@ describe('fake responses', function () {
 
         EstateRepository::assertSentCount(1);
     });
+
+    test('first', function () {
+        EstateRepository::fake(EstateRepository::response([
+            EstateRepository::page(recordFactories: [
+                EstateFactory::make()
+                    ->id(1),
+                EstateFactory::make()
+                    ->id(2),
+            ]),
+        ]));
+
+        $response = EstateRepository::query()->first();
+
+        expect($response)->toBeArray()
+            ->and($response['id'])->toBe(1);
+
+        EstateRepository::assertSentCount(1);
+    });
 });
 
 describe('real responses', function () {

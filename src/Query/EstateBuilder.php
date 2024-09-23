@@ -35,10 +35,11 @@ class EstateBuilder extends Builder
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
     public function first(): ?array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Estate,
             parameters: [
@@ -51,7 +52,8 @@ class EstateBuilder extends Builder
             ]
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 
     /**
