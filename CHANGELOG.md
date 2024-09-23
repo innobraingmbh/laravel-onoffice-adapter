@@ -1,6 +1,10 @@
 # Changelog
 ## main
 
+## v1.1.3
+- Fixes first() method on Estate- and ImprintRepository
+- Adds credential validation on `HMAC Invalid` exceptions for easier debugging
+
 ## v1.1.2
 - Allows integer values for elements function in factories
 
