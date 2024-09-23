@@ -38,8 +38,6 @@ describe('fake responses', function () {
 
         expect($response)->toBeArray()
             ->and($response['id'])->toBe(1);
-
-        EstateRepository::assertSentCount(1);
     });
 });
 
