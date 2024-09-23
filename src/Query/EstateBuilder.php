@@ -34,8 +34,7 @@ class EstateBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
-     * @throws Throwable
+     * @throws Throwable<OnOfficeException>
      */
     public function first(): ?array
     {
