@@ -32,6 +32,11 @@ class BaseRepository extends Facade
         return RootRepository::class;
     }
 
+    public static function sequence(OnOfficeResponse $response, int $times = 1): array
+    {
+        return static::getFacadeRoot()->sequence($response, $times);
+    }
+
     public static function response(array $pages = []): OnOfficeResponse
     {
         return static::getFacadeRoot()->response($pages);

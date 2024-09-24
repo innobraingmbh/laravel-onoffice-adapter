@@ -74,6 +74,16 @@ class BaseRepository
         return $this;
     }
 
+    public function sequence(OnOfficeResponse $response, int $times = 1): array
+    {
+        return collect(range(1, $times))
+            ->map(function () use ($response) {
+                return clone $response;
+            })
+            ->values()
+            ->toArray();
+    }
+
     public function response(array $pages = []): OnOfficeResponse
     {
         if ($pages === []) {

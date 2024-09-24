@@ -1,5 +1,6 @@
 # Changelog
 ## main
+- Added a sequence method for base repository to repeat a response
 
 ## v1.1.3
 - Fixes first() method on Estate- and ImprintRepository
