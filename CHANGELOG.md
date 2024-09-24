@@ -1,6 +1,10 @@
 # Changelog
 ## main
 
+## v1.2.1
+- Added a resource type multiselectkey
+- Added the body const modul
+
 ## v1.2.0
 - Added a sequence method for base repository to repeat a response
 

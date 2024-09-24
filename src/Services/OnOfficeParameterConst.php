@@ -42,4 +42,6 @@ trait OnOfficeParameterConst
     public const IDS = 'ids';
 
     public const INPUT = 'input';
+
+    public const MODUL = 'modul';
 }

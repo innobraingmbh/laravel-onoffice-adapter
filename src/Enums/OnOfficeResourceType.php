@@ -23,4 +23,5 @@ enum OnOfficeResourceType: string
     case ActionTypes = 'actionkindtypes';
     case Relation = 'relation';
     case Search = 'search';
+    case MultiselectKey = 'multiselectkey';
 }
