@@ -194,7 +194,7 @@ $response = EstateRepository::query()->get();
 expect($response->count())->toBe(2)
     ->and($response->first()['id'])->toBe(1)
     ->and($response->last()['id'])->toBe(2);
-    
+
 $response = EstateRepository::query()->get();
 
 expect($response->count())->toBe(2)
@@ -205,6 +205,24 @@ EstateRepository::assertSentCount(4);
 
 $response = EstateRepository::query()->get(); // throws StrayRequestException
 ```
+```php
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+
+EstateRepository::preventStrayRequests();
+EstateRepository::fake(EstateRepository::sequence(
+    EstateRepository::response([
+        EstateRepository::page(recordFactories: EstateFactory::times(20)),
+    ]),
+    times: 30,
+));
+
+for ($i = 0; $i < 30; ++$i) {
+    $response = EstateRepository::query()->get();
+
+    expect($response->count())->toBe(20);
+}
+```
+
 
 ## Testing
 

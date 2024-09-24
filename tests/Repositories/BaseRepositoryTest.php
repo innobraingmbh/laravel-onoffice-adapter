@@ -129,6 +129,20 @@ describe('fake', function () {
 
         expect($m->getValue($builder)->toArray()[0])->toBeInstanceOf(OnOfficeResponse::class);
     });
+
+    it('can fake a sequence', function () {
+        $builder = new BaseRepository;
+
+        $builder->fake($builder->sequence(
+            new OnOfficeResponse(collect()),
+            20,
+        ));
+
+        $m = new ReflectionProperty($builder, 'stubCallables');
+        $m->setAccessible(true);
+
+        expect($m->getValue($builder)->toArray())->toHaveCount(20);
+    });
 });
 
 describe('assert', function () {
