@@ -76,7 +76,8 @@ class BaseRepository
 
     public function sequence(OnOfficeResponse $response, int $times = 1): array
     {
-        return collect(range(1, $times))
+        return collect()
+            ->range(1, $times)
             ->map(function () use ($response) {
                 return clone $response;
             })
