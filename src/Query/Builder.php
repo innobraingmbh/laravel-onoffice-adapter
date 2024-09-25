@@ -153,9 +153,8 @@ class Builder implements BuilderInterface
          * @throws OnOfficeException
          * @throws Throwable
          */ function (int $pageSize, int $offset) use ($request) {
-            $parameter = $request->parameters;
-            data_set($parameter, OnOfficeService::LISTLIMIT, $pageSize);
-            data_set($parameter, OnOfficeService::LISTOFFSET, $offset);
+            data_set($request->parameters, OnOfficeService::LISTLIMIT, $pageSize);
+            data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
 
             return $this->requestApi($request);
         }, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit);
@@ -170,9 +169,8 @@ class Builder implements BuilderInterface
          * @throws OnOfficeException
          * @throws Throwable
          */ function (int $pageSize, int $offset) use ($request) {
-            $parameter = $request->parameters;
-            data_set($parameter, OnOfficeService::LISTLIMIT, $pageSize);
-            data_set($parameter, OnOfficeService::LISTOFFSET, $offset);
+            data_set($request->parameters, OnOfficeService::LISTLIMIT, $pageSize);
+            data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
 
             return $this->requestApi($request);
         }, $callback, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit);
