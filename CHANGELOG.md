@@ -1,5 +1,7 @@
 # Changelog
 ## main
+
+## v1.2.2
 - Fixed the missing overwrite of the list limit
 
 ## v1.2.1
