@@ -8,7 +8,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 
-readonly class OnOfficeRequest
+class OnOfficeRequest
 {
     public function __construct(
         public OnOfficeAction $actionId,

@@ -1,5 +1,6 @@
 # Changelog
 ## main
+- Fixed the missing overwrite of the list limit
 
 ## v1.2.1
 - Added a resource type multiselectkey
