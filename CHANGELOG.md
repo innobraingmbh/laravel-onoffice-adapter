@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v1.2.4
+- Add more address-estate relation types
+
 ## v1.2.3
 - Increased default file upload block size to more performant value
 
