@@ -13,4 +13,8 @@ enum OnOfficeRelationType: string
     case ProspectiveBuyer = 'urn:onoffice-de-ns:smart:2.5:relationTypes:estate:address:interested';
     case ContactPersonBroker = 'urn:onoffice-de-ns:smart:2.5:relationTypes:estate:address:contactPerson';
     case ContactPersonAll = 'urn:onoffice-de-ns:smart:2.5:relationTypes:estate:address:contactPersonAll';
+    case EstateOfferAngebot = 'urn:onoffice-de-ns:smart:2.5:relationTypes:address:estate:offer';
+    case EstateContacted = 'urn:onoffice-de-ns:smart:2.5:relationTypes:address:estate:contacted';
+    case EstateMatching = 'urn:onoffice-de-ns:smart:2.5:relationTypes:address:estate:matching';
+    case EstateOffer = 'urn:onoffice-de-ns:smart:2.5:relationTypes:address:estate:offerByAgentsLog';
 }
