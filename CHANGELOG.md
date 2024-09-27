@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v1.2.3
+- Increased default file upload block size to more performant value
+
 ## v1.2.2
 - Fixed the missing overwrite of the list limit
 
