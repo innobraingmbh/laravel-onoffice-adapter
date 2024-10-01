@@ -21,4 +21,9 @@ readonly class OnOfficeResponse
     {
         return $this->pages->isEmpty();
     }
+
+    public function count(): int
+    {
+        return $this->pages->count();
+    }
 }
