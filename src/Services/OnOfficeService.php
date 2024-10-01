@@ -125,8 +125,9 @@ class OnOfficeService
         int $pageSize = 500,
         int $offset = 0,
         int $limit = -1,
+        ?int $pageOverwrite = null,
     ): Collection {
-        $maxPage = 0;
+        $maxPage = $pageOverwrite ?? 0;
         $data = new Collection;
         do {
             try {
@@ -134,7 +135,7 @@ class OnOfficeService
             } catch (OnOfficeException $exception) {
                 Log::error("{$exception->getMessage()} - {$exception->getCode()}");
 
-                if ($maxPage === 0) {
+                if ($maxPage === 0 || $pageOverwrite !== null) {
                     throw $exception;
                 }
 
@@ -190,8 +191,9 @@ class OnOfficeService
         int $pageSize = 500,
         int $offset = 0,
         int $limit = -1,
+        ?int $pageOverwrite = null,
     ): void {
-        $maxPage = 0;
+        $maxPage = $pageOverwrite ?? 0;
         $elementCount = 0;
         do {
             try {
@@ -199,7 +201,7 @@ class OnOfficeService
             } catch (OnOfficeException $exception) {
                 Log::error("{$exception->getMessage()} - {$exception->getCode()}");
 
-                if ($maxPage === 0) {
+                if ($maxPage === 0 || $pageOverwrite !== null) {
                     throw $exception;
                 }
 

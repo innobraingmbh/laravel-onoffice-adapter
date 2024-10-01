@@ -8,6 +8,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
 
 describe('stray requests', function () {
@@ -142,6 +143,102 @@ describe('fake', function () {
         $m->setAccessible(true);
 
         expect($m->getValue($builder)->toArray())->toHaveCount(20);
+    });
+
+    it('can fake a response with more than one page', function () {
+        $builder = new BaseRepository;
+
+        $builder->fake([
+            $builder->response([
+                $builder->page(recordFactories: [
+                    BaseFactory::make(),
+                ]),
+                $builder->page(recordFactories: [
+                    BaseFactory::make(),
+                ]),
+            ]),
+        ]);
+
+        $result = $builder->query()->call(new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Estate,
+        ));
+
+        expect($result->count())->toBe(2);
+    });
+
+    it('can fake a response with more than one page and another response', function () {
+        $builder = new BaseRepository;
+
+        $builder->fake([
+            $builder->response([
+                $builder->page(recordFactories: [
+                    BaseFactory::make(),
+                ]),
+                $builder->page(recordFactories: [
+                    BaseFactory::make(),
+                ]),
+            ]),
+            $builder->response([
+                $builder->page(recordFactories: [
+                    BaseFactory::make(),
+                ]),
+            ]),
+        ]);
+
+        $result = $builder->query()->call(new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Estate,
+        ));
+
+        expect($result->count())->toBe(2);
+
+        $result = $builder->query()->call(new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Estate,
+        ));
+
+        expect($result->count())->toBe(1);
+    });
+
+    it('can fake a response with more than one page and another response on each page', function () {
+        $builder = new BaseRepository;
+
+        $builder->fake([
+            $builder->response([
+                $builder->page(recordFactories: [
+                    BaseFactory::make(),
+                ]),
+                $builder->page(recordFactories: [
+                    BaseFactory::make(),
+                ]),
+            ]),
+            $builder->response([
+                $builder->page(recordFactories: [
+                    BaseFactory::make(),
+                ]),
+            ]),
+        ]);
+
+        $result = [];
+        $builder->query()->chunked(new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Estate,
+        ), function (array $records) use (&$result) {
+            $result[] = count($records);
+        });
+
+        expect($result[0])->toBe(1)
+            ->and($result[1])->toBe(1);
+
+        $builder->query()->chunked(new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Estate,
+        ), function (array $records) use (&$result) {
+            $result[] = count($records);
+        });
+
+        expect($result[2])->toBe(1);
     });
 });
 

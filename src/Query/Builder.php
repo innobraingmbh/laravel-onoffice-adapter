@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\BuilderInterface;
@@ -86,6 +87,16 @@ class Builder implements BuilderInterface
      */
     protected BaseRepository $repository;
 
+    /**
+     * The last request that was made. Needed for the stubbing.
+     */
+    private ?OnOfficeRequest $requestCache = null;
+
+    /**
+     * The last stub response.
+     */
+    private ?OnOfficeResponse $responseCache = null;
+
     public function __construct() {}
 
     protected function getOnOfficeService(): OnOfficeService
@@ -157,7 +168,21 @@ class Builder implements BuilderInterface
             data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
 
             return $this->requestApi($request);
-        }, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit);
+        }, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit, pageOverwrite: $this->getPageOverwrite());
+    }
+
+    /**
+     * To have a more flexible way to overwrite the page sizes
+     * in stub responses.
+     * We need to determine the page size by
+     * counting the number of pages in the stub response.
+     */
+    private function getPageOverwrite(): ?int
+    {
+        /** @var ?OnOfficeResponse $stub */
+        $stub = ($this->stubCallables ?? collect())->first();
+
+        return $stub?->count();
     }
 
     /**
@@ -173,7 +198,7 @@ class Builder implements BuilderInterface
             data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
 
             return $this->requestApi($request);
-        }, $callback, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit);
+        }, $callback, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit, pageOverwrite: $this->getPageOverwrite());
     }
 
     /**
@@ -181,20 +206,20 @@ class Builder implements BuilderInterface
      */
     protected function getStubCallable(OnOfficeRequest $request): ?Response
     {
-        $response = ($this->stubCallables ?? collect())->first();
+        // if the request is different from the last one, reset the response cache
+        if ($this->requestCache !== $request) {
+            $this->requestCache = $request;
+            $this->responseCache = ($this->stubCallables ?? collect())->shift();
+        }
 
-        ($this->stubCallables ?? collect())->shift();
+        /** @var ?OnOfficeResponsePage $response */
+        $response = $this->responseCache?->shift();
 
         if (is_null($response)) {
             return null;
         }
 
-        /** @var OnOfficeResponse $response */
-        if ($response->isEmpty()) {
-            return null;
-        }
-
-        $response = $response->shift()->toResponse();
+        $response = $response->toResponse();
 
         $response = new Psr7Response(200, [], json_encode($response, JSON_THROW_ON_ERROR));
 

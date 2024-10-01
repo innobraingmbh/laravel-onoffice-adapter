@@ -23,5 +23,6 @@ it('works', function () {
     $response = new OnOfficeResponse(collect([$page]));
 
     expect($response->shift())->toBeInstanceOf(OnOfficeResponsePage::class)
+        ->and($response->count())->toBe(0)
         ->and($response->isEmpty())->toBeTrue();
 });
