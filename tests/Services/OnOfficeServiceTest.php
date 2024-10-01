@@ -488,3 +488,71 @@ describe('requestAllChunked', function () {
         expect($count)->toBe(3);
     });
 });
+
+describe('retry', function () {
+    it('can use the retry count', function (int $given, int $expected) {
+        Config::set([
+            'onoffice.retry.count' => $given,
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        expect($onOfficeService->getRetryCount())->toBe($expected);
+    })->with([
+        [3, 3],
+        [-1, 1],
+        [0, 1],
+    ]);
+
+    it('can use the retry delay', function (int $given, int $expected) {
+        Config::set([
+            'onoffice.retry.delay' => $given,
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        expect($onOfficeService->getRetryDelay())->toBe($expected);
+    })->with([
+        [100, 100],
+        [-100, 1],
+        [0, 1],
+    ]);
+
+    it('can use the retry only on connection error', function (bool $given) {
+        Config::set([
+            'onoffice.retry.only_on_connection_error' => $given,
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        expect($onOfficeService->retryOnlyOnConnectionError())->toBe($given);
+    })->with([true, false]);
+
+    it('will use the retry settings', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::sequence([
+                Http::response(status: 500),
+                Http::response([
+                    'status' => [
+                        'code' => 200,
+                    ],
+                ]),
+            ]),
+        ]);
+
+        Config::set([
+            'onoffice.retry.count' => 2,
+            'onoffice.retry.only_on_connection_error' => false,
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $onOfficeService->requestApi(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        Http::assertSentCount(2);
+    });
+});

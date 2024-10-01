@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Innobrain\OnOfficeAdapter\Services;
 
+use Exception;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -35,6 +37,25 @@ class OnOfficeService
     public function getApiClaim(): string
     {
         return Config::get('onoffice.api_claim', '') ?? '';
+    }
+
+    public function getRetryCount(): int
+    {
+        $count = Config::get('onoffice.retry.count', 3) ?? 3;
+
+        return max($count, 1);
+    }
+
+    public function getRetryDelay(): int
+    {
+        $delay = Config::get('onoffice.retry.delay', 200) ?? 200;
+
+        return max($delay, 1);
+    }
+
+    public function retryOnlyOnConnectionError(): bool
+    {
+        return Config::get('onoffice.retry.only_on_connection_error', true) ?? true;
     }
 
     /*
@@ -86,7 +107,16 @@ class OnOfficeService
             $parameters = array_replace([self::EXTENDEDCLAIM => $this->getApiClaim()], $parameters);
         }
 
+        $retryOnlyOnConnectionError = static function ($exception): bool {
+            return $exception instanceof ConnectionException;
+        };
+
+        if (! $this->retryOnlyOnConnectionError()) {
+            $retryOnlyOnConnectionError = null;
+        }
+
         $response = Http::onOffice()
+            ->retry($this->getRetryCount(), $this->getRetryDelay(), $retryOnlyOnConnectionError, throw: false)
             ->post('/', [
                 'token' => $this->getToken(),
                 'request' => [
