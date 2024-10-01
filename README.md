@@ -41,6 +41,15 @@ return [
     ],
 
     /**
+     * Retry
+     */
+    'retry' => [
+        'count' => 3,
+        'delay' => 200,
+        'only_on_connection_error' => true,
+    ],
+
+    /**
      * The token and secret to be used for authentication with the OnOffice API.
      */
     'token' => env('ON_OFFICE_TOKEN', ''),
