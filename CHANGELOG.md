@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v1.2.5
+- Fixed retry option does not handle timestamp change
+
 ## v1.2.4
 - Add more address-estate relation types
 
