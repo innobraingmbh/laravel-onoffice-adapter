@@ -7,6 +7,7 @@ namespace Innobrain\OnOfficeAdapter\Query;
 use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
@@ -82,7 +83,11 @@ class EstateFileBuilder extends Builder
         $result = $response->json('response.results.0.data.records.0');
 
         if (! $result) {
-            throw new OnOfficeException('File not found');
+            throw new OnOfficeException(
+                OnOfficeError::File_Not_Found->toString(),
+                OnOfficeError::File_Not_Found->value,
+                isResponseError: true,
+            );
         }
 
         return $result;
