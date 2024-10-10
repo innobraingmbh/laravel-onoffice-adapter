@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Innobrain\OnOfficeAdapter\Repositories\FilterRepository;
 use Innobrain\OnOfficeAdapter\Query\FilterBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\FilterRepository;
 
 describe('withModule', function () {
     it('should set the module property to the given module', function () {
