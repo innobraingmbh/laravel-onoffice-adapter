@@ -27,7 +27,7 @@ class GetFiltersResponse
             ],
         ]);
 
-        return array_merge_recursive([
+        return array_replace_recursive([
             'status' => [
                 'code' => 200,
                 'errorcode' => 0,
