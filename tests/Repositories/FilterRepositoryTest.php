@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeQueryException;
 use Innobrain\OnOfficeAdapter\Facades\FilterRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\FilterFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\GetFiltersResponse;
@@ -50,4 +51,18 @@ describe('real responses', function () {
 
         FilterRepository::assertSentCount(3);
     });
+});
+
+describe('query exception', function () {
+    it('will throw a query exception when module is missing', function (string $method) {
+        Http::preventStrayRequests();
+
+        FilterRepository::query()->{$method}(fn () => null);
+    })
+        ->with([
+            'get',
+            'first',
+            'each',
+        ])
+        ->throws(OnOfficeQueryException::class, 'Filter Builder module is not set');
 });

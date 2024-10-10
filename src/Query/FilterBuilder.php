@@ -9,6 +9,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeQueryException;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -18,9 +19,12 @@ class FilterBuilder extends Builder
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable<OnOfficeQueryException>
      */
     public function get(): Collection
     {
+        throw_unless(isset($this->module), new OnOfficeQueryException('Filter Builder module is not set'));
+
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Filters,
@@ -34,9 +38,12 @@ class FilterBuilder extends Builder
 
     /**
      * @throws Throwable<OnOfficeException>
+     * @throws Throwable<OnOfficeQueryException>
      */
     public function first(): ?array
     {
+        throw_unless(isset($this->module), new OnOfficeQueryException('Filter Builder module is not set'));
+
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Filters,
@@ -52,9 +59,12 @@ class FilterBuilder extends Builder
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable<OnOfficeQueryException>
      */
     public function each(callable $callback): void
     {
+        throw_unless(isset($this->module), new OnOfficeQueryException('Filter Builder module is not set'));
+
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Filters,

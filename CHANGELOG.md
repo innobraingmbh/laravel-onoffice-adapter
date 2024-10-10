@@ -1,5 +1,6 @@
 # Changelog
 ## main
+- Added a query exception to filter repository
 
 ## v1.2.6
 - Added Get Filters Repository
