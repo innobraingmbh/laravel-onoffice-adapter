@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v1.2.6
+- Added Get Filters Repository
+
 ## v1.2.5
 - Fixed retry option does not handle timestamp change
 
