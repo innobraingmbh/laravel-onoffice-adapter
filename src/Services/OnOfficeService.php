@@ -69,7 +69,7 @@ class OnOfficeService
      *
      * Read more: https://apidoc.onoffice.de/onoffice-api-request/request-elemente/action/#hmac
      */
-    private function getHmac(OnOfficeAction $actionId, OnOfficeResourceType $resourceType): string
+    public function getHmac(OnOfficeAction $actionId, OnOfficeResourceType $resourceType): string
     {
         return base64_encode(
             hash_hmac(
@@ -100,10 +100,6 @@ class OnOfficeService
      */
     public function requestApi(OnOfficeRequest $request): Response
     {
-        if (! empty($this->getApiClaim())) {
-            $request->parameters = array_replace([self::EXTENDEDCLAIM => $this->getApiClaim()], $request->parameters);
-        }
-
         $retryOnlyOnConnectionError = static function ($exception): bool {
             return $exception instanceof ConnectionException;
         };
@@ -120,24 +116,7 @@ class OnOfficeService
          */
         $response = null;
         retry($this->getRetryCount(), function () use ($request, &$response) {
-            $response = Http::onOffice()
-                ->post('/', [
-                    'token' => $this->getToken(),
-                    'request' => [
-                        'actions' => [
-                            [
-                                'actionid' => $request->actionId->value,
-                                'resourceid' => $request->resourceId instanceof OnOfficeResourceId ? $request->resourceId->value : $request->resourceId,
-                                'resourcetype' => $request->resourceType->value,
-                                'identifier' => $request->identifier,
-                                'timestamp' => Carbon::now()->timestamp,
-                                'hmac' => $this->getHmac($request->actionId, $request->resourceType),
-                                'hmac_version' => 2,
-                                'parameters' => $request->parameters,
-                            ],
-                        ],
-                    ],
-                ]);
+            $response = Http::onOffice()->post('/', $request->toRequestArray());
 
             $this->throwIfResponseIsFailed($response);
         }, $this->getRetryDelay(), $retryOnlyOnConnectionError);
