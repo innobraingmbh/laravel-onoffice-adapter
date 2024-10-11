@@ -1,5 +1,8 @@
 # Changelog
 ## main
+- Refactored the passing of the request to the on office service
+- Added a method to get the last request response pair from the repository
+- Added die and dump functions to the queries
 
 ## v1.3.0
 - Added a throw to stub responses
