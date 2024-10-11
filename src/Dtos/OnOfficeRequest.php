@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Innobrain\OnOfficeAdapter\Dtos;
 
+use Illuminate\Support\Carbon;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 
 class OnOfficeRequest
 {
@@ -26,6 +28,36 @@ class OnOfficeRequest
             'resourceId' => $this->resourceId,
             'identifier' => $this->identifier,
             'parameters' => $this->parameters,
+        ];
+    }
+
+    public function toRequestArray(): array
+    {
+        /** @var OnOfficeService $onOfficeService */
+        $onOfficeService = app(OnOfficeService::class);
+
+        if (! empty($onOfficeService->getApiClaim())) {
+            $this->parameters = array_replace([OnOfficeService::EXTENDEDCLAIM => $onOfficeService->getApiClaim()], $this->parameters);
+        }
+
+        return [
+            'token' => $onOfficeService->getToken(),
+            'request' => [
+                'actions' => [
+                    [
+                        'actionid' => $this->actionId->value,
+                        'resourceid' => $this->resourceId instanceof OnOfficeResourceId
+                            ? $this->resourceId->value
+                            : $this->resourceId,
+                        'resourcetype' => $this->resourceType->value,
+                        'identifier' => $this->identifier,
+                        'timestamp' => Carbon::now()->timestamp,
+                        'hmac' => $onOfficeService->getHmac($this->actionId, $this->resourceType),
+                        'hmac_version' => 2,
+                        'parameters' => $this->parameters,
+                    ],
+                ],
+            ],
         ];
     }
 }

@@ -55,11 +55,11 @@ class ImprintBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
+     * @throws Throwable<OnOfficeException>
      */
     public function find(int $id): array
     {
-        $response = $this->onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Impressum,
             resourceId: $id,
@@ -69,6 +69,7 @@ class ImprintBuilder extends Builder
             ]
         );
 
-        return $response->json('response.results.0.data.records.0');
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
     }
 }

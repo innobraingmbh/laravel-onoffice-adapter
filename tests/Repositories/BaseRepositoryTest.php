@@ -12,6 +12,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
+use Symfony\Component\VarDumper\VarDumper;
 
 describe('stray requests', function () {
     it('will set the preventStrayRequests property when calling preventStrayRequests default', function () {
@@ -107,6 +108,48 @@ describe('record', function () {
         $m->setAccessible(true);
 
         expect($m->getValue($builder))->toBe([]);
+    });
+
+    it('will dump the last record', function () {
+        $builder = new BaseRepository;
+
+        $builder->record();
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        $builder->recordRequestResponsePair($request, ['response']);
+
+        $response = $builder->lastRecorded();
+
+        expect($response)->toBe([$request, ['response']]);
+    });
+
+    it('will dump the last record request', function () {
+        $builder = new BaseRepository;
+
+        $builder->record();
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        $builder->recordRequestResponsePair($request, ['response']);
+
+        $response = $builder->lastRecordedRequest();
+
+        expect($response)->toBe($request);
+    });
+
+    it('will dump the last record response', function () {
+        $builder = new BaseRepository;
+
+        $builder->record();
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        $builder->recordRequestResponsePair($request, ['response']);
+
+        $response = $builder->lastRecordedResponse();
+
+        expect($response)->toBe(['response']);
     });
 });
 
@@ -391,5 +434,132 @@ describe('request', function () {
         });
 
         Http::assertSentCount(1);
+    });
+});
+
+describe('middlewares', function () {
+    it('will call the before callbacks', function () {
+        $builder = new BaseRepository;
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+            ]),
+        ]);
+
+        $builder->record();
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        $builder->query()
+            ->before(function (OnOfficeRequest $request) {
+                $request->identifier = 'before';
+            })
+            ->call($request);
+
+        $builder->assertSent(function (OnOfficeRequest $request) {
+            return $request->identifier === 'before';
+        });
+    });
+
+    it('will call the before callbacks in the order they are added', function () {
+        $builder = new BaseRepository;
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+            ]),
+        ]);
+
+        $builder->record();
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        $builder->query()
+            ->before(function (OnOfficeRequest $request) {
+                $request->identifier = 'before';
+            })
+            ->before(function (OnOfficeRequest $request) {
+                $request->identifier = 'after_the_first_before';
+            })
+            ->call($request);
+
+        $builder->assertSent(function (OnOfficeRequest $request) {
+            return $request->identifier === 'after_the_first_before';
+        });
+    });
+
+    it('can dump the request', function () {
+        $builder = new BaseRepository;
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+            ]),
+        ]);
+
+        $dumped = [];
+
+        VarDumper::setHandler(static function (mixed $value) use (&$dumped) {
+            $dumped[] = $value;
+        });
+
+        $builder->record();
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        $builder->query()
+            ->dump()
+            ->call($request);
+
+        expect($dumped)->toHaveCount(1)
+            ->and($dumped[0])->toBeInstanceOf(OnOfficeRequest::class)
+            ->and($dumped[0]->actionId)->toBe(OnOfficeAction::Read)
+            ->and($dumped[0]->resourceType)->toBe(OnOfficeResourceType::Estate);
+
+        VarDumper::setHandler(null);
+    });
+
+    it('can raw the request', function () {
+        $builder = new BaseRepository;
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+            ]),
+        ]);
+
+        $dumped = [];
+
+        VarDumper::setHandler(static function (mixed $value) use (&$dumped) {
+            $dumped[] = $value;
+        });
+
+        $builder->record();
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        $builder->query()
+            ->dump()
+            ->call($request);
+
+        expect($dumped)->toHaveCount(1)
+            ->and($dumped[0])->toBeInstanceOf(OnOfficeRequest::class)
+            ->and($dumped[0]->actionId)->toBe(OnOfficeAction::Read)
+            ->and($dumped[0]->resourceType)->toBe(OnOfficeResourceType::Estate);
+
+        VarDumper::setHandler(null);
     });
 });

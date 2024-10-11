@@ -186,6 +186,21 @@ class BaseRepository
         return $this;
     }
 
+    public function lastRecorded(): ?array
+    {
+        return collect($this->recorded)->last();
+    }
+
+    public function lastRecordedRequest(): ?OnOfficeRequest
+    {
+        return collect($this->recorded)->last()[0] ?? null;
+    }
+
+    public function lastRecordedResponse(): ?array
+    {
+        return collect($this->recorded)->last()[1] ?? null;
+    }
+
     /**
      * Get a collection of the request / response pairs matching the given truth test.
      */

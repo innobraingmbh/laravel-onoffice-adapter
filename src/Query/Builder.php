@@ -19,6 +19,7 @@ use Innobrain\OnOfficeAdapter\Query\Concerns\BuilderInterface;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use JsonException;
+use Symfony\Component\VarDumper\VarDumper;
 use Throwable;
 
 class Builder implements BuilderInterface
@@ -97,6 +98,11 @@ class Builder implements BuilderInterface
      */
     private ?OnOfficeResponse $responseCache = null;
 
+    /**
+     * The before sending middlewares.
+     */
+    protected array $beforeSendingCallbacks = [];
+
     public function __construct() {}
 
     protected function getOnOfficeService(): OnOfficeService
@@ -130,24 +136,52 @@ class Builder implements BuilderInterface
         return $this;
     }
 
+    public function before(callable $callback): static
+    {
+        $this->beforeSendingCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function dump(): static
+    {
+        return $this->before(static function (OnOfficeRequest $request) {
+            VarDumper::dump($request);
+        });
+    }
+
+    public function dd(): static
+    {
+        return $this->before(static function (OnOfficeRequest $request) {
+            VarDumper::dump($request);
+
+            exit(1);
+        });
+    }
+
+    public function raw(): static
+    {
+        return $this->before(static function (OnOfficeRequest $request) {
+            VarDumper::dump($request->toRequestArray());
+
+            exit(1);
+        });
+    }
+
     /**
      * @throws OnOfficeException
      * @throws Throwable
      */
     public function requestApi(OnOfficeRequest $request): Response
     {
+        $request = $this->runBeforeSendingCallbacks($request);
+
         $response = $this->getStubCallable($request);
 
         if (is_null($response)) {
             throw_if($this->preventStrayRequests, new StrayRequestException(request: $request));
 
-            $response = $this->getOnOfficeService()->requestApi(
-                $request->actionId,
-                $request->resourceType,
-                $request->resourceId,
-                $request->identifier,
-                $request->parameters,
-            );
+            $response = $this->getOnOfficeService()->requestApi($request);
         } else {
             $this->getOnOfficeService()->throwIfResponseIsFailed($response);
         }
@@ -155,6 +189,19 @@ class Builder implements BuilderInterface
         $this->repository->recordRequestResponsePair($request, $response->json());
 
         return $response;
+    }
+
+    protected function runBeforeSendingCallbacks(OnOfficeRequest $request): OnOfficeRequest
+    {
+        return tap($request, function (OnOfficeRequest &$request) {
+            collect($this->beforeSendingCallbacks)->each(function (callable $callback) use (&$request) {
+                $result = $callback($request);
+
+                if ($result instanceof OnOfficeRequest) {
+                    $request = $result;
+                }
+            });
+        });
     }
 
     /**

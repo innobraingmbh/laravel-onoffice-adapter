@@ -12,9 +12,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
-use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Throwable;
@@ -68,7 +68,7 @@ class OnOfficeService
      *
      * Read more: https://apidoc.onoffice.de/onoffice-api-request/request-elemente/action/#hmac
      */
-    private function getHmac(OnOfficeAction $actionId, OnOfficeResourceType $resourceType): string
+    public function getHmac(OnOfficeAction $actionId, OnOfficeResourceType $resourceType): string
     {
         return base64_encode(
             hash_hmac(
@@ -97,17 +97,8 @@ class OnOfficeService
      * @throws OnOfficeException
      * @throws Throwable
      */
-    public function requestApi(
-        OnOfficeAction $actionId,
-        OnOfficeResourceType $resourceType,
-        OnOfficeResourceId|string|int $resourceId = OnOfficeResourceId::None,
-        string|int $identifier = '',
-        array $parameters = [],
-    ): Response {
-        if (! empty($this->getApiClaim())) {
-            $parameters = array_replace([self::EXTENDEDCLAIM => $this->getApiClaim()], $parameters);
-        }
-
+    public function requestApi(OnOfficeRequest $request): Response
+    {
         $retryOnlyOnConnectionError = static function ($exception): bool {
             return $exception instanceof ConnectionException;
         };
@@ -123,25 +114,8 @@ class OnOfficeService
          * To avoid this, we need to retry the request with payload creation until we get a valid response.
          */
         $response = null;
-        retry($this->getRetryCount(), function () use ($parameters, $identifier, $resourceType, $resourceId, $actionId, &$response) {
-            $response = Http::onOffice()
-                ->post('/', [
-                    'token' => $this->getToken(),
-                    'request' => [
-                        'actions' => [
-                            [
-                                'actionid' => $actionId->value,
-                                'resourceid' => $resourceId instanceof OnOfficeResourceId ? $resourceId->value : $resourceId,
-                                'resourcetype' => $resourceType->value,
-                                'identifier' => $identifier,
-                                'timestamp' => Carbon::now()->timestamp,
-                                'hmac' => $this->getHmac($actionId, $resourceType),
-                                'hmac_version' => 2,
-                                'parameters' => $parameters,
-                            ],
-                        ],
-                    ],
-                ]);
+        retry($this->getRetryCount(), function () use ($request, &$response) {
+            $response = Http::onOffice()->post('/', $request->toRequestArray());
 
             $this->throwIfResponseIsFailed($response);
         }, $this->getRetryDelay(), $retryOnlyOnConnectionError);

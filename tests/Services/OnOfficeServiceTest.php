@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
@@ -71,10 +72,12 @@ describe('exceptions', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        $onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Estate,
         );
+
+        $onOfficeService->requestApi($request);
     })
         ->throws(OnOfficeException::class)
         ->with([300, 301, 400, 401, 500, 501]);
@@ -93,12 +96,13 @@ describe('exceptions', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        expect(
-            fn () => $onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            )
-        )->toThrow(OnOfficeException::class, 'Customer unknown!');
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        expect(fn () => $onOfficeService->requestApi($request))
+            ->toThrow(OnOfficeException::class, 'Customer unknown!');
     });
 
     it('throws an exception on failed request inside response', function () {
@@ -109,12 +113,14 @@ describe('exceptions', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        expect(/**
-         * @throws OnOfficeException
-         */ static fn () => $onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Estate,
-        )
+        );
+
+        expect(/**
+         * @throws OnOfficeException
+         */ static fn () => $onOfficeService->requestApi($request)
         )->toThrow(OnOfficeException::class, 'The HMAC is invalid');
     });
 
@@ -131,12 +137,14 @@ describe('exceptions', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        expect(/**
-         * @throws OnOfficeException
-         */ static fn () => $onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Estate,
-        )
+        );
+
+        expect(/**
+         * @throws OnOfficeException
+         */ static fn () => $onOfficeService->requestApi($request)
         )->toThrow(OnOfficeException::class, $message);
     })->with([
         [32, 64, 'The HMAC is invalid'],
@@ -181,12 +189,14 @@ describe('exceptions', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        expect(/**
-         * @throws OnOfficeException
-         */ static fn () => $onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Estate,
-        )
+        );
+
+        expect(/**
+         * @throws OnOfficeException
+         */ static fn () => $onOfficeService->requestApi($request)
         )->toThrow(OnOfficeException::class, 'Empty request');
     })->with([
         [32, 64],
@@ -204,11 +214,13 @@ describe('exceptions', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
         try {
-            $onOfficeService->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            );
+            $onOfficeService->requestApi($request);
         } catch (OnOfficeException $exception) {
             expect($exception->getError())->toBe(OnOfficeError::The_HMAC_Is_Invalid);
         }
@@ -233,11 +245,13 @@ describe('requestAll', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        $onOfficeService->requestAll(function () {
-            app(OnOfficeService::class)->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            );
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        $onOfficeService->requestAll(function () use ($request) {
+            app(OnOfficeService::class)->requestApi($request);
         });
     })->with([300, 301, 400, 401, 500, 501])->throws(OnOfficeException::class);
 
@@ -264,11 +278,13 @@ describe('requestAll', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        $response = $onOfficeService->requestAll(function () {
-            return app(OnOfficeService::class)->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            );
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        $response = $onOfficeService->requestAll(function () use ($request) {
+            return app(OnOfficeService::class)->requestApi($request);
         });
 
         expect($response)->toBeInstanceOf(Collection::class)
@@ -309,11 +325,13 @@ describe('requestAll', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        $response = $onOfficeService->requestAll(function () {
-            return app(OnOfficeService::class)->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            );
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        $response = $onOfficeService->requestAll(function () use ($request) {
+            return app(OnOfficeService::class)->requestApi($request);
         }, limit: 1);
 
         expect($response)->toBeInstanceOf(Collection::class)
@@ -339,11 +357,13 @@ describe('requestAllChunked', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        $onOfficeService->requestAllChunked(function () {
-            app(OnOfficeService::class)->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            );
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        $onOfficeService->requestAllChunked(function () use ($request) {
+            app(OnOfficeService::class)->requestApi($request);
         }, function () {});
     })->with([300, 301, 400, 401, 500, 501])->throws(OnOfficeException::class);
 
@@ -361,11 +381,13 @@ describe('requestAllChunked', function () {
         $callback = Mockery::mock();
         $callback->shouldReceive('call')->once();
 
-        $onOfficeService->requestAllChunked(function () {
-            return app(OnOfficeService::class)->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            );
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        $onOfficeService->requestAllChunked(function () use ($request) {
+            return app(OnOfficeService::class)->requestApi($request);
         }, function () use ($callback) {
             $callback->call();
         });
@@ -405,12 +427,14 @@ describe('requestAllChunked', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
         $count = 0;
-        $onOfficeService->requestAllChunked(function () {
-            return app(OnOfficeService::class)->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            );
+        $onOfficeService->requestAllChunked(function () use ($request) {
+            return app(OnOfficeService::class)->requestApi($request);
         }, function ($elements) use (&$count) {
             $count += count($elements);
         }, limit: 1);
@@ -475,12 +499,14 @@ describe('requestAllChunked', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
         $count = 0;
-        $onOfficeService->requestAllChunked(function () {
-            return app(OnOfficeService::class)->requestApi(
-                OnOfficeAction::Get,
-                OnOfficeResourceType::Estate,
-            );
+        $onOfficeService->requestAllChunked(function () use ($request) {
+            return app(OnOfficeService::class)->requestApi($request);
         }, function ($elements) use (&$count) {
             $count += count($elements);
         }, pageSize: 2, limit: 3);
@@ -548,10 +574,12 @@ describe('retry', function () {
 
         $onOfficeService = app(OnOfficeService::class);
 
-        $onOfficeService->requestApi(
+        $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Estate,
         );
+
+        $onOfficeService->requestApi($request);
 
         Http::assertSentCount(2);
     });
