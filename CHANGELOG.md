@@ -1,5 +1,6 @@
 # Changelog
 ## main
+- Added a throw to stub responses
 
 ## v.1.2.7
 - Added a query exception to filter repository

@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
 
@@ -240,6 +242,24 @@ describe('fake', function () {
 
         expect($result[2])->toBe(1);
     });
+
+    it('can throw stub responses', function () {
+        $builder = new BaseRepository;
+
+        $builder->fake([
+            $builder->response([
+                $builder->page(
+                    errorCodeResult: OnOfficeError::Unknown_Error_Occurred->value,
+                    messageResult: OnOfficeError::Unknown_Error_Occurred->toString(),
+                ),
+            ]),
+        ]);
+
+        $builder->query()->call(new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Estate,
+        ));
+    })->throws(OnOfficeException::class, OnOfficeError::Unknown_Error_Occurred->toString());
 });
 
 describe('assert', function () {

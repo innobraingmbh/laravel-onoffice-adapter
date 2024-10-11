@@ -148,6 +148,8 @@ class Builder implements BuilderInterface
                 $request->identifier,
                 $request->parameters,
             );
+        } else {
+            $this->getOnOfficeService()->throwIfResponseIsFailed($response);
         }
 
         $this->repository->recordRequestResponsePair($request, $response->json());
