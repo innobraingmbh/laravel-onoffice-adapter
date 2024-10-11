@@ -17,4 +17,5 @@ enum OnOfficeRelationType: string
     case EstateContacted = 'urn:onoffice-de-ns:smart:2.5:relationTypes:address:estate:contacted';
     case EstateMatching = 'urn:onoffice-de-ns:smart:2.5:relationTypes:address:estate:matching';
     case EstateOffer = 'urn:onoffice-de-ns:smart:2.5:relationTypes:address:estate:offerByAgentsLog';
+    case ComplexEstateUnits = 'urn:onoffice-de-ns:smart:2.5:relationTypes:complex:estate:units';
 }
