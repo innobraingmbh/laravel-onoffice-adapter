@@ -1,5 +1,7 @@
 # Changelog
 ## main
+
+## v.1.2.7
 - Added a query exception to filter repository
 - Added more relation types
 
