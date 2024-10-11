@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Innobrain\OnOfficeAdapter\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
@@ -85,6 +86,21 @@ class BaseRepository extends Facade
     public static function stopRecording(): RootRepository
     {
         return static::getFacadeRoot()->stopRecording();
+    }
+
+    public static function lastRecorded(): ?array
+    {
+        return static::getFacadeRoot()->lastRecorded();
+    }
+
+    public static function lastRecordedRequest(): ?OnOfficeRequest
+    {
+        return static::getFacadeRoot()->lastRecordedRequest();
+    }
+
+    public static function lastRecordedResponse(): ?array
+    {
+        return static::getFacadeRoot()->lastRecordedResponse();
     }
 
     public static function assertSent(?callable $callback = null): void

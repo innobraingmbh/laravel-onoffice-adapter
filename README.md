@@ -131,6 +131,55 @@ Config::set('onoffice.secret', 'secret');
 Config::set('onoffice.api_claim', 'api_claim');
 ```
 
+### Middlewares
+```php
+use Illuminate\Support\Facades\Log;
+use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
+
+BaseRepository::query()
+    ->before(static function (OnOfficeRequest $request) {
+        Log::info('About to send request', [
+            'request' => $request->toArray(),
+        ]);
+    })
+    ->call(new OnOfficeRequest(
+        OnOfficeAction::Read,
+        OnOfficeResourceType::Estate,
+    ));
+```
+
+### Debugging
+```php
+use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
+
+BaseRepository::query()
+    ->dd()
+    ->call(new OnOfficeRequest(
+        OnOfficeAction::Read,
+        OnOfficeResourceType::Estate,
+    ));
+```
+```php
+use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
+
+BaseRepository::record();
+
+BaseRepository::query()
+    ->call(new OnOfficeRequest(
+        OnOfficeAction::Read,
+        OnOfficeResourceType::Estate,
+    ));
+
+$result = BaseRepository::lastRecorded();
+
+/*
+    $result = [
+        OnOfficeRequest,
+        OnOfficeResponse,
+    ];
+*/
+```
+
 ### Usage in tests
 ```php
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
