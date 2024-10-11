@@ -288,7 +288,7 @@ class OnOfficeService
      *
      * @throws OnOfficeException
      */
-    private function throwIfResponseIsFailed(Response $response): void
+    public function throwIfResponseIsFailed(Response $response): void
     {
         $statusCode = $response->json('status.code', 500);
         $statusErrorCode = $response->json('status.errorcode', 0);
