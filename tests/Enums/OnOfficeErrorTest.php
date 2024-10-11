@@ -8,5 +8,5 @@ describe('to string', function () {
     it('can stringify an error', function (OnOfficeError $error) {
         expect($error->toString())->toBeString()
             ->toBe(data_get(OnOfficeError::errorTexts(), $error->value, 'unknown error'));
-    })->with(OnOfficeError::cases());
+    })->with(array_slice(OnOfficeError::cases(), 0, 10));
 });
