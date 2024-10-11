@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
@@ -97,15 +98,10 @@ class OnOfficeService
      * @throws OnOfficeException
      * @throws Throwable
      */
-    public function requestApi(
-        OnOfficeAction $actionId,
-        OnOfficeResourceType $resourceType,
-        OnOfficeResourceId|string|int $resourceId = OnOfficeResourceId::None,
-        string|int $identifier = '',
-        array $parameters = [],
-    ): Response {
+    public function requestApi(OnOfficeRequest $request): Response
+    {
         if (! empty($this->getApiClaim())) {
-            $parameters = array_replace([self::EXTENDEDCLAIM => $this->getApiClaim()], $parameters);
+            $request->parameters = array_replace([self::EXTENDEDCLAIM => $this->getApiClaim()], $request->parameters);
         }
 
         $retryOnlyOnConnectionError = static function ($exception): bool {
@@ -123,21 +119,21 @@ class OnOfficeService
          * To avoid this, we need to retry the request with payload creation until we get a valid response.
          */
         $response = null;
-        retry($this->getRetryCount(), function () use ($parameters, $identifier, $resourceType, $resourceId, $actionId, &$response) {
+        retry($this->getRetryCount(), function () use ($request, &$response) {
             $response = Http::onOffice()
                 ->post('/', [
                     'token' => $this->getToken(),
                     'request' => [
                         'actions' => [
                             [
-                                'actionid' => $actionId->value,
-                                'resourceid' => $resourceId instanceof OnOfficeResourceId ? $resourceId->value : $resourceId,
-                                'resourcetype' => $resourceType->value,
-                                'identifier' => $identifier,
+                                'actionid' => $request->actionId->value,
+                                'resourceid' => $request->resourceId instanceof OnOfficeResourceId ? $request->resourceId->value : $request->resourceId,
+                                'resourcetype' => $request->resourceType->value,
+                                'identifier' => $request->identifier,
                                 'timestamp' => Carbon::now()->timestamp,
-                                'hmac' => $this->getHmac($actionId, $resourceType),
+                                'hmac' => $this->getHmac($request->actionId, $request->resourceType),
                                 'hmac_version' => 2,
-                                'parameters' => $parameters,
+                                'parameters' => $request->parameters,
                             ],
                         ],
                     ],

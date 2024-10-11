@@ -141,13 +141,7 @@ class Builder implements BuilderInterface
         if (is_null($response)) {
             throw_if($this->preventStrayRequests, new StrayRequestException(request: $request));
 
-            $response = $this->getOnOfficeService()->requestApi(
-                $request->actionId,
-                $request->resourceType,
-                $request->resourceId,
-                $request->identifier,
-                $request->parameters,
-            );
+            $response = $this->getOnOfficeService()->requestApi($request);
         } else {
             $this->getOnOfficeService()->throwIfResponseIsFailed($response);
         }
