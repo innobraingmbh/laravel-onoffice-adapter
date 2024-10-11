@@ -1,8 +1,10 @@
 # Changelog
 ## main
+
+## v1.3.0
 - Added a throw to stub responses
 
-## v.1.2.7
+## v1.2.7
 - Added a query exception to filter repository
 - Added more relation types
 
