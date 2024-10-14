@@ -21,6 +21,7 @@ use Throwable;
 
 class OnOfficeService
 {
+    use OnOfficeDefaultFieldConst;
     use OnOfficeParameterConst;
 
     public function __construct() {}

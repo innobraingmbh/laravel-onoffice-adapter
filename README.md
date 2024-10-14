@@ -180,6 +180,37 @@ $result = BaseRepository::lastRecorded();
 */
 ```
 
+### Default Fields
+Sometimes, it can be useful to have default fields for your queries
+to quickly glance at data. You can find a selection of default fields
+in the OnOfficeService.
+
+```php
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+
+$estates = EstateRepository::query()
+    ->select(OnOfficeService::DEFAULT_ESTATE_INFO_FIELDS)
+    ->get();
+```
+
+### Helpers
+When using default fields, you might find it helpful to hide all
+empty fields. To do so, use the `clean_elements` helper.
+It will work with both `find` and `get` responses.
+
+```php
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+ 
+$estates = EstateRepository::query()
+    ->select(OnOfficeService::DEFAULT_ESTATE_INFO_FIELDS)
+    ->get();
+    
+// will leave out fields with empty values like "", "0.00", [], or null.
+$estates = clean_elements($estates);
+```
+
 ### Usage in tests
 ```php
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
