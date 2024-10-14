@@ -1,9 +1,12 @@
 # Changelog
+
 ## main
 - Refactored the passing of the request to the on office service
 - Added a method to get the last request response pair from the repository
 - Added die and dump functions to the queries
 - Fixed ImprintBuilder cannot return imprint with find
+- Added a file to collect default fields which exist in most clients (currently only added estate info)
+- Added a helper to easily clean empty fields from onOffice responses (`clean_elements`)
 
 ## v1.3.0
 - Added a throw to stub responses
