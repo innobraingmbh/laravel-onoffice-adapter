@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
-use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\PictureFactory;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstatePictureFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\GetEstateFilesResponse;
 
 describe('fake responses', function () {
@@ -12,7 +12,7 @@ describe('fake responses', function () {
         Http::preventStrayRequests();
         EstateRepository::fake(EstateRepository::response([
             EstateRepository::page(recordFactories: [
-                PictureFactory::make()
+                EstatePictureFactory::make()
                     ->id(1),
             ]),
         ]));
@@ -21,7 +21,7 @@ describe('fake responses', function () {
 
         expect($response->count())->toBe(1)
             ->and($response->first()['id'])->toBe(1)
-            ->and($response->first()['type'])->toBe('files')
+            ->and($response->first()['type'])->toBe('estatepictures')
             ->and($response->first()['elements']['url'])->toBe('https://via.placeholder.com/150')
             ->and($response->first()['elements']['estateId'])->toBe(1);
 

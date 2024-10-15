@@ -6,11 +6,11 @@ namespace Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories;
 
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\Concerns\SuccessTrait;
 
-class PictureFactory extends BaseFactory
+class EstatePictureFactory extends BaseFactory
 {
     use SuccessTrait;
 
-    public string $type = 'files';
+    public string $type = 'estatepictures';
 
     public array $elements = [
         'url' => 'https://via.placeholder.com/150',
