@@ -1,6 +1,6 @@
 # Changelog
 
-## main
+## v1.4.0
 - Refactored the passing of the request to the on office service
 - Added a method to get the last request response pair from the repository
 - Added die and dump functions to the queries
