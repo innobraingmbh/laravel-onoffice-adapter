@@ -32,7 +32,7 @@ class GetEstatePicturesResponse
                         'identifier' => '',
                         'data' => [
                             'meta' => [
-                                'cntabsolute' => 5,
+                                'cntabsolute' => $count,
                             ],
                             'records' => [
                                 [
