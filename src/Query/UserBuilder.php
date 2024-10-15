@@ -58,7 +58,7 @@ class UserBuilder extends Builder
     /**
      * @throws Throwable<OnOfficeException>
      */
-    public function find(int $id): array
+    public function find(int $id): ?array
     {
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,

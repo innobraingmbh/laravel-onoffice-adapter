@@ -12,7 +12,7 @@ interface BuilderInterface
 
     public function first(): ?array;
 
-    public function find(int $id): array;
+    public function find(int $id): ?array;
 
     public function each(callable $callback): void;
 

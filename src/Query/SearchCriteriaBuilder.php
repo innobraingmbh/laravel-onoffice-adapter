@@ -19,7 +19,7 @@ class SearchCriteriaBuilder extends Builder
     /**
      * @throws Throwable<OnOfficeException>
      */
-    public function find(int|array $id): array
+    public function find(int|array $id): ?array
     {
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,

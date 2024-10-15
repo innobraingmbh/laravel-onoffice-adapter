@@ -434,7 +434,7 @@ class Builder implements BuilderInterface
     /**
      * @throws OnOfficeException
      */
-    public function find(int $id): array
+    public function find(int $id): ?array
     {
         throw new OnOfficeException('Not implemented');
     }
