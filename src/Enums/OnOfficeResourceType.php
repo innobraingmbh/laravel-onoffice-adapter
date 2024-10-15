@@ -8,6 +8,7 @@ enum OnOfficeResourceType: string
 {
     case Address = 'address';
     case Estate = 'estate';
+    case EstatePictures = 'estatepictures';
     case Fields = 'fields';
     case Filters = 'filters';
     case File = 'file';
