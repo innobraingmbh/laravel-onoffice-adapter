@@ -7,6 +7,7 @@
 - Fixed ImprintBuilder cannot return imprint with find
 - Added a file to collect default fields which exist in most clients (currently only added estate info)
 - Added a helper to easily clean empty fields from onOffice responses (`clean_elements`)
+- Fix return type for find actions, as they might be null if find does not resolve the record
 
 ## v1.3.0
 - Added a throw to stub responses
