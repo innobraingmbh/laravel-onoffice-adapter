@@ -7,7 +7,7 @@ namespace Innobrain\OnOfficeAdapter\Tests\Stubs;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Facades\Http;
 
-class EmptyGetEstatePicturesResponse
+class EmptyGetEstateFilesResponse
 {
     public static function make(array $data = []): PromiseInterface
     {

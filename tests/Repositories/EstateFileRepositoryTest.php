@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\FileFactory;
-use Innobrain\OnOfficeAdapter\Tests\Stubs\GetEstatePicturesResponse;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\GetEstateFilesResponse;
 
 describe('fake responses', function () {
     test('get', function () {
@@ -30,9 +30,9 @@ describe('real responses', function () {
         Http::preventStrayRequests();
         Http::fake([
             'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
-                GetEstatePicturesResponse::make(count: 1500),
-                GetEstatePicturesResponse::make(count: 1500),
-                GetEstatePicturesResponse::make(count: 1500),
+                GetEstateFilesResponse::make(count: 1500),
+                GetEstateFilesResponse::make(count: 1500),
+                GetEstateFilesResponse::make(count: 1500),
             ]),
         ]);
 
