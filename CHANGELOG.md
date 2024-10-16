@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.4.2
+- Add EstatePictures call
+
 ## v1.4.1
 - Prefer response error messages over general messages when available
 
