@@ -24,7 +24,9 @@ class OnOfficeRequest
     {
         return [
             'actionid' => $this->actionId->value,
-            'resourceType' => $this->resourceType->value,
+            'resourceType' => $this->resourceType instanceof OnOfficeResourceType
+                ? $this->resourceType->value
+                : $this->resourceType,
             'resourceId' => $this->resourceId,
             'identifier' => $this->identifier,
             'parameters' => $this->parameters,
