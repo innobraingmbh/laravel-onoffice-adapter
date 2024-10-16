@@ -14,7 +14,7 @@ class OnOfficeRequest
 {
     public function __construct(
         public OnOfficeAction $actionId,
-        public OnOfficeResourceType $resourceType,
+        public OnOfficeResourceType|string $resourceType,
         public OnOfficeResourceId|string|int $resourceId = OnOfficeResourceId::None,
         public string|int $identifier = '',
         public array $parameters = []
@@ -49,7 +49,9 @@ class OnOfficeRequest
                         'resourceid' => $this->resourceId instanceof OnOfficeResourceId
                             ? $this->resourceId->value
                             : $this->resourceId,
-                        'resourcetype' => $this->resourceType->value,
+                        'resourcetype' => $this->resourceType instanceof OnOfficeResourceType
+                            ? $this->resourceType->value
+                            : $this->resourceType,
                         'identifier' => $this->identifier,
                         'timestamp' => Carbon::now()->timestamp,
                         'hmac' => $onOfficeService->getHmac($this->actionId, $this->resourceType),
