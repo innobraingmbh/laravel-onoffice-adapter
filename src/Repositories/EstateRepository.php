@@ -6,6 +6,7 @@ namespace Innobrain\OnOfficeAdapter\Repositories;
 
 use Innobrain\OnOfficeAdapter\Query\EstateBuilder;
 use Innobrain\OnOfficeAdapter\Query\EstateFileBuilder;
+use Innobrain\OnOfficeAdapter\Query\EstatePictureBuilder;
 
 class EstateRepository extends BaseRepository
 {
@@ -21,5 +22,14 @@ class EstateRepository extends BaseRepository
     {
         /** @var EstateFileBuilder */
         return $this->createBuilderFromClass(EstateFileBuilder::class, $estateId);
+    }
+
+    /**
+     * Returns a new estate picture builder instance.
+     */
+    public function pictures(int|array $estateId): EstatePictureBuilder
+    {
+        /** @var EstatePictureBuilder */
+        return $this->createBuilderFromClass(EstatePictureBuilder::class, $estateId);
     }
 }
