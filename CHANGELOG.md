@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.4.3
+- Enable passing strings for ResourceTypes in the OnOfficeRequestDTO so users are not constrained by the enum
+
 ## v1.4.2
 - Add EstatePictures call
 
