@@ -12,6 +12,7 @@ use Innobrain\OnOfficeAdapter\Repositories\FileRepository as RootRepository;
 /**
  * @see RootRepository
  *
+ * @method static UploadBuilder upload()
  * @method static UploadBuilder query()
  */
 class FileRepository extends BaseRepository
