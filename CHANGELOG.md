@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.4.4
+- fix type annotation for upload function on file repository
+
 ## v1.4.3
 - Enable passing strings for ResourceTypes in the OnOfficeRequestDTO so users are not constrained by the enum
 
