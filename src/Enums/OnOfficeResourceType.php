@@ -15,6 +15,7 @@ enum OnOfficeResourceType: string
     case IdsFromRelation = 'idsfromrelation';
     case User = 'user';
     case Users = 'users';
+    case UserPhoto = 'userphoto';
     case UnlockProvider = 'unlockProvider';
     case Regions = 'regions';
     case UploadFile = 'uploadfile';
