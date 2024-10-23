@@ -47,6 +47,10 @@ export default defineConfig({
                 },
             link: 'https://inno-brain.de'
         }
-    ]
+    ],
+    footer: {
+        message: 'Released under the MIT License.',
+        copyright: 'Copyright © 2024-present InnoBrain GmbH'
+    }
   }
 })
