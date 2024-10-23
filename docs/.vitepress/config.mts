@@ -39,7 +39,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/innobrain-gmbh/laravel-onoffice-adapter' }
+      { icon: 'github', link: 'https://github.com/innobraingmbh/laravel-onoffice-adapter' },
     ]
   }
 })
