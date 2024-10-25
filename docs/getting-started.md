@@ -48,10 +48,13 @@ The package provides several repositories for interacting with different aspects
 - EstateRepository
 - FieldRepository
 - FileRepository
+- FilterRepository
 - MarketplaceRepository
 - RelationRepository
 - SearchCriteriaRepository
 - SettingRepository
+
+If your usecase is not covered by these repositories, you can use the `BaseRepository` to make custom requests.
 
 ### Querying Data
 
