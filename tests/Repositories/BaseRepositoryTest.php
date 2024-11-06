@@ -438,7 +438,7 @@ describe('request', function () {
         Http::assertSentCount(1);
     });
 
-    it('will call with string as resource type', function (){
+    it('will call with string as resource type', function () {
         Http::preventStrayRequests();
         Http::fake([
             'https://api.onoffice.de/api/stable/api.php/' => Http::response([

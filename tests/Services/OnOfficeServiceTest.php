@@ -338,7 +338,7 @@ describe('requestAll', function () {
             ->toHaveCount(1);
     });
 
-    it('can handle string resource type', function (){
+    it('can handle string resource type', function () {
         Http::preventStrayRequests();
         Http::fake([
             '*' => Http::response([
