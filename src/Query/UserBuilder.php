@@ -61,7 +61,7 @@ class UserBuilder extends Builder
     public function find(int $id): ?array
     {
         $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
+            OnOfficeAction::Read,
             OnOfficeResourceType::User,
             $id,
             parameters: [
