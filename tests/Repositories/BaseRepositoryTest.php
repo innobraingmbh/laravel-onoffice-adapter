@@ -605,7 +605,7 @@ describe('custom credentials', function () {
             ->and($onOfficeService->getApiClaim())->toBe('claim2');
     });
 
-    it('can will reset to default', function () {
+    it('will reset to default', function () {
         $builder = new BaseRepository;
         $builder
             ->query()
