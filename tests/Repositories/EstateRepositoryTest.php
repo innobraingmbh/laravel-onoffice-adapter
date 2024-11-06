@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadEstateResponse;
@@ -59,5 +63,31 @@ describe('real responses', function () {
         expect($response->count())->toBe(3);
 
         EstateRepository::assertSentCount(3);
+    });
+});
+
+describe('search', function () {
+    it('should be able to build a search request', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+                ReadEstateResponse::make(),
+            ]),
+        ]);
+
+        EstateRepository::record();
+
+        $builder = EstateRepository::query();
+        $builder
+            ->setInput('testInput')
+            ->search();
+
+        EstateRepository::assertSentCount(1);
+        EstateRepository::assertSent(function (OnOfficeRequest $request) {
+            return $request->resourceId === OnOfficeResourceId::Estate
+                && $request->actionId === OnOfficeAction::Get
+                && $request->resourceType === OnOfficeResourceType::Search
+                && $request->parameters['input'] === 'testInput';
+        });
     });
 });
