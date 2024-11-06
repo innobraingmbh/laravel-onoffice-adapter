@@ -91,7 +91,7 @@ class OnOfficeService
      *
      * Read more: https://apidoc.onoffice.de/onoffice-api-request/request-elemente/action/#hmac
      */
-    public function getHmac(OnOfficeAction $actionId, OnOfficeResourceType $resourceType): string
+    public function getHmac(OnOfficeAction $actionId, OnOfficeResourceType|string $resourceType): string
     {
         return base64_encode(
             hash_hmac(
@@ -101,7 +101,9 @@ class OnOfficeService
                     [
                         'timestamp' => Carbon::now()->timestamp,
                         'token' => $this->getToken(),
-                        'resourcetype' => $resourceType->value,
+                        'resourcetype' => $resourceType instanceof OnOfficeResourceType
+                            ? $resourceType->value
+                            : $resourceType,
                         'actionid' => $actionId->value,
                     ]
                 ),

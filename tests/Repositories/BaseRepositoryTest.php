@@ -437,6 +437,25 @@ describe('request', function () {
 
         Http::assertSentCount(1);
     });
+
+    it('will call with string as resource type', function (){
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+            ]),
+        ]);
+
+        $builder = new BaseRepository;
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, 'estate');
+
+        $builder->query()->call($request);
+
+        Http::assertSentCount(1);
+    });
 });
 
 describe('middlewares', function () {

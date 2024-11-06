@@ -337,6 +337,30 @@ describe('requestAll', function () {
         expect($response)->toBeInstanceOf(Collection::class)
             ->toHaveCount(1);
     });
+
+    it('can handle string resource type', function (){
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            'estate',
+        );
+
+        $onOfficeService->requestAll(function () use ($request) {
+            return app(OnOfficeService::class)->requestApi($request);
+        }, limit: 1);
+
+        Http::assertSentCount(1);
+    });
 });
 
 describe('requestAllChunked', function () {
