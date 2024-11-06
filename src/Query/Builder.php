@@ -10,6 +10,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeApiCredentials;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
@@ -103,11 +104,22 @@ class Builder implements BuilderInterface
      */
     protected array $beforeSendingCallbacks = [];
 
-    public function __construct() {}
+    public function __construct(
+        protected ?OnOfficeApiCredentials $credentials = null
+    ) {}
+
+    public function withCredentials(string $token, string $secret, string $apiClaim = ''): static
+    {
+        $this->credentials = new OnOfficeApiCredentials(token: $token, secret: $secret, apiClaim: $apiClaim);
+
+        return $this;
+    }
 
     protected function getOnOfficeService(): OnOfficeService
     {
-        return $this->onOfficeService ?? $this->createOnOfficeService();
+        return tap($this->onOfficeService ?? $this->createOnOfficeService(),
+            fn (OnOfficeService $service) => $service->setCredentials($this->credentials)
+        );
     }
 
     protected function createOnOfficeService(): OnOfficeService
