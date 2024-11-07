@@ -115,8 +115,8 @@ $success = FileRepository::upload()
 ```
 ```php
 ActivityRepository::query()
-    ->recordIds($recordIds)
-    ->recordIdsAsAddress()
+    ->addressIds($recordIds)
+    ->estateId($estateId)
     ->create([
         'datetime' => $event->getDateFormatted(),
         'actionkind' => 'Newsletter',

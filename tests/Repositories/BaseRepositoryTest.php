@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
@@ -12,6 +13,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Symfony\Component\VarDumper\VarDumper;
 
 describe('stray requests', function () {
@@ -435,6 +437,25 @@ describe('request', function () {
 
         Http::assertSentCount(1);
     });
+
+    it('will call with string as resource type', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+            ]),
+        ]);
+
+        $builder = new BaseRepository;
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, 'estate');
+
+        $builder->query()->call($request);
+
+        Http::assertSentCount(1);
+    });
 });
 
 describe('middlewares', function () {
@@ -561,5 +582,65 @@ describe('middlewares', function () {
             ->and($dumped[0]->resourceType)->toBe(OnOfficeResourceType::Estate);
 
         VarDumper::setHandler(null);
+    });
+});
+
+describe('custom credentials', function () {
+    it('can set custom credentials', function () {
+        $builder = new BaseRepository;
+
+        $builder = $builder
+            ->query()
+            ->withCredentials('token', 'secret', 'claim');
+
+        $m = new ReflectionMethod($builder, 'getOnOfficeService');
+        $m->setAccessible(true);
+        /* @var OnOfficeService $onOfficeService */
+        $onOfficeService = $m->invoke($builder);
+
+        expect($onOfficeService->getToken())->toBe('token')
+            ->and($onOfficeService->getSecret())->toBe('secret')
+            ->and($onOfficeService->getApiClaim())->toBe('claim');
+    });
+
+    it('can set custom credentials twice', function () {
+        $builder = new BaseRepository;
+        $builder
+            ->query()
+            ->withCredentials('token', 'secret', 'claim');
+
+        $builder = new BaseRepository;
+        $builder = $builder
+            ->query()
+            ->withCredentials('token2', 'secret2', 'claim2');
+
+        $m = new ReflectionMethod($builder, 'getOnOfficeService');
+        $m->setAccessible(true);
+        /* @var OnOfficeService $onOfficeService */
+        $onOfficeService = $m->invoke($builder);
+
+        expect($onOfficeService->getToken())->toBe('token2')
+            ->and($onOfficeService->getSecret())->toBe('secret2')
+            ->and($onOfficeService->getApiClaim())->toBe('claim2');
+    });
+
+    it('will reset to default', function () {
+        $builder = new BaseRepository;
+        $builder
+            ->query()
+            ->withCredentials('token', 'secret', 'claim');
+
+        $builder = new BaseRepository;
+        $builder = $builder
+            ->query();
+
+        $m = new ReflectionMethod($builder, 'getOnOfficeService');
+        $m->setAccessible(true);
+
+        /* @var OnOfficeService $onOfficeService */
+        $onOfficeService = $m->invoke($builder);
+        expect($onOfficeService->getToken())->toBe(Config::get('onoffice.token'))
+            ->and($onOfficeService->getSecret())->toBe(Config::get('onoffice.secret'))
+            ->and($onOfficeService->getApiClaim())->toBe('');
     });
 });

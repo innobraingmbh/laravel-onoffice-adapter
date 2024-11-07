@@ -7,13 +7,17 @@ namespace Innobrain\OnOfficeAdapter\Query;
 use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\Input;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class EstateBuilder extends Builder
 {
+    use Input;
+
     /**
      * @throws OnOfficeException
      */
@@ -127,5 +131,25 @@ class EstateBuilder extends Builder
 
         return $this->requestApi($request)
             ->json('response.results.0.data.records.0');
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function search(): Collection
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Search,
+            OnOfficeResourceId::Estate,
+            parameters: [
+                OnOfficeService::INPUT => $this->input,
+                OnOfficeService::SORTBY => data_get(array_keys($this->orderBy), 0),
+                OnOfficeService::SORTORDER => data_get($this->orderBy, 0),
+                ...$this->customParameters,
+            ],
+        );
+
+        return $this->requestAll($request);
     }
 }

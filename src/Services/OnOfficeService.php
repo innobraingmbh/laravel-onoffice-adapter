@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeApiCredentials;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
@@ -24,20 +25,41 @@ class OnOfficeService
     use OnOfficeDefaultFieldConst;
     use OnOfficeParameterConst;
 
-    public function __construct() {}
+    public function __construct(
+        private ?OnOfficeApiCredentials $credentials = null
+    ) {}
+
+    public function setCredentials(?OnOfficeApiCredentials $credentials): static
+    {
+        $this->credentials = $credentials;
+
+        return $this;
+    }
 
     public function getToken(): string
     {
+        if ($this->credentials instanceof OnOfficeApiCredentials) {
+            return $this->credentials->token;
+        }
+
         return Config::get('onoffice.token', '') ?? '';
     }
 
     public function getSecret(): string
     {
+        if ($this->credentials instanceof OnOfficeApiCredentials) {
+            return $this->credentials->secret;
+        }
+
         return Config::get('onoffice.secret', '') ?? '';
     }
 
     public function getApiClaim(): string
     {
+        if ($this->credentials instanceof OnOfficeApiCredentials) {
+            return $this->credentials->apiClaim;
+        }
+
         return Config::get('onoffice.api_claim', '') ?? '';
     }
 
@@ -69,7 +91,7 @@ class OnOfficeService
      *
      * Read more: https://apidoc.onoffice.de/onoffice-api-request/request-elemente/action/#hmac
      */
-    public function getHmac(OnOfficeAction $actionId, OnOfficeResourceType $resourceType): string
+    public function getHmac(OnOfficeAction $actionId, OnOfficeResourceType|string $resourceType): string
     {
         return base64_encode(
             hash_hmac(
@@ -79,7 +101,9 @@ class OnOfficeService
                     [
                         'timestamp' => Carbon::now()->timestamp,
                         'token' => $this->getToken(),
-                        'resourcetype' => $resourceType->value,
+                        'resourcetype' => $resourceType instanceof OnOfficeResourceType
+                            ? $resourceType->value
+                            : $resourceType,
                         'actionid' => $actionId->value,
                     ]
                 ),
