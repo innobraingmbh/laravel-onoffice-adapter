@@ -3,6 +3,9 @@
 ## main
 - TODO: Remove old activity repository code in next major release
 
+## v1.5.5
+- adds MacroRepository to resolve macros
+
 ## v1.5.4
 - enable setting both estateId and addressIds on activity repository
 - deprecates the current way of setting ids on activity repository

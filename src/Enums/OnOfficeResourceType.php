@@ -27,4 +27,5 @@ enum OnOfficeResourceType: string
     case Relation = 'relation';
     case Search = 'search';
     case MultiselectKey = 'multiselectkey';
+    case MacroResolve = 'macroresolve';
 }
