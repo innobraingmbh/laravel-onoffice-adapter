@@ -1,13 +1,16 @@
 # Activity Repository
 
-## Estates
+You can easily query and create activities with the ActivityRepository.
+
+## Query
+
 ```php
 use Innobrain\OnOfficeAdapter\Facades\ActivityRepository;
 
 $activities = ActivityRepository::query()
     ->estateId(1)
     ->get();
-    
+ 
 $activities = ActivityRepository::query()
     ->addressIds([1, 2])
     ->get();
@@ -24,10 +27,14 @@ ActivityRepository::query()
     ->each(function (array $estates) {
         // First page
     });
+```
 
+## Create
+```php
 $activity = ActivityRepository::query()
     ->addressIds([1, 2, 3])
     ->create([
-        'activity_id' => 1,
+        'note' => 'This is a note',
+        'datetime' => '2021-02-08 11:13:30'
     ]);
 ```
