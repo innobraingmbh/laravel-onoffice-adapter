@@ -1,5 +1,24 @@
 # Changelog
 
+## main
+- TODO: Remove old activity repository code in next major release
+
+## v1.5.4
+- enable setting both estateId and addressIds on activity repository
+- deprecates the current way of setting ids on activity repository
+
+## v1.5.3
+- enable search request on estate repository
+
+## v1.5.2
+- fixes user repository find function
+
+## v1.5.1
+- fixes issue where requests with strings as resource types could not be processed when generating the hmac
+
+## v1.5.0
+- feat: enable withCredentials call_ on Builder so config is not needed to set runtime credentials
+
 ## v1.4.4
 - fix type annotation for upload function on file repository
 
