@@ -1,6 +1,8 @@
 # Estate Repository
 
 ## Estates
+
+### Query
 ```php
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 
@@ -18,14 +20,37 @@ EstateRepository::query()
         // First page
     });
 
-EstateRepository::query()
-    ->addModify('estate_id', 1)
-    ->modify(1);
+```
 
+### Modify
+
+```php
+EstateRepository::query()
+    ->addModify('objektart', 'haus')
+    ->modify();
+
+```
+
+### Create
+
+```php
 $estate = EstateRepository::query()
     ->create([
-        'estate_id' => 1,
+        'objektart' => 'haus',
     ]);
+```
+
+### Search
+
+::: tip
+You can search using a search term. If you want to further restrict the search results, you can use the `where` method.
+:::
+
+```php
+EstateRepository::query()
+    ->search('Karmelitenstr.')
+    ->where('objektart', 'haus')
+    ->get();
 ```
 
 ## Estate Files

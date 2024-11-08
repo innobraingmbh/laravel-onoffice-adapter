@@ -1,6 +1,7 @@
 # Address Repository
 
-## Estates
+## Query
+
 ```php
 use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
 
@@ -25,20 +26,43 @@ AddressRepository::query()
         // First page
     });
 
-AddressRepository::query()
-    ->addModify('address_id', 1)
-    ->modify(1);
+```
 
+## Modify
+
+```php
+AddressRepository::query()
+    ->addModify('Vorname', 'Hans')
+    ->modify();
+```
+
+## Count
+
+```php
 $addressCounted = AddressRepository::query()
     ->recordIds([1, 2, 3])
     ->count();
+```
 
+## Create
+
+```php
 $estate = AddressRepository::query()
     ->create([
-        'estate_id' => 1,
+        'Vorname' => 'Hans',
     ]);
+```
 
+## Search
+
+::: tip
+You can search using a search term. If you want to further restrict the search results, you can use the `where` method.
+:::
+
+```php
+// Search with filters
 $addresses = AddressRepository::query()
     ->setInput('foo')
+    ->where('Vorname', 'like', 'Hans%')
     ->search();
 ```
