@@ -146,6 +146,7 @@ class EstateBuilder extends Builder
                 OnOfficeService::INPUT => $this->input,
                 OnOfficeService::SORTBY => data_get(array_keys($this->orderBy), 0),
                 OnOfficeService::SORTORDER => data_get($this->orderBy, 0),
+                OnOfficeService::FILTER => $this->getFilters(),
                 ...$this->customParameters,
             ],
         );
