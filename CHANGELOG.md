@@ -3,6 +3,9 @@
 ## main
 - TODO: Remove old activity repository code in next major release
 
+## v1.5.7
+- enable create call in searchcriteria repository
+
 ## v1.5.6
 - enable filtering in address and estate search api calls
 
