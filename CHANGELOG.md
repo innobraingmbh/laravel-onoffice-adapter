@@ -2,6 +2,9 @@
 
 ## main
 - TODO: Remove old activity repository code in next major release
+ 
+## v1.5.8
+- fix incorrect exception type on invalid create query
 
 ## v1.5.7
 - enable create call in searchcriteria repository

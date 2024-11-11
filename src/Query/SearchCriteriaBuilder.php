@@ -9,6 +9,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeQueryException;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -43,7 +44,7 @@ class SearchCriteriaBuilder extends Builder
     public function create(array $data): array
     {
         if (! isset($this->addressId)) {
-            throw new OnOfficeException('Address ID is required to create a search criteria');
+            throw new OnOfficeQueryException('Address ID is required to create a search criteria');
         }
 
         $request = new OnOfficeRequest(
