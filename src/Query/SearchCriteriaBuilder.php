@@ -16,6 +16,8 @@ class SearchCriteriaBuilder extends Builder
 {
     private string $mode = 'internal';
 
+    private int $addressId;
+
     /**
      * @throws Throwable<OnOfficeException>
      */
@@ -23,7 +25,7 @@ class SearchCriteriaBuilder extends Builder
     {
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
-            OnOfficeResourceType::SearchCriteria,
+            OnOfficeResourceType::GetSearchCriteria,
             parameters: [
                 OnOfficeService::MODE => $this->mode,
                 OnOfficeService::IDS => Arr::wrap($id),
@@ -35,9 +37,38 @@ class SearchCriteriaBuilder extends Builder
             ->json('response.results.0.data.records.0', []);
     }
 
+    /**
+     * @throws Throwable<OnOfficeException>
+     */
+    public function create(array $data): array
+    {
+        if (! isset($this->addressId)) {
+            throw new OnOfficeException('Address ID is required to create a search criteria');
+        }
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Create,
+            OnOfficeResourceType::SearchCriteria,
+            parameters: [
+                'addressid' => $this->addressId,
+                OnOfficeService::DATA => $data,
+            ],
+        );
+
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
+    }
+
     public function mode(string $mode): self
     {
         $this->mode = $mode;
+
+        return $this;
+    }
+
+    public function addressId(int $addressId): self
+    {
+        $this->addressId = $addressId;
 
         return $this;
     }

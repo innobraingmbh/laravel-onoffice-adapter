@@ -22,7 +22,8 @@ enum OnOfficeResourceType: string
     case FileRelation = 'fileRelation';
     case Impressum = 'impressum';
     case Activity = 'agentslog';
-    case SearchCriteria = 'searchcriterias';
+    case GetSearchCriteria = 'searchcriterias';
+    case SearchCriteria = 'searchcriteria';
     case ActionTypes = 'actionkindtypes';
     case Relation = 'relation';
     case Search = 'search';

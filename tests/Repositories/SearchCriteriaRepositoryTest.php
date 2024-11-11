@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Facades\SearchCriteriaRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\SearchCriteriaFactory;
+use Innobrain\OnOfficeAdapter\Tests\Stubs\CreateSearchCriteriaResponse;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\GetSearchCriteriaResponse;
 
 describe('fake responses', function () {
@@ -41,6 +42,27 @@ describe('real responses', function () {
         $response = SearchCriteriaRepository::query()->find(1);
 
         expect($response)->toBe([]);
+
+        SearchCriteriaRepository::assertSentCount(1);
+    });
+
+    test('create', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+                CreateSearchCriteriaResponse::make(),
+            ]),
+        ]);
+
+        SearchCriteriaRepository::record();
+
+        $response = SearchCriteriaRepository::query()->find(1);
+
+        expect($response)->toBe([
+            'id' => 25,
+            'type' => 'searchCriteria',
+            'elements' => [],
+        ]);
 
         SearchCriteriaRepository::assertSentCount(1);
     });
