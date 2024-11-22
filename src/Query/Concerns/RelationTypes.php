@@ -13,7 +13,7 @@ trait RelationTypes
 
     public array $childIds = [];
 
-    public OnOfficeRelationType $relationType;
+    public OnOfficeRelationType|string $relationType;
 
     public function parentIds(int|array $parentIds): static
     {
@@ -43,7 +43,7 @@ trait RelationTypes
         return $this;
     }
 
-    public function relationType(OnOfficeRelationType $relationType): static
+    public function relationType(OnOfficeRelationType|string $relationType): static
     {
         $this->relationType = $relationType;
 
