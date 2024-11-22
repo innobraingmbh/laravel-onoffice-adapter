@@ -10,7 +10,7 @@ class MarketPlaceUnlockProviderFactory extends BaseFactory
 {
     use SuccessTrait;
 
-    public function id(int $id): static
+    public function id(int|string $id): static
     {
         return $this;
     }

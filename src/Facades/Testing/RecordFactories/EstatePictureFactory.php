@@ -21,7 +21,7 @@ class EstatePictureFactory extends BaseFactory
         'estateMainId' => 1,
     ];
 
-    public function id(int $id): static
+    public function id(int|string $id): static
     {
         $this->id = $id;
         $this->elements['estateId'] = $id;
