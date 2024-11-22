@@ -17,7 +17,7 @@ class BaseFactory
      */
     final public function __construct() {}
 
-    public function id(int $id): static
+    public function id(int|string $id): static
     {
         $this->id = $id;
 

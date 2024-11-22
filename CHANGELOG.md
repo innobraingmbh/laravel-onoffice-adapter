@@ -2,6 +2,9 @@
 
 ## main
 - TODO: Remove old activity repository code in next major release
+
+## v1.5.9
+- add string type to base factory id() method
  
 ## v1.5.8
 - fix incorrect exception type on invalid create query
