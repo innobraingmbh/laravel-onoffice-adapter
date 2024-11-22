@@ -3,6 +3,10 @@
 ## main
 - TODO: Remove old activity repository code in next major release
 
+## v1.5.10
+- allow passing strings to relation trait so new relations do not have to be added every time they are used
+- add missing relation type to trait
+
 ## v1.5.9
 - add string type to base factory id() method
  
