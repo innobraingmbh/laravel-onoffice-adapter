@@ -3,6 +3,9 @@
 ## main
 - TODO: Remove old activity repository code in next major release
 
+## v1.6.0
+- feat: add efficient count() to ActivityRepository, AddressRepository, EstateRepository, and SettingsRepository::user()
+
 ## v1.5.10
 - allow passing strings to relation trait so new relations do not have to be added every time they are used
 - add missing relation type to trait
@@ -36,7 +39,7 @@
 - fixes issue where requests with strings as resource types could not be processed when generating the hmac
 
 ## v1.5.0
-- feat: enable withCredentials call_ on Builder so config is not needed to set runtime credentials
+- feat: enable withCredentials call on Builder so config is not needed to set runtime credentials
 
 ## v1.4.4
 - fix type annotation for upload function on file repository

@@ -17,6 +17,9 @@ SettingRepository::users()
     ->each(function (array $settings) {
         // First page
     });
+
+$count = SettingRepository::users()
+    ->count();
 ```
 
 ## Regions

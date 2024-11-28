@@ -27,6 +27,10 @@ ActivityRepository::query()
     ->each(function (array $estates) {
         // First page
     });
+
+$count = ActivityRepository::query()
+    ->addressIds([1, 2])
+    ->count();
 ```
 
 ## Create

@@ -42,4 +42,21 @@ describe('real responses', function () {
 
         SettingRepository::assertSentCount(1);
     });
+
+    test('count', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+                ReadUserResponse::make(count: 1500),
+            ]),
+        ]);
+
+        SettingRepository::record();
+
+        $response = SettingRepository::users()->count();
+
+        expect($response)->toBe(1500);
+
+        SettingRepository::assertSentCount(1);
+    });
 });

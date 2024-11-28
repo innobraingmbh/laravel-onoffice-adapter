@@ -136,22 +136,21 @@ class AddressBuilder extends Builder
     }
 
     /**
+     * Returns the number of records that match the query. This number is from the API
+     * and might be lower than the actual number of records when queried with get().
+     *
      * @throws Throwable<OnOfficeException>
      */
     public function count(): int
     {
-        $orderBy = $this->getOrderBy();
-
         $request = new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Address,
             parameters: [
                 OnOfficeService::RECORDIDS => $this->recordIds,
-                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::DATA => [],
                 OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::LISTLIMIT => $this->limit > 0 ? $this->limit : $this->pageSize,
-                OnOfficeService::SORTBY => data_get(array_keys($orderBy), 0),
-                OnOfficeService::SORTORDER => data_get($orderBy, 0),
+                OnOfficeService::LISTLIMIT => 1,
                 ...$this->customParameters,
             ]
         );

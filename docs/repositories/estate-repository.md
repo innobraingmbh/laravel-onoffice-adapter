@@ -40,6 +40,13 @@ $estate = EstateRepository::query()
     ]);
 ```
 
+### Count
+
+```php
+$count = EstateRepository::query()
+    ->count();
+```
+
 ### Search
 
 ::: tip

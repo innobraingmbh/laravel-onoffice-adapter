@@ -153,4 +153,27 @@ class EstateBuilder extends Builder
 
         return $this->requestAll($request);
     }
+
+    /**
+     * Returns the number of records that match the query. This number is from the API
+     * and might be lower than the actual number of records when queried with get().
+     *
+     * @throws OnOfficeException
+     */
+    public function count(): int
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Estate,
+            parameters: [
+                OnOfficeService::DATA => [],
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::LISTLIMIT => 1,
+                ...$this->customParameters,
+            ],
+        );
+
+        return $this->requestApi($request)
+            ->json('response.results.0.data.meta.cntabsolute', 0);
+    }
 }

@@ -64,6 +64,23 @@ describe('real responses', function () {
 
         EstateRepository::assertSentCount(3);
     });
+
+    test('count', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+                ReadEstateResponse::make(count: 1500),
+            ]),
+        ]);
+
+        EstateRepository::record();
+
+        $response = EstateRepository::query()->count();
+
+        expect($response)->toBe(1500);
+
+        EstateRepository::assertSentCount(1);
+    });
 });
 
 describe('search', function () {

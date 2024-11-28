@@ -44,4 +44,21 @@ describe('real responses', function () {
 
         ActivityRepository::assertSentCount(3);
     });
+
+    test('count', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+                ReadActivityResponse::make(count: 1500),
+            ]),
+        ]);
+
+        ActivityRepository::record();
+
+        $response = ActivityRepository::query()->count();
+
+        expect($response)->toBe(1500);
+
+        ActivityRepository::assertSentCount(1);
+    });
 });
