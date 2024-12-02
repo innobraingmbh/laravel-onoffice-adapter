@@ -11,7 +11,7 @@ trait NonFilterable
         return $this;
     }
 
-    public function whereNot(string $column, mixed $value): static
+    public function whereNot(string $column, int|string $value): static
     {
         return $this;
     }
