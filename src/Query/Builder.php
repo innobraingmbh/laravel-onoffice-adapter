@@ -370,7 +370,7 @@ class Builder implements BuilderInterface
         return $this;
     }
 
-    public function whereNot(string $column, mixed $value): static
+    public function whereNot(string $column, int|string $value): static
     {
         return $this->where($column, '!=', $value);
     }
