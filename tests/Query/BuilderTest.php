@@ -256,6 +256,150 @@ describe('where', function () {
     });
 });
 
+describe('whereNot', function () {
+    it('should add a not equal filter to the filters property', function () {
+        $builder = new Builder;
+
+        $builder->whereNot('ID', 1);
+
+        expect($builder->filters)->toBe([
+            'ID' => [
+                ['!=', 1],
+            ],
+        ]);
+    });
+
+    it('should return the builder instance', function () {
+        $builder = new Builder;
+
+        $result = $builder->whereNot('ID', 1);
+
+        expect($result)->toBeInstanceOf(Builder::class);
+    });
+});
+
+describe('whereIn', function () {
+    it('should add an in filter to the filters property', function () {
+        $builder = new Builder;
+
+        $builder->whereIn('ID', [1, 2, 3]);
+
+        expect($builder->filters)->toBe([
+            'ID' => [
+                ['in', [1, 2, 3]],
+            ],
+        ]);
+    });
+
+    it('should return the builder instance', function () {
+        $builder = new Builder;
+
+        $result = $builder->whereIn('ID', [1, 2, 3]);
+
+        expect($result)->toBeInstanceOf(Builder::class);
+    });
+});
+
+describe('whereNotIn', function () {
+    it('should add a not in filter to the filters property', function () {
+        $builder = new Builder;
+
+        $builder->whereNotIn('ID', [1, 2, 3]);
+
+        expect($builder->filters)->toBe([
+            'ID' => [
+                ['not in', [1, 2, 3]],
+            ],
+        ]);
+    });
+
+    it('should return the builder instance', function () {
+        $builder = new Builder;
+
+        $result = $builder->whereNotIn('ID', [1, 2, 3]);
+
+        expect($result)->toBeInstanceOf(Builder::class);
+    });
+});
+
+describe('whereBetween', function () {
+    it('should add a between filter to the filters property', function () {
+        $builder = new Builder;
+
+        $builder->whereBetween('ID', 1, 10);
+
+        expect($builder->filters)->toBe([
+            'ID' => [
+                ['between', [1, 10]],
+            ],
+        ]);
+    });
+
+    it('should return the builder instance', function () {
+        $builder = new Builder;
+
+        $result = $builder->whereBetween('ID', 1, 10);
+
+        expect($result)->toBeInstanceOf(Builder::class);
+    });
+
+    it('should work with string values', function () {
+        $builder = new Builder;
+
+        $builder->whereBetween('date', '2023-01-01', '2023-12-31');
+
+        expect($builder->filters)->toBe([
+            'date' => [
+                ['between', ['2023-01-01', '2023-12-31']],
+            ],
+        ]);
+    });
+});
+
+describe('whereLike', function () {
+    it('should add a like filter to the filters property', function () {
+        $builder = new Builder;
+
+        $builder->whereLike('Name', 'John');
+
+        expect($builder->filters)->toBe([
+            'Name' => [
+                ['like', 'John'],
+            ],
+        ]);
+    });
+
+    it('should return the builder instance', function () {
+        $builder = new Builder;
+
+        $result = $builder->whereLike('Name', 'John');
+
+        expect($result)->toBeInstanceOf(Builder::class);
+    });
+});
+
+describe('whereNotLike', function () {
+    it('should add a not like filter to the filters property', function () {
+        $builder = new Builder;
+
+        $builder->whereNotLike('Name', 'John');
+
+        expect($builder->filters)->toBe([
+            'Name' => [
+                ['not like', 'John'],
+            ],
+        ]);
+    });
+
+    it('should return the builder instance', function () {
+        $builder = new Builder;
+
+        $result = $builder->whereNotLike('Name', 'John');
+
+        expect($result)->toBeInstanceOf(Builder::class);
+    });
+});
+
 describe('getFilters', function () {
     it('should return the filters property', function () {
         $builder = new Builder;

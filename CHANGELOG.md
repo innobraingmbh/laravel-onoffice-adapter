@@ -3,6 +3,9 @@
 ## main
 - TODO: Remove old activity repository code in next major release
 
+## v1.7.0
+- feat: add handy where helpers (whereNot, whereIn, whereNotIn, whereBetween, whereLike, whereNotLike)
+
 ## v1.6.0
 - feat: add efficient count() to ActivityRepository, AddressRepository, EstateRepository, and SettingsRepository::user()
 

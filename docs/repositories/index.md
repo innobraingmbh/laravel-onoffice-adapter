@@ -30,6 +30,16 @@ $estate = EstateRepository::query()
 $estate = EstateRepository::query()
     ->find(1);
 
+$estate = EstateRepository::query()
+    ->where('objektart', 'buero_praxen')
+    ->whereIn('estate_id', [1, 2, 3])
+    ->get();
+
+$count = EstateRepository::query()
+    ->whereLike('objekttitel', '%Einliegerwohnung%')
+    ->whereBetween('kaufpreis', 100000, 200000)
+    ->count();
+ 
 EstateRepository::query()
     ->each(function (array $estates) {
         // First page

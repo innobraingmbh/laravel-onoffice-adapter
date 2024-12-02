@@ -370,6 +370,36 @@ class Builder implements BuilderInterface
         return $this;
     }
 
+    public function whereNot(string $column, int|string $value): static
+    {
+        return $this->where($column, '!=', $value);
+    }
+
+    public function whereIn(string $column, array $values): static
+    {
+        return $this->where($column, 'in', $values);
+    }
+
+    public function whereNotIn(string $column, array $values): static
+    {
+        return $this->where($column, 'not in', $values);
+    }
+
+    public function whereBetween(string $column, int|string $start, int|string $end): static
+    {
+        return $this->where($column, 'between', [$start, $end]);
+    }
+
+    public function whereLike(string $column, string $value): static
+    {
+        return $this->where($column, 'like', $value);
+    }
+
+    public function whereNotLike(string $column, string $value): static
+    {
+        return $this->where($column, 'not like', $value);
+    }
+
     protected function getFilters(): array
     {
         return collect($this->filters)->mapWithKeys(function (array $value, string $column) {
