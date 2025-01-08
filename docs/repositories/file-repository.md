@@ -25,6 +25,7 @@ FileRepository::query()
     ->saveAndLink(base64_encode($fileContent), [
         'module' => 'estate',
         'relatedRecordId' => '12345',
+        'file' => 'filename.pdf',
     ]);
 ```
 
