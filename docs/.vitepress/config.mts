@@ -36,7 +36,19 @@ export default defineConfig({
           { text: 'SearchCriteria', link: '/repositories/search-criteria-repository' },
           { text: 'Setting', link: '/repositories/setting-repository' }
         ]
-      }
+      },
+      {
+          text: 'Testing',
+          items: [
+              { text: 'Factories', link: '/testing/factories' },
+          ]
+      },
+      {
+          text: 'Advanced',
+          items: [
+              { text: 'Advanced Usage', link: 'advanced-usage' },
+          ]
+      },
     ],
 
     socialLinks: [
