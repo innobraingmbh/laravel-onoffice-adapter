@@ -1,11 +1,10 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
 hero:
   name: "Laravel onOffice Adapter"
-  text: "Query onOffice like it was your ORM"
-  tagline: "A Laravel package to make querying onOffice as easy as querying your database"
+  text: "Query onOffice like it's an ORM"
+  tagline: "Make your onOffice queries feel like Eloquent."
   actions:
     - theme: brand
       text: Repository Examples
@@ -16,16 +15,16 @@ hero:
 
 features:
   - title: Easy ORM-like Querying
-    details: Query onOffice data using familiar Laravel Eloquent-style methods, making integration seamless for Laravel developers.
-  - title: Comprehensive Repository System
-    details: Access various onOffice resources through specialized repositories, each tailored for specific data types and operations.
-  - title: Powerful Filtering and Pagination
-    details: Effortlessly filter and paginate results, allowing for efficient data retrieval and management of large datasets.
-  - title: Middleware Support
-    details: Intercept and modify requests using custom middlewares, providing flexibility and control over the communication with onOffice API.
-  - title: Debugging Tools
-    details: Utilize built-in debugging methods like dd(), dump(), and raw() to inspect requests and responses during development.
+    details: Leverage familiar Laravel Eloquent-style methods for onOffice queries, streamlining your codebase.
+  - title: Comprehensive Repositories
+    details: Access and manipulate multiple onOffice resources, including estates, addresses, activities, and more.
+  - title: Powerful Pagination and Filtering
+    details: Use methods like where, limit, each, and chunking to handle large datasets with ease.
+  - title: Middlewares
+    details: Insert custom logic before sending requests to adapt your calls or record logs automatically.
+  - title: Rich Debugging Tools
+    details: Use dd(), dump(), raw(), or record request/response pairs for thorough debugging.
   - title: File Management
-    details: Handle estate-related files with ease, including uploading, linking, and combined save-and-link operations.
----
+    details: Seamlessly upload, chunk, and link files with onOffice.
 
+---

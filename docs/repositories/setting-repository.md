@@ -1,48 +1,29 @@
 # Setting Repository
 
+The **SettingRepository** provides multiple sub-builders for different resource sets.
+
 ## Users
 ```php
-use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
-
-$settings = SettingRepository::users()
-    ->get();
-
-$setting = SettingRepository::users()
-    ->first();
-
-$setting = SettingRepository::users()
-    ->find(1);
-
-SettingRepository::users()
-    ->each(function (array $settings) {
-        // First page
-    });
-
-$count = SettingRepository::users()
-    ->count();
+$users = SettingRepository::users()->get();
+$user = SettingRepository::users()->find(1);
 ```
+::: tip
+You can chain typical builder methods like `where()`, `each()`, `count()`, etc.
+:::
 
 ## Regions
 ```php
-use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
-
-$settings = SettingRepository::regions()
-    ->get();
+$regions = SettingRepository::regions()->get();
 ```
 
 ## Imprint
 ```php
-use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
-
-$settings = SettingRepository::imprint()
-    ->get();
+$imprint = SettingRepository::imprint()->get();
 ```
 
 ## Actions
 ```php
-use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
-
-$settings = SettingRepository::actions()
-    ->get();
+$actions = SettingRepository::actions()->get();
 ```
 
+Each method returns a builder tailored to that feature. Refer to onOffice docs for fields and filter support.

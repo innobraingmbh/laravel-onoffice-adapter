@@ -1,106 +1,50 @@
 # Activity Repository
 
-The Activity Repository provides functionality to manage activities in the onOffice system. Activities can be associated with either estates or addresses.
+Manage activities related to addresses or estates.
 
-## Query Operations
-
-### Basic Queries
-
+## Basic Queries
 ```php
 use Innobrain\OnOfficeAdapter\Facades\ActivityRepository;
 
-// Query activities by estate
-$activities = ActivityRepository::query()
-    ->estateId(1)
-    ->get();
- 
-// Query activities by addresses
+// Query by address
 $activities = ActivityRepository::query()
     ->addressIds([1, 2])
     ->get();
 
-// Get first activity
-$activity = ActivityRepository::query()
-    ->addressIds(1)
-    ->first();
+// Query by estate
+$estateActivities = ActivityRepository::query()
+    ->estateId(10)
+    ->get();
 
-// Find specific activity
+// Single activity
 $activity = ActivityRepository::query()
-    ->find(1);
+    ->find(42);
+```
 
-// Process activities in chunks
+## Chunking & Counting
+```php
 ActivityRepository::query()
-    ->addressIds([1, 2])
+    ->addressIds(1)
     ->each(function (array $activities) {
-        // Process each chunk of activities
+        // process each chunk
     });
 
-// Count activities
 $count = ActivityRepository::query()
-    ->addressIds([1, 2])
+    ->estateId(10)
     ->count();
 ```
 
-::: tip
-The count method returns the number of records that match the query from the API. This number might be lower than the actual number of records when queried with get().
-:::
-
-## Create Operations
-
+## Create an Activity
 ```php
-// Create activity for addresses
-$activity = ActivityRepository::query()
+ActivityRepository::query()
     ->addressIds([1, 2, 3])
     ->create([
         'note' => 'This is a note',
-        'datetime' => '2021-02-08 11:13:30'
-    ]);
-
-// Create activity for estate
-$activity = ActivityRepository::query()
-    ->estateId(1)
-    ->create([
-        'note' => 'Estate activity note',
-        'datetime' => '2021-02-08 11:13:30'
+        'datetime' => '2023-05-01 10:00:00'
     ]);
 ```
 
-## Available Methods
+- **`estateId()`** or **`addressIds()`**: define the context.
+- **`create()`**: Add a new activity record in onOffice.
 
-### Configuration Methods
-- `estateId(int $estateId)`: Set the estate ID for the activity
-- `addressIds(int|array $addressIds)`: Set one or more address IDs for the activity
-- `where(string $field, mixed $value)`: Add filter conditions
-
-### Query Methods
-- `get()`: Returns a Collection of all matching activities
-- `first()`: Returns the first matching activity or null
-- `find(int $id)`: Returns a specific activity by ID or null
-- `each(callable $callback)`: Processes activities in chunks using the provided callback
-- `count()`: Returns the total count of matching activities
-
-### Creation Methods
-- `create(array $data)`: Creates a new activity with the provided data
-
-## Parameters
-
-### Query Parameters
-- `estateId`: ID of the estate to query activities for
-- `addressIds`: Single ID or array of address IDs to query activities for
-- Additional filter parameters as supported by the onOffice API
-
-### Create Parameters
-Required fields:
-- `note`: Activity note/description
-- `datetime`: Activity date and time
-Additional fields as defined in your onOffice setup
-
-## Returns
-
-- Query operations return either a Collection of activities or a single activity array
-- Create operations return the newly created activity array
-- Count operations return an integer
-
-## Exceptions
-
-All methods may throw `OnOfficeException` for API-related errors
+Use filters (`where()`, `whereLike()`, etc.) for advanced queries as needed.

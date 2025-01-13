@@ -1,26 +1,14 @@
 # Marketplace Repository
 
-The Marketplace Repository provides functionality to interact with marketplace-related features in the onOffice API.
-
-## Unlock Provider
-
-Unlocks a provider using the provided parameter cache ID and extended claim.
+Unlock providers in the onOffice Marketplace.
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\MarketplaceRepository;
 
-// Unlock a provider
 $success = MarketplaceRepository::query()
-    ->unlockProvider('parameterCacheId', 'extendedClaim');
-
-// Returns true if successful, false otherwise
+    ->unlockProvider('parameterCacheIdValue', 'extendedClaimValue');
 ```
 
-### Parameters
-
-- `parameterCacheId` (string): The parameter cache ID for the provider
-- `extendedClaim` (string): The extended claim for unlocking the provider
-
-### Returns
-
-- `bool`: Returns `true` if the unlock was successful, `false` otherwise
+- **`parameterCacheId`**: The parameter cache ID
+- **`extendedClaim`**: Extended claim for unlocking the provider
+- Returns `true` on success, otherwise `false`.
