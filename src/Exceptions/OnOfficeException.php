@@ -10,13 +10,9 @@ use Throwable;
 
 class OnOfficeException extends Exception
 {
-    private bool $isResponseError;
-
-    public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null, bool $isResponseError = false)
+    public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null, private readonly bool $isResponseError = false)
     {
         parent::__construct($message, $code, $previous);
-
-        $this->isResponseError = $isResponseError;
     }
 
     public function isResponseError(): bool

@@ -10,12 +10,8 @@ use Throwable;
 
 class StrayRequestException extends Exception
 {
-    public ?OnOfficeRequest $request;
-
-    public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null, ?OnOfficeRequest $request = null)
+    public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null, public ?OnOfficeRequest $request = null)
     {
         parent::__construct($message, $code, $previous);
-
-        $this->request = $request;
     }
 }

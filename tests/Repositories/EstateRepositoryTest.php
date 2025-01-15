@@ -100,11 +100,9 @@ describe('search', function () {
             ->search();
 
         EstateRepository::assertSentCount(1);
-        EstateRepository::assertSent(function (OnOfficeRequest $request) {
-            return $request->resourceId === OnOfficeResourceId::Estate
-                && $request->actionId === OnOfficeAction::Get
-                && $request->resourceType === OnOfficeResourceType::Search
-                && $request->parameters['input'] === 'testInput';
-        });
+        EstateRepository::assertSent(fn (OnOfficeRequest $request) => $request->resourceId === OnOfficeResourceId::Estate
+            && $request->actionId === OnOfficeAction::Get
+            && $request->resourceType === OnOfficeResourceType::Search
+            && $request->parameters['input'] === 'testInput');
     });
 });

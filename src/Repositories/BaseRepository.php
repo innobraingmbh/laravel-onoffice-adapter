@@ -78,9 +78,7 @@ class BaseRepository
     {
         return collect()
             ->range(1, $times)
-            ->map(function () use ($response) {
-                return clone $response;
-            })
+            ->map(fn () => clone $response)
             ->values()
             ->toArray();
     }
@@ -206,17 +204,13 @@ class BaseRepository
      */
     public function recorded(?callable $callback = null): Collection
     {
-        if (empty($this->recorded)) {
+        if ($this->recorded === []) {
             return collect();
         }
 
-        $callback = $callback ?: static function () {
-            return true;
-        };
+        $callback = $callback ?: static fn () => true;
 
-        return collect($this->recorded)->filter(function (array $pair) use ($callback) {
-            return $callback($pair[0], $pair[1]);
-        });
+        return collect($this->recorded)->filter(fn (array $pair) => $callback($pair[0], $pair[1]));
     }
 
     public function assertSent(?callable $callback = null): void

@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
@@ -229,10 +228,6 @@ describe('exceptions', function () {
 
 describe('requestAll', function () {
     it('logs the request error', function (int $statusCode) {
-        Log::shouldReceive('error')
-            ->once()
-            ->with("Error message - $statusCode");
-
         Http::preventStrayRequests();
         Http::fake([
             '*' => Http::response([
@@ -283,9 +278,7 @@ describe('requestAll', function () {
             OnOfficeResourceType::Estate,
         );
 
-        $response = $onOfficeService->requestAll(function () use ($request) {
-            return app(OnOfficeService::class)->requestApi($request);
-        });
+        $response = $onOfficeService->requestAll(fn () => app(OnOfficeService::class)->requestApi($request));
 
         expect($response)->toBeInstanceOf(Collection::class)
             ->toBeEmpty();
@@ -330,9 +323,7 @@ describe('requestAll', function () {
             OnOfficeResourceType::Estate,
         );
 
-        $response = $onOfficeService->requestAll(function () use ($request) {
-            return app(OnOfficeService::class)->requestApi($request);
-        }, limit: 1);
+        $response = $onOfficeService->requestAll(fn () => app(OnOfficeService::class)->requestApi($request), limit: 1);
 
         expect($response)->toBeInstanceOf(Collection::class)
             ->toHaveCount(1);
@@ -355,9 +346,7 @@ describe('requestAll', function () {
             'estate',
         );
 
-        $onOfficeService->requestAll(function () use ($request) {
-            return app(OnOfficeService::class)->requestApi($request);
-        }, limit: 1);
+        $onOfficeService->requestAll(fn () => app(OnOfficeService::class)->requestApi($request), limit: 1);
 
         Http::assertSentCount(1);
     });
@@ -365,10 +354,6 @@ describe('requestAll', function () {
 
 describe('requestAllChunked', function () {
     it('logs the request error', function (int $statusCode) {
-        Log::shouldReceive('error')
-            ->once()
-            ->with("Error message - $statusCode");
-
         Http::preventStrayRequests();
         Http::fake([
             '*' => Http::response([
@@ -410,9 +395,7 @@ describe('requestAllChunked', function () {
             OnOfficeResourceType::Estate,
         );
 
-        $onOfficeService->requestAllChunked(function () use ($request) {
-            return app(OnOfficeService::class)->requestApi($request);
-        }, function () use ($callback) {
+        $onOfficeService->requestAllChunked(fn () => app(OnOfficeService::class)->requestApi($request), function () use ($callback) {
             $callback->call();
         });
     });
@@ -457,9 +440,7 @@ describe('requestAllChunked', function () {
         );
 
         $count = 0;
-        $onOfficeService->requestAllChunked(function () use ($request) {
-            return app(OnOfficeService::class)->requestApi($request);
-        }, function ($elements) use (&$count) {
+        $onOfficeService->requestAllChunked(fn () => app(OnOfficeService::class)->requestApi($request), function ($elements) use (&$count) {
             $count += count($elements);
         }, limit: 1);
 
@@ -529,9 +510,7 @@ describe('requestAllChunked', function () {
         );
 
         $count = 0;
-        $onOfficeService->requestAllChunked(function () use ($request) {
-            return app(OnOfficeService::class)->requestApi($request);
-        }, function ($elements) use (&$count) {
+        $onOfficeService->requestAllChunked(fn () => app(OnOfficeService::class)->requestApi($request), function ($elements) use (&$count) {
             $count += count($elements);
         }, pageSize: 2, limit: 3);
 

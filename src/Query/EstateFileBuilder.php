@@ -15,13 +15,9 @@ use Throwable;
 
 class EstateFileBuilder extends Builder
 {
-    public int $estateId;
-
     public function __construct(
-        int $estateId,
+        public int $estateId,
     ) {
-        $this->estateId = $estateId;
-
         parent::__construct();
     }
 
@@ -82,13 +78,11 @@ class EstateFileBuilder extends Builder
 
         $result = $response->json('response.results.0.data.records.0');
 
-        if (! $result) {
-            throw new OnOfficeException(
-                OnOfficeError::File_Not_Found->toString(),
-                OnOfficeError::File_Not_Found->value,
-                isResponseError: true,
-            );
-        }
+        throw_unless($result, new OnOfficeException(
+            OnOfficeError::File_Not_Found->toString(),
+            OnOfficeError::File_Not_Found->value,
+            isResponseError: true,
+        ));
 
         return $result;
     }

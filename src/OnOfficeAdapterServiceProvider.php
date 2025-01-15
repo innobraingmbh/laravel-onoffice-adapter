@@ -25,13 +25,9 @@ class OnOfficeAdapterServiceProvider extends PackageServiceProvider
 
     public function bootingPackage(): void
     {
-        Http::macro('onOffice', function () {
-            return Http::withHeaders(config('onoffice.headers'))
-                ->baseUrl(config('onoffice.base_url'));
-        });
+        Http::macro('onOffice', fn () => Http::withHeaders(config('onoffice.headers'))
+            ->baseUrl(config('onoffice.base_url')));
 
-        $this->app->scoped(OnOfficeService::class, function () {
-            return new OnOfficeService;
-        });
+        $this->app->scoped(OnOfficeService::class, fn () => new OnOfficeService);
     }
 }

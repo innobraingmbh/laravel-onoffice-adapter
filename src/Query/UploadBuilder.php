@@ -30,11 +30,7 @@ class UploadBuilder extends Builder
      */
     public function save(string $fileContent): string
     {
-        if ($this->uploadInBlocks > 0) {
-            $fileContentSplit = str_split($fileContent, $this->uploadInBlocks);
-        } else {
-            $fileContentSplit = [$fileContent];
-        }
+        $fileContentSplit = $this->uploadInBlocks > 0 ? str_split($fileContent, $this->uploadInBlocks) : [$fileContent];
 
         $tmpUploadId = null;
 

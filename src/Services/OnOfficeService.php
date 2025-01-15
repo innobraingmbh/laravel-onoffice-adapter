@@ -124,9 +124,7 @@ class OnOfficeService
      */
     public function requestApi(OnOfficeRequest $request): Response
     {
-        $retryOnlyOnConnectionError = static function ($exception): bool {
-            return $exception instanceof ConnectionException;
-        };
+        $retryOnlyOnConnectionError = static fn ($exception): bool => $exception instanceof ConnectionException;
 
         if (! $this->retryOnlyOnConnectionError()) {
             $retryOnlyOnConnectionError = null;
@@ -173,9 +171,7 @@ class OnOfficeService
             } catch (OnOfficeException $exception) {
                 Log::error("{$exception->getMessage()} - {$exception->getCode()}");
 
-                if ($maxPage === 0 || $pageOverwrite !== null) {
-                    throw $exception;
-                }
+                throw_if($maxPage === 0 || $pageOverwrite !== null, $exception);
 
                 return $data;
             }
@@ -239,9 +235,7 @@ class OnOfficeService
             } catch (OnOfficeException $exception) {
                 Log::error("{$exception->getMessage()} - {$exception->getCode()}");
 
-                if ($maxPage === 0 || $pageOverwrite !== null) {
-                    throw $exception;
-                }
+                throw_if($maxPage === 0 || $pageOverwrite !== null, $exception);
 
                 return;
             }
@@ -307,9 +301,7 @@ class OnOfficeService
             $token = $this->getToken();
             $secret = $this->getSecret();
 
-            if (strlen($token) !== 32 || strlen($secret) !== 64) {
-                throw new OnOfficeException('The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.', $statusErrorCode, isResponseError: true);
-            }
+            throw_if(strlen($token) !== 32 || strlen($secret) !== 64, new OnOfficeException('The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.', $statusErrorCode, isResponseError: true));
         }
 
         match (true) {

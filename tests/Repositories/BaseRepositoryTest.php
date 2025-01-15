@@ -314,9 +314,7 @@ describe('assert', function () {
         $builder->record();
         $builder->recordRequestResponsePair(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate), ['response']);
 
-        $filteredRecordings = $builder->recorded(function (OnOfficeRequest $request, array $response) {
-            return $request->actionId === OnOfficeAction::Read;
-        });
+        $filteredRecordings = $builder->recorded(fn (OnOfficeRequest $request, array $response) => $request->actionId === OnOfficeAction::Read);
 
         expect($filteredRecordings)->toBeInstanceOf(Collection::class)
             ->and($filteredRecordings[0][0]->toArray())->toBe((new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate))->toArray())
@@ -329,9 +327,7 @@ describe('assert', function () {
         $builder->record();
         $builder->recordRequestResponsePair(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate), ['response']);
 
-        $builder->assertSent(function (OnOfficeRequest $request) {
-            return $request->actionId === OnOfficeAction::Read;
-        });
+        $builder->assertSent(fn (OnOfficeRequest $request) => $request->actionId === OnOfficeAction::Read);
     });
 
     it('can assert sent with a response', function () {
@@ -340,9 +336,7 @@ describe('assert', function () {
         $builder->record();
         $builder->recordRequestResponsePair(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate), ['response']);
 
-        $builder->assertSent(function (OnOfficeRequest $request, array $response) {
-            return $request->actionId === OnOfficeAction::Read && $response === ['response'];
-        });
+        $builder->assertSent(fn (OnOfficeRequest $request, array $response) => $request->actionId === OnOfficeAction::Read && $response === ['response']);
     });
 
     it('can assert not sent', function () {
@@ -351,9 +345,7 @@ describe('assert', function () {
         $builder->record();
         $builder->recordRequestResponsePair(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate), ['response']);
 
-        $builder->assertNotSent(function (OnOfficeRequest $request) {
-            return $request->actionId === OnOfficeAction::Create;
-        });
+        $builder->assertNotSent(fn (OnOfficeRequest $request) => $request->actionId === OnOfficeAction::Create);
     });
 
     it('can assert not sent with a response', function () {
@@ -362,9 +354,7 @@ describe('assert', function () {
         $builder->record();
         $builder->recordRequestResponsePair(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate), ['response']);
 
-        $builder->assertNotSent(function (OnOfficeRequest $request, array $response) {
-            return $request->actionId === OnOfficeAction::Create && $response === ['response'];
-        });
+        $builder->assertNotSent(fn (OnOfficeRequest $request, array $response) => $request->actionId === OnOfficeAction::Create && $response === ['response']);
     });
 
     it('can assert sent count', function () {
@@ -431,9 +421,7 @@ describe('request', function () {
 
         $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
 
-        $builder->query()->chunked($request, function () {
-            return true;
-        });
+        $builder->query()->chunked($request, fn () => true);
 
         Http::assertSentCount(1);
     });
@@ -481,9 +469,7 @@ describe('middlewares', function () {
             })
             ->call($request);
 
-        $builder->assertSent(function (OnOfficeRequest $request) {
-            return $request->identifier === 'before';
-        });
+        $builder->assertSent(fn (OnOfficeRequest $request) => $request->identifier === 'before');
     });
 
     it('will call the before callbacks in the order they are added', function () {
@@ -511,9 +497,7 @@ describe('middlewares', function () {
             })
             ->call($request);
 
-        $builder->assertSent(function (OnOfficeRequest $request) {
-            return $request->identifier === 'after_the_first_before';
-        });
+        $builder->assertSent(fn (OnOfficeRequest $request) => $request->identifier === 'after_the_first_before');
     });
 
     it('can dump the request', function () {

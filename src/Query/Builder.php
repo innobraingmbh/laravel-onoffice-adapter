@@ -402,18 +402,16 @@ class Builder implements BuilderInterface
 
     protected function getFilters(): array
     {
-        return collect($this->filters)->mapWithKeys(function (array $value, string $column) {
-            return [
-                $column => collect($value)->map(function ($filter) {
-                    [$operator, $value] = $filter;
+        return collect($this->filters)->mapWithKeys(fn (array $value, string $column) => [
+            $column => collect($value)->map(function ($filter) {
+                [$operator, $value] = $filter;
 
-                    return [
-                        'op' => $operator,
-                        'val' => $value,
-                    ];
-                })->toArray(),
-            ];
-        })->toArray();
+                return [
+                    'op' => $operator,
+                    'val' => $value,
+                ];
+            })->toArray(),
+        ])->toArray();
     }
 
     protected function getOrderBy(): array

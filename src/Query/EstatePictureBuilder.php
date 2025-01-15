@@ -46,7 +46,7 @@ class EstatePictureBuilder extends Builder
      */
     public function get(): Collection
     {
-        if (empty($this->categories)) {
+        if ($this->categories === []) {
             $this->categories = self::DEFAULT_CATEGORIES;
         }
 
@@ -69,7 +69,7 @@ class EstatePictureBuilder extends Builder
      */
     public function each(callable $callback): void
     {
-        if (empty($this->categories)) {
+        if ($this->categories === []) {
             $this->categories = self::DEFAULT_CATEGORIES;
         }
 
