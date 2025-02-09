@@ -108,6 +108,7 @@ class EstateBuilder extends Builder
             $id,
             parameters: [
                 OnOfficeService::DATA => $this->modifies,
+                ...$this->customParameters,
             ],
         );
 
@@ -126,6 +127,7 @@ class EstateBuilder extends Builder
             OnOfficeResourceType::Estate,
             parameters: [
                 OnOfficeService::DATA => $data,
+                ...$this->customParameters,
             ],
         );
 
