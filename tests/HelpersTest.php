@@ -110,3 +110,34 @@ test('clear_elements preserves non-empty values', function () {
 
     expect($result)->toEqual($expected);
 });
+
+test('clear other element values', function () {
+    $input = [
+        'id' => '1',
+        'type' => 'estate',
+        'elements' => [
+            'name' => 'Test Estate',
+            'price' => '100000',
+            'rooms' => '3',
+            'area' => '',
+            'features' => [],
+            'balcony' => 'Nein',
+            'garage' => 'Non',
+            'garden' => 'No',
+        ],
+    ];
+
+    $expected = [
+        'id' => '1',
+        'type' => 'estate',
+        'elements' => [
+            'name' => 'Test Estate',
+            'price' => '100000',
+            'rooms' => '3',
+        ],
+    ];
+
+    $result = clear_elements($input, ['', '0', '0.00', null, [], 0, 0.00, 'Nein', 'Non', 'No']);
+
+    expect($result)->toEqual($expected);
+});
