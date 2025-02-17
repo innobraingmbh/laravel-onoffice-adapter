@@ -7,12 +7,14 @@ namespace Innobrain\OnOfficeAdapter\Facades;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Query\AddressBuilder;
+use Innobrain\OnOfficeAdapter\Query\AddressFileBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\AddressRepository as RootRepository;
 
 /**
  * @see RootRepository
  *
  * @method static AddressBuilder query()
+ * @method static AddressFileBuilder files(int $addressId)
  */
 class AddressRepository extends BaseRepository
 {
