@@ -10,6 +10,6 @@ class LogRepository extends BaseRepository
 {
     protected function createBuilder(): LogBuilder
     {
-        return new LogBuilder();
+        return new LogBuilder;
     }
 }

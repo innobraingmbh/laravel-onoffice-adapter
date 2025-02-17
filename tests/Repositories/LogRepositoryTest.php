@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Facades\LogRepository;
-use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\LogFactory;
-use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\UserFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadLogResponse;
-use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadUserResponse;
 
 describe('fake responses', function () {
     test('get', function () {

@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Innobrain\OnOfficeAdapter\Query;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
-use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
-use Innobrain\OnOfficeAdapter\Query\Concerns\Input;
-use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -153,7 +149,6 @@ class LogBuilder extends Builder
         return $this->requestApi($request)
             ->json('response.results.0.data.meta.cntabsolute', 0);
     }
-
 
     public function withModule(string $module): static
     {

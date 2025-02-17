@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
-use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\FileFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\GetAddressFilesResponse;
-use Innobrain\OnOfficeAdapter\Tests\Stubs\GetEstateFilesResponse;
 
 describe('fake responses', function () {
     test('get', function () {
