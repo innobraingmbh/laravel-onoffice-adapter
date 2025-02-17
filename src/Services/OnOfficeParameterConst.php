@@ -46,4 +46,6 @@ trait OnOfficeParameterConst
     public const MODUL = 'modul';
 
     public const MODULE = 'module';
+
+    public const ACTION = 'action';
 }

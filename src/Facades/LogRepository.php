@@ -6,17 +6,15 @@ namespace Innobrain\OnOfficeAdapter\Facades;
 
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
-use Innobrain\OnOfficeAdapter\Query\AddressBuilder;
-use Innobrain\OnOfficeAdapter\Query\AddressFileBuilder;
-use Innobrain\OnOfficeAdapter\Repositories\AddressRepository as RootRepository;
+use Innobrain\OnOfficeAdapter\Query\LogBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\LogRepository as RootRepository;
 
 /**
  * @see RootRepository
  *
- * @method static AddressBuilder query()
- * @method static AddressFileBuilder files(int $addressId)
+ * @method static LogBuilder query()
  */
-class AddressRepository extends BaseRepository
+class LogRepository extends BaseRepository
 {
     public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {

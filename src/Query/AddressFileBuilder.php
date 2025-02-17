@@ -14,10 +14,10 @@ use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
-class EstateFileBuilder extends Builder
+class AddressFileBuilder extends Builder
 {
     public function __construct(
-        public int $estateId,
+        public int $addressId,
     ) {
         parent::__construct();
     }
@@ -30,9 +30,9 @@ class EstateFileBuilder extends Builder
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::File,
-            OnOfficeResourceId::Estate,
+            OnOfficeResourceId::Address,
             parameters: [
-                'estateid' => $this->estateId,
+                'addressid' => $this->addressId,
                 OnOfficeService::LISTLIMIT => $this->limit,
                 OnOfficeService::LISTOFFSET => $this->offset,
                 ...$this->customParameters,
@@ -50,9 +50,9 @@ class EstateFileBuilder extends Builder
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::File,
-            OnOfficeResourceId::Estate,
+            OnOfficeResourceId::Address,
             parameters: [
-                'estateid' => $this->estateId,
+                'addressid' => $this->addressId,
                 ...$this->customParameters,
             ],
         );
@@ -69,9 +69,9 @@ class EstateFileBuilder extends Builder
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::File,
-            OnOfficeResourceId::Estate,
+            OnOfficeResourceId::Address,
             parameters: [
-                'estateid' => $this->estateId,
+                'addressid' => $this->addressId,
                 'fileid' => $id,
                 ...$this->customParameters,
             ],
@@ -98,9 +98,9 @@ class EstateFileBuilder extends Builder
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::File,
-            OnOfficeResourceId::Estate,
+            OnOfficeResourceId::Address,
             parameters: [
-                'estateid' => $this->estateId,
+                'addressid' => $this->addressId,
                 ...$this->customParameters,
             ],
         );
@@ -115,8 +115,8 @@ class EstateFileBuilder extends Builder
     {
         $parameters = array_replace($this->modifies, [
             'fileId' => $id,
-            'parentid' => $this->estateId,
-            'relationtype' => 'estate',
+            'parentid' => $this->addressId,
+            'relationtype' => 'address',
         ]);
 
         $request = new OnOfficeRequest(
@@ -139,8 +139,8 @@ class EstateFileBuilder extends Builder
             OnOfficeResourceType::FileRelation,
             parameters: [
                 'fileId' => $id,
-                'parentid' => $this->estateId,
-                'relationtype' => 'estate',
+                'parentid' => $this->addressId,
+                'relationtype' => 'address',
                 ...$this->customParameters,
             ],
         );
