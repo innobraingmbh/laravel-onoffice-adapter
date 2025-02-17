@@ -29,4 +29,5 @@ enum OnOfficeResourceType: string
     case Search = 'search';
     case MultiselectKey = 'multiselectkey';
     case MacroResolve = 'macroresolve';
+    case Log = 'log';
 }
