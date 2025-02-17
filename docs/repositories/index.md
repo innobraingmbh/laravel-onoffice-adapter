@@ -15,6 +15,7 @@ Repositories are the primary entry point for retrieving and modifying data in on
 10. [Relation](./relation-repository.md)
 11. [Search Criteria](./search-criteria-repository.md)
 12. [Setting](./setting-repository.md)
+13. [Log](./log-repository.md)
 
 ## Usage Example
 

@@ -52,6 +52,16 @@ AddressRepository::query()
     ->modify(2);
 ```
 
+##  Files
+```php
+// Retrieve files
+$files = AddressRepository::files(100)->get();
+
+// Modify or delete a file
+AddressRepository::files(100)->addModify('file_id', 12)->modify(12);
+AddressRepository::files(100)->delete(12);
+```
+
 ## Additional Methods
 - **`recordIds()`**: Restrict results to specific IDs.
 - **`each()`**: Process addresses in chunks for large result sets.
