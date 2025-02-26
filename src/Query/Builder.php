@@ -108,8 +108,14 @@ class Builder implements BuilderInterface
         protected ?OnOfficeApiCredentials $credentials = null
     ) {}
 
-    public function withCredentials(string $token, string $secret, string $apiClaim = ''): static
+    public function withCredentials(string|OnOfficeApiCredentials $token, string $secret = '', string $apiClaim = ''): static
     {
+        if ($token instanceof OnOfficeApiCredentials) {
+            $this->credentials = $token;
+
+            return $this;
+        }
+
         $this->credentials = new OnOfficeApiCredentials(token: $token, secret: $secret, apiClaim: $apiClaim);
 
         return $this;
