@@ -27,3 +27,4 @@
 **/*.meta
 **/package-lock.json
 **/composer.lock
+tests/Stubs/**
