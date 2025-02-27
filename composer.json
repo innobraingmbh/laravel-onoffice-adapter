@@ -1,8 +1,10 @@
 {
     "name": "innobrain/laravel-onoffice-adapter",
-    "description": "This is my package laravel-onoffice-adapter",
+    "description": "Laravel package to joyfully interact with the onOffice API",
     "keywords": [
         "Katalam",
+        "InnoBrain",
+        "onOffice",
         "laravel",
         "laravel-onoffice-adapter"
     ],
