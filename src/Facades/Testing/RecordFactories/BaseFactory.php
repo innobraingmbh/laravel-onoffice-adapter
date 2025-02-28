@@ -17,6 +17,18 @@ class BaseFactory
      */
     final public function __construct() {}
 
+    public function __call(string $name, array $arguments): static
+    {
+        if (str_starts_with($name, 'set')) {
+            $key = lcfirst(substr($name, 3));
+            $value = data_get($arguments, 0);
+
+            return $this->set($key, $value);
+        }
+
+        return $this;
+    }
+
     public function id(int|string $id): static
     {
         $this->id = $id;
@@ -62,17 +74,5 @@ class BaseFactory
             'type' => $this->type,
             'elements' => $this->elements,
         ];
-    }
-
-    public function __call(string $name, array $arguments): static
-    {
-        if (str_starts_with($name, 'set')) {
-            $key = lcfirst(substr($name, 3));
-            $value = data_get($arguments, 0);
-
-            return $this->set($key, $value);
-        }
-
-        return $this;
     }
 }

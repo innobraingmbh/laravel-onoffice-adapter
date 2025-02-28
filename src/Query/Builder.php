@@ -90,6 +90,11 @@ class Builder implements BuilderInterface
     protected BaseRepository $repository;
 
     /**
+     * The before sending middlewares.
+     */
+    protected array $beforeSendingCallbacks = [];
+
+    /**
      * The last request that was made. Needed for the stubbing.
      */
     private ?OnOfficeRequest $requestCache = null;
@@ -98,11 +103,6 @@ class Builder implements BuilderInterface
      * The last stub response.
      */
     private ?OnOfficeResponse $responseCache = null;
-
-    /**
-     * The before sending middlewares.
-     */
-    protected array $beforeSendingCallbacks = [];
 
     public function __construct(
         protected ?OnOfficeApiCredentials $credentials = null
