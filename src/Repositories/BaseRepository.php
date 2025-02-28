@@ -223,7 +223,6 @@ class BaseRepository
 
     public function assertNotSent(?callable $callback = null): void
     {
-        // @phpstan-ignore-next-line
         PHPUnit::assertTrue(
             $this->recorded($callback)->isEmpty(),
             'An unexpected request was recorded.'
