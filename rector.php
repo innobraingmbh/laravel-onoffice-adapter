@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector;
 use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\LevelSetList;
-use Rector\Set\ValueObject\SetList;
 use RectorLaravel\Rector\Expr\AppEnvironmentComparisonToParameterRector;
 use RectorLaravel\Rector\FuncCall\RemoveDumpDataDeadCodeRector;
 
@@ -16,6 +15,13 @@ return RectorConfig::configure()
         __DIR__.'/src',
         __DIR__.'/tests',
     ])
+    ->withPreparedSets(
+        deadCode: true,
+        codeQuality: true,
+        earlyReturn: true,
+        strictBooleans: true,
+        carbon: true,
+    )
     ->withRules([
         InlineConstructorDefaultToPropertyRector::class,
         RemoveDumpDataDeadCodeRector::class,
@@ -23,9 +29,6 @@ return RectorConfig::configure()
     ])
     ->withSets([
         LevelSetList::UP_TO_PHP_82,
-        SetList::DEAD_CODE,
-        SetList::CODE_QUALITY,
-        SetList::EARLY_RETURN,
         RectorLaravel\Set\LaravelLevelSetList::UP_TO_LARAVEL_110,
         RectorLaravel\Set\LaravelSetList::LARAVEL_CODE_QUALITY,
         RectorLaravel\Set\LaravelSetList::LARAVEL_IF_HELPERS,
