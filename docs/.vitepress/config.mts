@@ -30,6 +30,7 @@ export default defineConfig({
           { text: 'Field', link: '/repositories/field-repository' },
           { text: 'File', link: '/repositories/file-repository' },
           { text: 'Filter', link: '/repositories/filter-repository' },
+          { text: 'Logs', link: '/repositories/log-repository' },
           { text: 'Macros', link: '/repositories/macro-repository' },
           { text: 'Marketplace', link: '/repositories/marketplace-repository' },
           { text: 'Relation', link: '/repositories/relation-repository' },
