@@ -18,7 +18,7 @@ composer require innobrain/laravel-onoffice-adapter
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-onoffice-adapter-config"
+php artisan vendor:publish --tag="onoffice-adapter-config"
 ```
 
 This is the contents of the published config file:
