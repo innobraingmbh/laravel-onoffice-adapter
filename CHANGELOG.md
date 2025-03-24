@@ -3,6 +3,18 @@
 ## main
 - TODO: Remove old activity repository code in next major release
 
+## v1.8.2
+
+- chore: allow laravel 12
+
+## v1.8.1
+
+- chore: allow withCredentials with DTO
+
+## v1.8.0
+
+- feat: add LogRepository
+
 ## v1.7.0
 - feat: add handy where helpers (whereNot, whereIn, whereNotIn, whereBetween, whereLike, whereNotLike)
 
