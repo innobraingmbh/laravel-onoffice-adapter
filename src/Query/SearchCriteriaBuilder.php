@@ -84,4 +84,11 @@ class SearchCriteriaBuilder extends Builder
 
         return $this;
     }
+
+    public function ids(array $ids): self
+    {
+        $this->customParameters[OnOfficeService::IDS] = $ids;
+
+        return $this;
+    }
 }
