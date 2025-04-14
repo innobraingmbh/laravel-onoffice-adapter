@@ -24,7 +24,16 @@ class SearchCriteriaBuilder extends Builder
      */
     public function get(): Collection
     {
-        throw new OnOfficeException('Not implemented');
+        $response = $this->onOfficeService->requestApi(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::SearchCriteria,
+            parameters: [
+                OnOfficeService::MODE => $this->mode,
+                ...$this->customParameters,
+            ],
+        );
+
+        return $response->json('response.results.0.data.records.*', []);
     }
 
     /**
