@@ -305,9 +305,9 @@ class OnOfficeService
         }
 
         match (true) {
-            $statusCode >= 300 && $statusErrorCode > 0 && $responseStatusCode === 0 => throw new OnOfficeException($errorMessage, $statusErrorCode, isResponseError: true),
-            $statusCode >= 300 && $statusErrorCode <= 0 && $responseStatusCode === 0 => throw new OnOfficeException($errorMessage, $statusCode),
-            $responseStatusCode > 0 => throw new OnOfficeException($responseErrorMessage, $responseStatusCode, isResponseError: true),
+            $statusCode >= 300 && $statusErrorCode > 0 && $responseStatusCode === 0 => throw new OnOfficeException($errorMessage, $statusErrorCode, isResponseError: true, originalResponse: $response),
+            $statusCode >= 300 && $statusErrorCode <= 0 && $responseStatusCode === 0 => throw new OnOfficeException($errorMessage, $statusCode, originalResponse: $response),
+            $responseStatusCode > 0 => throw new OnOfficeException($responseErrorMessage, $responseStatusCode, isResponseError: true, originalResponse: $response),
             default => null,
         };
     }
