@@ -27,6 +27,7 @@ $newAddress = AddressRepository::query()
 ## Filtering & Searching
 ```php
 $searchedAddresses = AddressRepository::query()
+    ->setInput('Müller') // Set the search term
     ->where('country', 'DE')
     ->search();
 
@@ -35,7 +36,7 @@ $count = AddressRepository::query()
     ->count();
 ```
 ::: warning
-`search()` uses the onOffice search endpoint. Ensure you set relevant filters and parameters.
+`search()` uses the onOffice search endpoint. Ensure you set relevant filters and parameters, including the search input via `setInput()`.
 :::
 
 ## Modifying Addresses

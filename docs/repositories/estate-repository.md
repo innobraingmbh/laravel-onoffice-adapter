@@ -23,12 +23,13 @@ $estate = EstateRepository::query()
 ```php
 // Full text search with filters
 $estates = EstateRepository::query()
-    ->search('Karmelitenstr.')
-    ->where('objektart', 'haus');
+    ->setInput('Karmelitenstr.') // Set the search term
+    ->where('objektart', 'haus')
+    ->search();
 ```
 
 ::: tip
-The `search()` method calls the onOffice search endpoint, which might differ from direct `get()` queries.
+The `search()` method calls the onOffice search endpoint, which might differ from direct `get()` queries. Ensure you set the search term using `setInput()`.
 :::
 
 ## Create & Modify

@@ -18,10 +18,13 @@ $collection = BaseRepository::query()
 You can pass strings for resource types not present in `OnOfficeResourceType`. For example, `'myCustomType'`.
 
 ## Single-call Execution
+The `once()` method executes a single API request and returns the `Illuminate\Http\Client\Response` object.
 ```php
-$first = BaseRepository::query()
-    ->call(new OnOfficeRequest(...))
-    ->once();
+$response = BaseRepository::query()
+    ->once(new OnOfficeRequest(...));
+
+// You can then process the response, for example:
+// $record = $response->json('response.results.0.data.records.0');
 ```
 
 ## Chunked Pagination
