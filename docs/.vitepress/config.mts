@@ -70,9 +70,10 @@ export default defineConfig({
         }
     },
     vite: {
-        plugins: [llmstxt({
-            ignoreFiles: ['imprint.md'],
-            generateLLMFriendlyDocsForEachPage: true,
-        })]
+        plugins: [
+            llmstxt({
+                ignoreFiles: ['imprint.md'],
+            })
+        ]
     }
 })
