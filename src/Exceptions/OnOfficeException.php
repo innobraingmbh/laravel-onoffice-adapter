@@ -31,7 +31,7 @@ class OnOfficeException extends Exception
         return OnOfficeError::tryFrom($this->getCode()) ?? OnOfficeError::UNKNOWN;
     }
 
-    public function getOriginalResponse(): Response
+    public function getOriginalResponse(): ?Response
     {
         return $this->originalResponse;
     }
