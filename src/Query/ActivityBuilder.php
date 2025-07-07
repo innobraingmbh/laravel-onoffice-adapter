@@ -125,7 +125,7 @@ class ActivityBuilder extends Builder
     public function create(array $data): array
     {
         $data = array_replace($data, [
-            ...$this->prepareEstateOrAddressParameters(),
+            ...$this->prepareEstateOrAddressParameters(create: true),
         ]);
 
         $request = new OnOfficeRequest(
@@ -220,7 +220,7 @@ class ActivityBuilder extends Builder
      * Function is used to deprecate the usage of recordIdsAsEstate() and recordIdsAsAddress()
      * without breaking changes.
      */
-    private function prepareEstateOrAddressParameters(): array
+    private function prepareEstateOrAddressParameters(bool $create = false): array
     {
         $parameters = [$this->estateOrAddress => $this->recordIds];
 
@@ -234,7 +234,12 @@ class ActivityBuilder extends Builder
         }
 
         if ($this->addressIds !== []) {
-            $parameters['addressid'] = $this->addressIds;
+            $key = match ($create) {
+                true => 'addressids',
+                false => 'addressid',
+            };
+
+            $parameters[$key] = $this->addressIds;
         }
 
         return $parameters;
