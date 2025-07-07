@@ -177,7 +177,7 @@ class ActivityBuilder extends Builder
      */
     public function address(): static
     {
-        $this->estateOrAddress = 'addressids';
+        $this->estateOrAddress = 'addressid';
 
         return $this;
     }
@@ -234,7 +234,7 @@ class ActivityBuilder extends Builder
         }
 
         if ($this->addressIds !== []) {
-            $parameters['addressids'] = $this->addressIds;
+            $parameters['addressid'] = $this->addressIds;
         }
 
         return $parameters;
