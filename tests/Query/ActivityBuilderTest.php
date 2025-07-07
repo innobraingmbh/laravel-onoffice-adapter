@@ -32,7 +32,7 @@ describe('deprecated estate/address methods', function () {
         $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
-        expect($parameters)->toBe(['addressids' => [1, 2, 3]]);
+        expect($parameters)->toBe(['addressid' => [1, 2, 3]]);
     });
 
     it('sets estate parameter via recordIdsAsEstate', function () {
@@ -58,7 +58,7 @@ describe('deprecated estate/address methods', function () {
         $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
-        expect($parameters)->toBe(['addressids' => [1, 2, 3]]);
+        expect($parameters)->toBe(['addressid' => [1, 2, 3]]);
     });
 });
 
@@ -84,7 +84,7 @@ describe('new estate/address methods', function () {
         $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
-        expect($parameters)->toBe(['addressids' => [123]]);
+        expect($parameters)->toBe(['addressid' => [123]]);
     });
 
     it('sets addressIds parameter correctly with array of IDs', function () {
@@ -96,7 +96,7 @@ describe('new estate/address methods', function () {
         $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
-        expect($parameters)->toBe(['addressids' => [1, 2, 3]]);
+        expect($parameters)->toBe(['addressid' => [1, 2, 3]]);
     });
 
     it('combines estateId and addressIds parameters correctly', function () {
@@ -112,7 +112,7 @@ describe('new estate/address methods', function () {
 
         expect($parameters)->toBe([
             'estateid' => 123,
-            'addressids' => [1, 2, 3],
+            'addressid' => [1, 2, 3],
         ]);
     });
 });
@@ -169,7 +169,7 @@ describe('CRUD operations', function () {
             $body = json_decode($request->body(), true);
 
             return data_get($body, 'request.actions.0.parameters.estateid') === 123
-                && data_get($body, 'request.actions.0.parameters.addressids') === [1, 2]
+                && data_get($body, 'request.actions.0.parameters.addressid') === [1, 2]
                 && data_get($body, 'request.actions.0.actionid') === OnOfficeAction::Read->value
                 && data_get($body, 'request.actions.0.resourcetype') === OnOfficeResourceType::Activity->value;
         });
