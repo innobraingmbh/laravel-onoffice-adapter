@@ -99,6 +99,18 @@ describe('new estate/address methods', function () {
         expect($parameters)->toBe(['addressid' => [1, 2, 3]]);
     });
 
+    it('sets addressIds parameter correctly with array of IDs when calling create', function () {
+        $builder = new ActivityBuilder;
+
+        $builder->addressIds([1, 2, 3]);
+
+        $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
+        $m->setAccessible(true);
+        $parameters = $m->invoke($builder, true);
+
+        expect($parameters)->toBe(['addressids' => [1, 2, 3]]);
+    });
+
     it('combines estateId and addressIds parameters correctly', function () {
         $builder = new ActivityBuilder;
 
@@ -171,6 +183,25 @@ describe('CRUD operations', function () {
             return data_get($body, 'request.actions.0.parameters.estateid') === 123
                 && data_get($body, 'request.actions.0.parameters.addressid') === [1, 2]
                 && data_get($body, 'request.actions.0.actionid') === OnOfficeAction::Read->value
+                && data_get($body, 'request.actions.0.resourcetype') === OnOfficeResourceType::Activity->value;
+        });
+    });
+
+    it('creates activities with combined parameters', function () {
+        $builder = new ActivityBuilder;
+
+        $builder
+            ->setRepository(new ActivityRepository)
+            ->estateId(123)
+            ->addressIds([1, 2])
+            ->create(['note' => 'Test activity']);
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $body = json_decode($request->body(), true);
+
+            return data_get($body, 'request.actions.0.parameters.estateid') === 123
+                && data_get($body, 'request.actions.0.parameters.addressids') === [1, 2]
+                && data_get($body, 'request.actions.0.actionid') === OnOfficeAction::Create->value
                 && data_get($body, 'request.actions.0.resourcetype') === OnOfficeResourceType::Activity->value;
         });
     });
