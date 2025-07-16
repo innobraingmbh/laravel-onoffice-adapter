@@ -49,7 +49,7 @@ describe('real responses', function () {
     test('get', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+            'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
                 ReadEstateResponse::make(count: 1500),
                 ReadEstateResponse::make(count: 1500),
                 ReadEstateResponse::make(count: 1500),
@@ -68,7 +68,7 @@ describe('real responses', function () {
     test('count', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+            'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
                 ReadEstateResponse::make(count: 1500),
             ]),
         ]);
@@ -87,7 +87,7 @@ describe('search', function () {
     it('should be able to build a search request', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+            'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
                 ReadEstateResponse::make(),
             ]),
         ]);

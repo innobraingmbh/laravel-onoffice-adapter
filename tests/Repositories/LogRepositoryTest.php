@@ -29,7 +29,7 @@ describe('real responses', function () {
     test('get', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+            'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
                 ReadLogResponse::make(),
             ]),
         ]);
@@ -46,7 +46,7 @@ describe('real responses', function () {
     test('count', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+            'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
                 ReadLogResponse::make(count: 1500),
             ]),
         ]);

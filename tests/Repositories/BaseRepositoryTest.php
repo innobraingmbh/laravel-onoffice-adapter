@@ -372,7 +372,7 @@ describe('request', function () {
     it('will call once', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
                 'status' => [
                     'code' => 200,
                 ],
@@ -391,7 +391,7 @@ describe('request', function () {
     it('will call call', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
                 'status' => [
                     'code' => 200,
                 ],
@@ -410,7 +410,7 @@ describe('request', function () {
     it('will call chunked', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
                 'status' => [
                     'code' => 200,
                 ],
@@ -429,7 +429,7 @@ describe('request', function () {
     it('will call with string as resource type', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
                 'status' => [
                     'code' => 200,
                 ],
@@ -452,7 +452,7 @@ describe('middlewares', function () {
 
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
                 'status' => [
                     'code' => 200,
                 ],
@@ -477,7 +477,7 @@ describe('middlewares', function () {
 
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
                 'status' => [
                     'code' => 200,
                 ],
@@ -505,7 +505,7 @@ describe('middlewares', function () {
 
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
                 'status' => [
                     'code' => 200,
                 ],
@@ -539,7 +539,7 @@ describe('middlewares', function () {
 
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
                 'status' => [
                     'code' => 200,
                 ],

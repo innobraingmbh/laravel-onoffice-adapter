@@ -138,8 +138,7 @@ class OnOfficeService
          */
         $response = null;
         retry($this->getRetryCount(), function () use ($request, &$response) {
-            /* @phpstan-ignore staticMethod.notFound */
-            $response = Http::onOffice()->post('/', $request->toRequestArray());
+            $response = Http::withHeaders(config('onoffice.headers'))->post(config('onoffice.base_url'), $request->toRequestArray());
 
             $this->throwIfResponseIsFailed($response);
         }, $this->getRetryDelay(), $retryOnlyOnConnectionError);

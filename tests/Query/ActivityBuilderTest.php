@@ -133,7 +133,7 @@ describe('CRUD operations', function () {
     beforeEach(function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::response([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
                 'status' => [
                     'code' => 200,
                 ],

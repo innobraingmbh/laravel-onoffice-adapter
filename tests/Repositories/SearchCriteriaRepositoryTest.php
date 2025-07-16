@@ -32,7 +32,7 @@ describe('real responses', function () {
     test('get', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+            'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
                 GetSearchCriteriaResponse::make(),
             ]),
         ]);
@@ -49,7 +49,7 @@ describe('real responses', function () {
     test('create', function () {
         Http::preventStrayRequests();
         Http::fake([
-            'https://api.onoffice.de/api/stable/api.php/' => Http::sequence([
+            'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
                 CreateSearchCriteriaResponse::make(),
             ]),
         ]);
