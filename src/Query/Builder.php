@@ -18,9 +18,9 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
+use Innobrain\OnOfficeAdapter\Facades\BaseRepository as BaseRepositoryFacade;
 use Innobrain\OnOfficeAdapter\Query\Concerns\BuilderInterface;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
-use Innobrain\OnOfficeAdapter\Facades\BaseRepository as BaseRepositoryFacade;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use JsonException;
 use Symfony\Component\VarDumper\VarDumper;
@@ -173,7 +173,6 @@ class Builder implements BuilderInterface
      * If $callback is an array, the first element
      * is considered the callable, and the rest are parameters to be passed to the callable.
      *
-     * @param callable|array $callback
      * @return $this
      */
     public function after(callable|array $callback): static

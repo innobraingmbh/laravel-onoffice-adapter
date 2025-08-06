@@ -631,7 +631,6 @@ describe('custom credentials', function () {
     });
 });
 
-
 describe('check user rights', function () {
     test('user rights callback', function () {
         BaseRepositoryFacade::preventStrayRequests();
