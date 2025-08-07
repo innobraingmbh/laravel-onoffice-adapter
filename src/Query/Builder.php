@@ -264,18 +264,32 @@ class Builder implements BuilderInterface
         });
     }
 
-    public function checkUserRecordsRight(string $action, string $module, int $userId): self
+    /**
+     * Will check for each record in the response if the user has the right to access it.
+     * Will remove every record that the user does not have access to from the response.
+     * But it will not change anything else in the response (e.g. count_absolute).
+     */
+    public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = 'response.results.0.data.records' ): self
     {
         return $this->after([
-            static function (Response $response, string $action, string $module, int $userId) {
+            static function (Response $response, string $action, string $module, int $userId) use ($resultPath): ?Response {
                 if ($response->failed()) {
-                    return;
+                    return null;
                 }
 
                 $ids = $response->json('response.results.0.data.records.*.id', []);
 
                 if ($ids === []) {
-                    return;
+                    $responseBody = $response->json();
+                    data_set($responseBody, $resultPath, []);
+
+                    return new Response(new Psr7Response(
+                        $response->getStatusCode(),
+                        $response->getHeaders(),
+                        json_encode($responseBody),
+                        $response->getProtocolVersion(),
+                        $response->getReasonPhrase(),
+                    ));
                 }
 
                 $userRightsResponse = BaseRepositoryFacade::query()
@@ -293,14 +307,14 @@ class Builder implements BuilderInterface
                 $allowedIds = $userRightsResponse->json('response.results.0.data.records.0.elements', []);
                 $allowedIds = collect($allowedIds)->map(fn (string $element) => (int) $element)->toArray();
 
-                $records = $response->json('response.results.0.data.records', []);
+                $records = $response->json($resultPath, []);
 
                 $records = collect($records)->filter(function (array $record) use ($allowedIds) {
                     return in_array((int) $record['id'], $allowedIds, true);
                 })->toArray();
 
                 $responseBody = $response->json();
-                data_set($responseBody, 'response.results.0.data.records', array_values($records));
+                data_set($responseBody, $resultPath, array_values($records));
 
                 return new Response(new Psr7Response(
                     $response->getStatusCode(),
