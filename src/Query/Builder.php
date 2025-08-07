@@ -269,7 +269,7 @@ class Builder implements BuilderInterface
      * Will remove every record that the user does not have access to from the response.
      * But it will not change anything else in the response (e.g. count_absolute).
      */
-    public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = 'response.results.0.data.records' ): self
+    public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = 'response.results.0.data.records'): self
     {
         return $this->after([
             static function (Response $response, string $action, string $module, int $userId) use ($resultPath): ?Response {

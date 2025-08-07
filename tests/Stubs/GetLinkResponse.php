@@ -39,7 +39,7 @@ class GetLinkResponse
                                     'id' => 5979,
                                     'type' => '',
                                     'elements' => [
-                                        'url' => 'https://beta.smart.onoffice.de/smart/smart.php?params=5nQt5%2B3vEm8pMspgWpqAdCzylyROxhpTIzFucBqtNpuysiqbyYnSblYFrB%2BCq8NWzDxGjsYc%2FmhPFpGh0fnvaJzJlQSSvDNWADJ%2BofMt6hQKAiBDyrb9fVEJkIJKtIqS%2FFVclqS%2FqUO0vUBsuY7lsw%3D%3D'
+                                        'url' => 'https://beta.smart.onoffice.de/smart/smart.php?params=5nQt5%2B3vEm8pMspgWpqAdCzylyROxhpTIzFucBqtNpuysiqbyYnSblYFrB%2BCq8NWzDxGjsYc%2FmhPFpGh0fnvaJzJlQSSvDNWADJ%2BofMt6hQKAiBDyrb9fVEJkIJKtIqS%2FFVclqS%2FqUO0vUBsuY7lsw%3D%3D',
                                     ],
                                 ],
                             ],
