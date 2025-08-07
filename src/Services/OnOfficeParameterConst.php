@@ -33,6 +33,8 @@ trait OnOfficeParameterConst
 
     public const RECORDIDS = 'recordids';
 
+    public const RECORDID = 'recordId';
+
     public const PARAMETERCACHEID = 'parameterCacheId';
 
     public const EXTENDEDCLAIM = 'extendedclaim';

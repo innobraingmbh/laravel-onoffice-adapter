@@ -31,4 +31,5 @@ enum OnOfficeResourceType: string
     case MacroResolve = 'macroresolve';
     case Log = 'log';
     case CheckUserRecordsRight = 'checkuserrecordsright';
+    case GetLink = 'getlink';
 }
