@@ -14,8 +14,11 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeApiCredentials;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
+use Innobrain\OnOfficeAdapter\Facades\BaseRepository as BaseRepositoryFacade;
 use Innobrain\OnOfficeAdapter\Query\Concerns\BuilderInterface;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
@@ -95,6 +98,11 @@ class Builder implements BuilderInterface
     protected array $beforeSendingCallbacks = [];
 
     /**
+     * The after sending middlewares.
+     */
+    protected array $afterSendingCallbacks = [];
+
+    /**
      * The last request that was made. Needed for the stubbing.
      */
     private ?OnOfficeRequest $requestCache = null;
@@ -161,6 +169,19 @@ class Builder implements BuilderInterface
         return $this;
     }
 
+    /**
+     * If $callback is an array, the first element
+     * is considered the callable, and the rest are parameters to be passed to the callable.
+     *
+     * @return $this
+     */
+    public function after(callable|array $callback): static
+    {
+        $this->afterSendingCallbacks[] = $callback;
+
+        return $this;
+    }
+
     public function dump(): static
     {
         return $this->before(static function (OnOfficeRequest $request) {
@@ -206,7 +227,7 @@ class Builder implements BuilderInterface
 
         $this->repository->recordRequestResponsePair($request, $response->json());
 
-        return $response;
+        return $this->runAfterSendingCallbacks($response);
     }
 
     protected function runBeforeSendingCallbacks(OnOfficeRequest $request): OnOfficeRequest
@@ -220,6 +241,93 @@ class Builder implements BuilderInterface
                 }
             });
         });
+    }
+
+    protected function runAfterSendingCallbacks(Response $response): Response
+    {
+        return tap($response, function (Response &$response) {
+            collect($this->afterSendingCallbacks)->each(function (callable|array $callback) use (&$response) {
+                // if the callback is an array, we assume the first element is the callable
+                // and the rest are parameters to be passed to the callable
+                $params = [];
+                if (is_array($callback)) {
+                    $params = $callback;
+                    array_shift($params);
+                    $callback = $callback[0];
+                }
+                $result = $callback($response, ...$params);
+
+                if ($result instanceof Response) {
+                    $response = $result;
+                }
+            });
+        });
+    }
+
+    /**
+     * Will check for each record in the response if the user has the right to access it.
+     * Will remove every record that the user does not have access to from the response.
+     * But it will not change anything else in the response (e.g. count_absolute).
+     */
+    public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = 'response.results.0.data.records'): self
+    {
+        return $this->after([
+            static function (Response $response, string $action, string $module, int $userId) use ($resultPath): ?Response {
+                if ($response->failed()) {
+                    return null;
+                }
+
+                $ids = $response->json('response.results.0.data.records.*.id', []);
+
+                if ($ids === []) {
+                    $responseBody = $response->json();
+                    data_set($responseBody, $resultPath, []);
+
+                    return new Response(new Psr7Response(
+                        $response->getStatusCode(),
+                        $response->getHeaders(),
+                        json_encode($responseBody),
+                        $response->getProtocolVersion(),
+                        $response->getReasonPhrase(),
+                    ));
+                }
+
+                $userRightsResponse = BaseRepositoryFacade::query()
+                    ->requestApi(new OnOfficeRequest(
+                        actionId: OnOfficeAction::Get,
+                        resourceType: OnOfficeResourceType::CheckUserRecordsRight,
+                        parameters: [
+                            'action' => $action,
+                            'module' => $module,
+                            'userId' => $userId,
+                            'recordIds' => $ids,
+                        ],
+                    ));
+
+                $allowedIds = $userRightsResponse->json('response.results.0.data.records.0.elements', []);
+                $allowedIds = collect($allowedIds)->map(fn (string $element) => (int) $element)->toArray();
+
+                $records = $response->json($resultPath, []);
+
+                $records = collect($records)->filter(function (array $record) use ($allowedIds) {
+                    return in_array((int) $record['id'], $allowedIds, true);
+                })->toArray();
+
+                $responseBody = $response->json();
+                data_set($responseBody, $resultPath, array_values($records));
+
+                return new Response(new Psr7Response(
+                    $response->getStatusCode(),
+                    $response->getHeaders(),
+                    json_encode($responseBody),
+                    $response->getProtocolVersion(),
+                    $response->getReasonPhrase(),
+                ));
+            },
+            $action,
+            $module,
+            $userId,
+        ]);
     }
 
     /**
