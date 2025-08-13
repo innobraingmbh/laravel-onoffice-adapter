@@ -271,12 +271,11 @@ class Builder implements BuilderInterface
      * Removes every record that the user does not have access to from the response,
      * but does not change anything else in the response (e.g. count_absolute).
      *
-     * @param string $action The action to check rights for (e.g. 'get', 'edit').
-     * @param string $module The module name to check rights in (e.g. 'estate', 'address').
-     * @param int $userId The ID of the user whose rights are being checked.
-     * @param string $resultPath The dot-notated path to the records in the response body.
-     *                           Defaults to 'response.results.0.data.records'.
-     *
+     * @param  string  $action  The action to check rights for (e.g. 'get', 'edit').
+     * @param  string  $module  The module name to check rights in (e.g. 'estate', 'address').
+     * @param  int  $userId  The ID of the user whose rights are being checked.
+     * @param  string  $resultPath  The dot-notated path to the records in the response body.
+     *                              Defaults to 'response.results.0.data.records'.
      * @return self Returns the current Builder instance for method chaining.
      */
     public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = 'response.results.0.data.records'): self
