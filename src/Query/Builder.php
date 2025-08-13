@@ -267,7 +267,17 @@ class Builder implements BuilderInterface
     /**
      * Will check for each record in the response if the user has the right to access it.
      * Will remove every record that the user does not have access to from the response.
-     * But it will not change anything else in the response (e.g. count_absolute).
+     * Checks for each record in the response if the user has the right to access it.
+     * Removes every record that the user does not have access to from the response,
+     * but does not change anything else in the response (e.g. count_absolute).
+     *
+     * @param string $action The action to check rights for (e.g. 'get', 'edit').
+     * @param string $module The module name to check rights in (e.g. 'estate', 'address').
+     * @param int $userId The ID of the user whose rights are being checked.
+     * @param string $resultPath The dot-notated path to the records in the response body.
+     *                           Defaults to 'response.results.0.data.records'.
+     *
+     * @return self Returns the current Builder instance for method chaining.
      */
     public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = 'response.results.0.data.records'): self
     {
@@ -305,13 +315,13 @@ class Builder implements BuilderInterface
                     ));
 
                 $allowedIds = $userRightsResponse->json('response.results.0.data.records.0.elements', []);
-                $allowedIds = collect($allowedIds)->map(fn (string $element) => (int) $element)->toArray();
+                $allowedIds = array_map(static fn (string $element): int => (int) $element, $allowedIds);
 
                 $records = $response->json($resultPath, []);
 
                 $records = collect($records)->filter(function (array $record) use ($allowedIds) {
                     return in_array((int) $record['id'], $allowedIds, true);
-                })->toArray();
+                })->all();
 
                 $responseBody = $response->json();
                 data_set($responseBody, $resultPath, array_values($records));

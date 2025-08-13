@@ -72,7 +72,8 @@ class LinkBuilder extends Builder
     }
 
     /**
-     * @throws Throwable<OnOfficeException>
+     * @throws Throwable
+     * @throws OnOfficeException
      */
     public function find(int $id): ?array
     {
