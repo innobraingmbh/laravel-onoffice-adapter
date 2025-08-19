@@ -281,7 +281,7 @@ class Builder implements BuilderInterface
     public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = 'response.results.0.data.records'): self
     {
         return $this->after([
-            static function (Response $response, string $action, string $module, int $userId) use ($resultPath): ?Response {
+            function (Response $response, string $action, string $module, int $userId) use ($resultPath): ?Response {
                 if ($response->failed()) {
                     return null;
                 }
@@ -302,6 +302,7 @@ class Builder implements BuilderInterface
                 }
 
                 $userRightsResponse = BaseRepositoryFacade::query()
+                    ->when($this->credentials, fn (Builder $query) => $query->withCredentials($this->credentials))
                     ->requestApi(new OnOfficeRequest(
                         actionId: OnOfficeAction::Get,
                         resourceType: OnOfficeResourceType::CheckUserRecordsRight,

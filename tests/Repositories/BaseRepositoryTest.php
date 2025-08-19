@@ -16,7 +16,10 @@ use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Mockery\MockInterface;
 use Symfony\Component\VarDumper\VarDumper;
+
+use function Pest\Laravel\mock;
 
 describe('stray requests', function () {
     it('will set the preventStrayRequests property when calling preventStrayRequests default', function () {
@@ -661,5 +664,40 @@ describe('check user rights', function () {
         expect($response->json('response.results.0.data.records.*.id'))
             ->toHaveCount(1)
             ->toBe([3]);
+    });
+
+    test('will use same credentials as the repository', function () {
+        BaseRepositoryFacade::preventStrayRequests();
+
+        BaseRepositoryFacade::fake([
+            BaseRepositoryFacade::response([
+                BaseRepositoryFacade::page(recordFactories: [
+                    EstateFactory::make()
+                        ->id(2),
+                    EstateFactory::make()
+                        ->id(3),
+                ]),
+            ]),
+            BaseRepositoryFacade::response([
+                BaseRepositoryFacade::page(recordFactories: [
+                    BaseFactory::make()
+                        ->data([
+                            '3',
+                        ]),
+                ]),
+            ]),
+        ]);
+
+        mock(OnOfficeService::class, function (MockInterface $mock) {
+            $mock->makePartial()
+                ->shouldReceive('setCredentials')
+                ->twice()
+                ->andReturnSelf();
+        });
+
+        BaseRepositoryFacade::query()
+            ->withCredentials('token', 'secret', 'claim')
+            ->checkUserRecordsRight('read', 'address', 17)
+            ->requestApi(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate));
     });
 });
