@@ -309,7 +309,7 @@ class Builder implements BuilderInterface
                         parameters: [
                             'action' => $action,
                             'module' => $module,
-                            'userId' => $userId,
+                            'userid' => $userId,
                             'recordIds' => $ids,
                         ],
                     ));
