@@ -3,7 +3,7 @@ import llmstxt from 'vitepress-plugin-llms'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-    title: "Laravel onOffice Adapter",
+    title: "onOffice Adapter for Laravel",
     description: "Query onOffice like it was your ORM",
     themeConfig: {
         // https://vitepress.dev/reference/default-theme-config

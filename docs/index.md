@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: "Laravel onOffice Adapter"
+  name: "onOffice Adapter for Laravel"
   text: "Query onOffice like it's an ORM"
   tagline: "Make your onOffice queries feel like Eloquent."
   actions:
