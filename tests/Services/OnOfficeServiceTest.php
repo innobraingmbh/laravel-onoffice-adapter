@@ -448,6 +448,8 @@ describe('requestAllChunked', function () {
     });
 
     it('will stop with take amount on different pages', function () {
+        Config::set('concurrency.default', 'sync');
+
         Http::preventStrayRequests();
         Http::fake([
             '*' => Http::sequence([

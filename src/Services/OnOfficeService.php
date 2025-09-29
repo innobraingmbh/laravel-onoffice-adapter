@@ -7,6 +7,7 @@ namespace Innobrain\OnOfficeAdapter\Services;
 use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Concurrency;
@@ -229,37 +230,43 @@ class OnOfficeService
     ): void {
         $maxPage = $pageOverwrite ?? 0;
         $elementCount = 0;
-        do {
-            $response = $this->tryCallable($request, $pageSize, $offset, $maxPage, $pageOverwrite);
 
-            if (! $response instanceof Response) {
-                return;
-            }
+        $response = $this->tryCallable($request, $pageSize, $offset, $maxPage, $pageOverwrite);
 
-            // If the maxPage is 0,
-            // we need to calculate it from the total count of estates
-            // and the page size,
-            // the first time we get the response from the API
-            if ($maxPage === 0) {
-                $maxPage = $this->getMaxPage($response, $countPath, $pageSize, $limit);
-            }
+        if (! $response instanceof Response) {
+            return;
+        }
 
-            // If the take parameter is set,
-            // and we have more records than the take parameter.
-            // We break the loop and return the sliced records
-            // because it is not guaranteed that the record page size
-            // will be the same as the take parameter
-            $elements = $response->json($resultPath);
-            $elementCount += count($elements ?? []);
-            if ($limit > -1 && $elementCount > $limit) {
-                $elements = array_slice($elements, 0, $limit - $elementCount);
-            }
+        $elements = $this->getSlicedElements($response, $resultPath, $elementCount, $limit);
+        $callback($elements);
 
-            $callback($elements);
+        // If the maxPage is 0,
+        // we need to calculate it from the total count of elements
+        // and the page size,
+        // the first time we get the response from the API
+        if ($maxPage === 0) {
+            $maxPage = $this->getMaxPage($response, $countPath, $pageSize, $limit);
+        }
+
+        $offset += $pageSize;
+        $currentPage = $offset / $pageSize;
+
+        $requests = [];
+
+        while ($maxPage > $currentPage) {
+            $requests[] = fn () => $request($pageSize, $offset);
 
             $offset += $pageSize;
             $currentPage = $offset / $pageSize;
-        } while ($maxPage > $currentPage);
+        }
+
+        $responses = Concurrency::run($requests);
+
+        collect($responses)->each(function (Response $response) use ($limit, &$elementCount, $callback, $resultPath) {
+            $elements = $this->getSlicedElements($response, $resultPath, $elementCount, $limit);
+
+            $callback($elements);
+        });
     }
 
     /**
@@ -428,5 +435,27 @@ class OnOfficeService
         }
 
         return (int) ceil($countAbsolute / $pageSize);
+    }
+
+    /**
+     * Returns the elements from the response,
+     * sliced to the limit if the limit is set
+     * and the element count exceeds the limit.
+     */
+    protected function getSlicedElements(Response $response, string $resultPath, int &$elementCount, int $limit): array
+    {
+        $elements = $response->json($resultPath);
+
+        // If the take parameter is set,
+        // and we have more records than the take parameter.
+        // We break the loop and return the sliced records
+        // because it is not guaranteed that the record page size
+        // will be the same as the take parameter
+        $elementCount += count($elements ?? []);
+        if ($limit > -1 && $elementCount > $limit) {
+            $elements = array_slice($elements, 0, $limit - $elementCount);
+        }
+
+        return $elements ?? [];
     }
 }

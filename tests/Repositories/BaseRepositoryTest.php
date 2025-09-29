@@ -254,6 +254,8 @@ describe('fake', function () {
     });
 
     it('can fake a response with more than one page and another response on each page', function () {
+        Config::set('concurrency.default', 'sync');
+
         $builder = new BaseRepository;
 
         $builder->fake([
