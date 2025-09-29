@@ -336,13 +336,15 @@ class OnOfficeService
          */
         $responses = Concurrency::run($requests);
 
-        collect($responses)->each(function (Response $response) use ($resultPath, &$data) {
-            $responseResult = $response->json($resultPath);
+        collect($responses)
+            ->filter(fn (mixed $response) => $response instanceof Response)
+            ->each(function (Response $response) use ($resultPath, &$data) {
+                $responseResult = $response->json($resultPath);
 
-            if (is_array($responseResult)) {
-                $data->push(...$responseResult);
-            }
-        });
+                if (is_array($responseResult)) {
+                    $data->push(...$responseResult);
+                }
+            });
 
         if (($limitedData = $this->reachedLimit($limit, $data)) instanceof Collection) {
             return $limitedData;
