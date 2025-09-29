@@ -319,9 +319,7 @@ class Builder implements BuilderInterface
 
                 $records = $response->json($resultPath, []);
 
-                $records = collect($records)->filter(function (array $record) use ($allowedIds) {
-                    return in_array((int) $record['id'], $allowedIds, true);
-                })->all();
+                $records = collect($records)->filter(fn (array $record) => in_array((int) $record['id'], $allowedIds, true))->all();
 
                 $responseBody = $response->json();
                 data_set($responseBody, $resultPath, array_values($records));
@@ -342,6 +340,7 @@ class Builder implements BuilderInterface
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
     protected function requestAll(OnOfficeRequest $request): Collection
     {
@@ -372,6 +371,7 @@ class Builder implements BuilderInterface
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
     protected function requestAllChunked(OnOfficeRequest $request, callable $callback): void
     {
@@ -384,6 +384,23 @@ class Builder implements BuilderInterface
 
             return $this->requestApi($request);
         }, $callback, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit, pageOverwrite: $this->getPageOverwrite());
+    }
+
+    /**
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    protected function requestConcurrently(OnOfficeRequest $request): Collection
+    {
+        return $this->getOnOfficeService()->requestConcurrently(/**
+         * @throws OnOfficeException
+         * @throws Throwable
+         */ function (int $pageSize, int $offset) use ($request) {
+            data_set($request->parameters, OnOfficeService::LISTLIMIT, $pageSize);
+            data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
+
+            return $this->requestApi($request);
+        }, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit, pageOverwrite: $this->getPageOverwrite());
     }
 
     /**
@@ -566,13 +583,14 @@ class Builder implements BuilderInterface
     /**
      * @throws OnOfficeException
      */
-    public function get(): Collection
+    public function get(bool $concurrently = false): Collection
     {
         throw new OnOfficeException('Not implemented');
     }
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
     public function call(OnOfficeRequest $request): Collection
     {
@@ -613,6 +631,7 @@ class Builder implements BuilderInterface
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
     public function chunked(OnOfficeRequest $request, callable $callback): void
     {

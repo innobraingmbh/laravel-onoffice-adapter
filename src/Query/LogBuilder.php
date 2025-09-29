@@ -22,8 +22,9 @@ class LogBuilder extends Builder
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
-    public function get(): Collection
+    public function get(bool $concurrently = false): Collection
     {
         $parameters = [
             OnOfficeService::MODULE => $this->module,
@@ -43,6 +44,10 @@ class LogBuilder extends Builder
             OnOfficeResourceType::Log,
             parameters: $parameters,
         );
+
+        if ($concurrently) {
+            return $this->requestConcurrently($request);
+        }
 
         return $this->requestAll($request);
     }

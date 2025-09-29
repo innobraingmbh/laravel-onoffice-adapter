@@ -518,6 +518,182 @@ describe('requestAllChunked', function () {
     });
 });
 
+describe('requestConcurrently', function () {
+    it('logs the request error', function (int $statusCode) {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => $statusCode,
+                    'message' => 'Error message',
+                ],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        $onOfficeService->requestConcurrently(function () use ($request) {
+            app(OnOfficeService::class)->requestApi($request);
+        });
+    })->with([300, 301, 400, 401, 500, 501])->throws(OnOfficeException::class);
+
+    it('can handle null in result path', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => [
+                                    'cntabsolute' => 0,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        $response = $onOfficeService->requestConcurrently(fn () => app(OnOfficeService::class)->requestApi($request));
+
+        expect($response)->toBeInstanceOf(Collection::class)
+            ->toBeEmpty();
+    });
+
+    it('will stop with take amount', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => [
+                                    'cntabsolute' => 50,
+                                ],
+                                'records' => [
+                                    [
+                                        'id' => 1,
+                                    ],
+                                    [
+                                        'id' => 2,
+                                    ],
+                                    [
+                                        'id' => 3,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        $response = $onOfficeService->requestConcurrently(fn () => app(OnOfficeService::class)->requestApi($request), limit: 1);
+
+        expect($response)->toBeInstanceOf(Collection::class)
+            ->toHaveCount(1);
+    });
+
+    it('request all concurrently', function () {
+        Config::set('concurrency.default', 'sync');
+
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => [
+                                    'cntabsolute' => 501,
+                                ],
+                                'records' => [
+                                    [
+                                        'id' => 1,
+                                    ],
+                                    [
+                                        'id' => 2,
+                                    ],
+                                    [
+                                        'id' => 3,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        $response = $onOfficeService->requestConcurrently(fn () => app(OnOfficeService::class)->requestApi($request));
+
+        // 6 items expected, since we overwrite the count absolute with 501 items
+        // 501 > 500 = 2 pages with 3 items each = 6 items
+        // the response will be duplicated, since we fake the same response for each request
+        expect($response)->toBeInstanceOf(Collection::class)
+            ->toHaveCount(6);
+    });
+
+    it('can handle string resource type', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response([
+                'status' => [
+                    'code' => 200,
+                ],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            'estate',
+        );
+
+        $onOfficeService->requestConcurrently(fn () => app(OnOfficeService::class)->requestApi($request), limit: 1);
+
+        Http::assertSentCount(1);
+    });
+});
+
 describe('retry', function () {
     it('can use the retry count', function (int $given, int $expected) {
         Config::set([

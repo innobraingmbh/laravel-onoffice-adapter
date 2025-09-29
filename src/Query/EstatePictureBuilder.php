@@ -11,6 +11,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Throwable;
 
 class EstatePictureBuilder extends Builder
 {
@@ -43,8 +44,9 @@ class EstatePictureBuilder extends Builder
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
-    public function get(): Collection
+    public function get(bool $concurrently = false): Collection
     {
         if ($this->categories === []) {
             $this->categories = self::DEFAULT_CATEGORIES;
@@ -60,6 +62,10 @@ class EstatePictureBuilder extends Builder
                 ...$this->customParameters,
             ],
         );
+
+        if ($concurrently) {
+            return $this->requestConcurrently($request);
+        }
 
         return $this->requestAll($request);
     }

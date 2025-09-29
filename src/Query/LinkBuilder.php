@@ -23,8 +23,9 @@ class LinkBuilder extends Builder
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
-    public function get(): Collection
+    public function get(bool $concurrently = false): Collection
     {
         $parameters = [
             OnOfficeService::RECORDID => $this->recordId,
@@ -41,6 +42,10 @@ class LinkBuilder extends Builder
             $this->resourceId,
             parameters: $parameters,
         );
+
+        if ($concurrently) {
+            return $this->requestConcurrently($request);
+        }
 
         return $this->requestAll($request);
     }

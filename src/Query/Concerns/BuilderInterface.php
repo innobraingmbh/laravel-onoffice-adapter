@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 
 interface BuilderInterface
 {
-    public function get(): Collection;
+    public function get(bool $concurrently = false): Collection;
 
     public function first(): ?array;
 

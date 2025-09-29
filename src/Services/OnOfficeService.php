@@ -9,6 +9,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -153,6 +154,7 @@ class OnOfficeService
      * of the first request.
      *
      * @throws OnOfficeException
+     * @throws Throwable
      */
     public function requestAll(
         callable $request,
@@ -165,14 +167,11 @@ class OnOfficeService
     ): Collection {
         $maxPage = $pageOverwrite ?? 0;
         $data = new Collection;
+
         do {
-            try {
-                $response = $request($pageSize, $offset);
-            } catch (OnOfficeException $exception) {
-                Log::error("{$exception->getMessage()} - {$exception->getCode()}");
+            $response = $this->tryCallable($request, $pageSize, $offset, $maxPage, $pageOverwrite);
 
-                throw_if($maxPage === 0 || $pageOverwrite !== null, $exception);
-
+            if (! $response instanceof Response) {
                 return $data;
             }
 
@@ -181,9 +180,9 @@ class OnOfficeService
             // and the page size,
             // the first time we get the response from the API
             if ($maxPage === 0) {
-                $countAbsolute = $response->json($countPath, 0);
-                $maxPage = ceil($countAbsolute / $pageSize);
+                $maxPage = $this->getMaxPage($response, $countPath, $pageSize, $limit);
             }
+
             $responseResult = $response->json($resultPath);
 
             if (is_array($responseResult)) {
@@ -194,8 +193,8 @@ class OnOfficeService
             // and we have more records than the take parameter,
             // we break the loop and return the data except the
             // records that are more than the take parameter
-            if ($limit > -1 && $data->count() > $limit) {
-                $data = $data->take($limit);
+            if (($limitedData = $this->reachedLimit($limit, $data)) instanceof Collection) {
+                $data = $limitedData;
                 break;
             }
 
@@ -216,6 +215,7 @@ class OnOfficeService
      * but will call the given callback function with the records of each page.
      *
      * @throws OnOfficeException
+     * @throws Throwable
      */
     public function requestAllChunked(
         callable $request,
@@ -230,13 +230,9 @@ class OnOfficeService
         $maxPage = $pageOverwrite ?? 0;
         $elementCount = 0;
         do {
-            try {
-                $response = $request($pageSize, $offset);
-            } catch (OnOfficeException $exception) {
-                Log::error("{$exception->getMessage()} - {$exception->getCode()}");
+            $response = $this->tryCallable($request, $pageSize, $offset, $maxPage, $pageOverwrite);
 
-                throw_if($maxPage === 0 || $pageOverwrite !== null, $exception);
-
+            if (! $response instanceof Response) {
                 return;
             }
 
@@ -245,16 +241,7 @@ class OnOfficeService
             // and the page size,
             // the first time we get the response from the API
             if ($maxPage === 0) {
-                $countAbsolute = $response->json($countPath, 0);
-
-                // if the take parameter is set,
-                // and we have more records than the take parameter,
-                // we set the countAbsolute to the take parameter
-                if ($limit > -1 && $countAbsolute > $limit) {
-                    $countAbsolute = $limit;
-                }
-
-                $maxPage = ceil($countAbsolute / $pageSize);
+                $maxPage = $this->getMaxPage($response, $countPath, $pageSize, $limit);
             }
 
             // If the take parameter is set,
@@ -276,10 +263,93 @@ class OnOfficeService
     }
 
     /**
+     * Makes a paginated request to the onOffice API.
+     * With a max page calculation based on
+     * the total count of records,
+     * of the first request.
+     * All requests, but the first one,
+     * will be executed concurrently.
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    public function requestConcurrently(
+        callable $request,
+        string $resultPath = 'response.results.0.data.records',
+        string $countPath = 'response.results.0.data.meta.cntabsolute',
+        int $pageSize = 500,
+        int $offset = 0,
+        int $limit = -1,
+        ?int $pageOverwrite = null,
+    ): Collection {
+        $maxPage = $pageOverwrite ?? 0;
+        $data = new Collection;
+
+        $response = $this->tryCallable($request, $pageSize, $offset, $maxPage, $pageOverwrite);
+
+        if (! $response instanceof Response) {
+            return $data;
+        }
+
+        // If the maxPage is 0,
+        // we need to calculate it from the total count of estates
+        // and the page size,
+        // the first time we get the response from the API
+        if ($maxPage === 0) {
+            $maxPage = $this->getMaxPage($response, $countPath, $pageSize, $limit);
+        }
+        $responseResult = $response->json($resultPath);
+
+        if (is_array($responseResult)) {
+            $data->push(...$responseResult);
+        }
+
+        if (($limitedData = $this->reachedLimit($limit, $data)) instanceof Collection) {
+            return $limitedData;
+        }
+
+        $offset += $pageSize;
+        $currentPage = $offset / $pageSize;
+
+        $requests = [];
+
+        while ($maxPage > $currentPage) {
+            $requests[] = fn () => $request($pageSize, $offset);
+
+            $offset += $pageSize;
+            $currentPage = $offset / $pageSize;
+        }
+
+        /*
+         * Using default driver (process)
+         * fork is not recommended here,
+         * because we want to have the Repositories available
+         * on request level.
+         * Fork does not work inside the request cycle
+         */
+        $responses = Concurrency::run($requests);
+
+        collect($responses)->each(function (Response $response) use ($resultPath, &$data) {
+            $responseResult = $response->json($resultPath);
+
+            if (is_array($responseResult)) {
+                $data->push(...$responseResult);
+            }
+        });
+
+        if (($limitedData = $this->reachedLimit($limit, $data)) instanceof Collection) {
+            return $limitedData;
+        }
+
+        return $data;
+    }
+
+    /**
      * Returns true if the response has a status code greater than 300
      * inside the status dot code key in the response.
      *
      * @throws OnOfficeException
+     * @throws Throwable
      */
     public function throwIfResponseIsFailed(Response $response): void
     {
@@ -310,5 +380,53 @@ class OnOfficeService
             $responseStatusCode > 0 => throw new OnOfficeException($responseErrorMessage, $responseStatusCode, isResponseError: true, originalResponse: $response),
             default => null,
         };
+    }
+
+    /**
+     * If the take parameter is set,
+     * and we have more records than the take parameter,
+     * we return a collection with the sliced records.
+     * Otherwise, we return null.
+     */
+    protected function reachedLimit(int $limit, Collection $data): ?Collection
+    {
+        if ($limit > -1 && $data->count() >= $limit) {
+            return $data->take($limit);
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws Throwable
+     */
+    protected function tryCallable(callable $request, int $pageSize, int $offset, int $maxPage, ?int $pageOverwrite): ?Response
+    {
+        try {
+            return $request($pageSize, $offset);
+        } catch (OnOfficeException $exception) {
+            Log::error("{$exception->getMessage()} - {$exception->getCode()}");
+
+            throw_if($maxPage === 0 || $pageOverwrite !== null, $exception);
+        }
+
+        return null;
+    }
+
+    /**
+     * If the maxPage is 0,
+     * we need to calculate it from the total count of records
+     * and the page size,
+     * the first time we get the response from the API.
+     */
+    protected function getMaxPage(Response $response, string $countPath, int $pageSize, int $limit): int
+    {
+        $countAbsolute = $response->json($countPath, 0);
+
+        if ($limit > -1 && $countAbsolute > $limit) {
+            $countAbsolute = $limit;
+        }
+
+        return (int) ceil($countAbsolute / $pageSize);
     }
 }

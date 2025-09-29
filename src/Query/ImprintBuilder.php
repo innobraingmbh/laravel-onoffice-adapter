@@ -21,8 +21,9 @@ class ImprintBuilder extends Builder
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
-    public function get(): Collection
+    public function get(bool $concurrently = false): Collection
     {
         $request = new OnOfficeRequest(
             OnOfficeAction::Read,
@@ -32,6 +33,10 @@ class ImprintBuilder extends Builder
                 ...$this->customParameters,
             ]
         );
+
+        if ($concurrently) {
+            return $this->requestConcurrently($request);
+        }
 
         return $this->requestAll($request);
     }

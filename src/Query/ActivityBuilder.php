@@ -26,8 +26,9 @@ class ActivityBuilder extends Builder
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
-    public function get(): Collection
+    public function get(bool $concurrently = false): Collection
     {
         $orderBy = $this->getOrderBy();
 
@@ -43,6 +44,10 @@ class ActivityBuilder extends Builder
                 ...$this->customParameters,
             ]
         );
+
+        if ($concurrently) {
+            return $this->requestConcurrently($request);
+        }
 
         return $this->requestAll($request);
     }

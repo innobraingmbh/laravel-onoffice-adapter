@@ -54,15 +54,15 @@ describe('real responses', function () {
 });
 
 describe('query exception', function () {
-    it('will throw a query exception when module is missing', function (string $method) {
+    it('will throw a query exception when module is missing', function (string $method, mixed ...$parameters) {
         Http::preventStrayRequests();
 
-        FilterRepository::query()->{$method}(fn () => null);
+        FilterRepository::query()->{$method}(...$parameters);
     })
         ->with([
-            'get',
-            'first',
-            'each',
+            ['get', false],
+            ['first'],
+            ['each', fn () => null],
         ])
         ->throws(OnOfficeQueryException::class, 'Filter Builder module is not set');
 });

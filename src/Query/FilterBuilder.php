@@ -21,7 +21,7 @@ class FilterBuilder extends Builder
      * @throws OnOfficeException
      * @throws Throwable<OnOfficeQueryException>
      */
-    public function get(): Collection
+    public function get(bool $concurrently = false): Collection
     {
         throw_unless(isset($this->module), new OnOfficeQueryException('Filter Builder module is not set'));
 
@@ -32,6 +32,10 @@ class FilterBuilder extends Builder
                 OnOfficeService::MODULE => $this->module,
             ]
         );
+
+        if ($concurrently) {
+            return $this->requestConcurrently($request);
+        }
 
         return $this->requestAll($request);
     }

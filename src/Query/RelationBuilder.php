@@ -25,8 +25,9 @@ class RelationBuilder extends Builder
 
     /**
      * @throws OnOfficeException
+     * @throws Throwable
      */
-    public function get(): Collection
+    public function get(bool $concurrently = false): Collection
     {
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
