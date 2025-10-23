@@ -53,7 +53,7 @@ class LastSeenBuilder extends Builder
         $parameters = [
             OnOfficeService::MODULE => $this->module,
             OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => $this->limit,
+            OnOfficeService::LISTLIMIT => 1,
             ...$this->customParameters,
         ];
 
@@ -76,15 +76,7 @@ class LastSeenBuilder extends Builder
      */
     public function find(int $id): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::RecordsLastSeen,
-            $id,
-            parameters: $this->customParameters,
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+        throw new OnOfficeException('Find by ID is not supported for LastSeen records.');
     }
 
     /**
@@ -120,26 +112,7 @@ class LastSeenBuilder extends Builder
      */
     public function count(): int
     {
-        $parameters = [
-            OnOfficeService::MODULE => $this->module,
-            OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => $this->limit,
-            OnOfficeService::LISTOFFSET => $this->offset,
-            ...$this->customParameters,
-        ];
-
-        if ($this->userId > 0) {
-            $parameters['user'] = $this->userId;
-        }
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::RecordsLastSeen,
-            parameters: $parameters
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.meta.cntabsolute', 0);
+        throw new OnOfficeException('Count is not supported for LastSeen records.');
     }
 
     public function withModule(string $module): static
