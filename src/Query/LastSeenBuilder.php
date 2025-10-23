@@ -22,7 +22,7 @@ class LastSeenBuilder extends Builder
      * @throws OnOfficeException
      * @throws Throwable
      */
-    public function get(bool $concurrently = false): Collection
+    public function get(): Collection
     {
         $parameters = [
             OnOfficeService::MODULE => $this->module,
