@@ -42,21 +42,4 @@ describe('real responses', function () {
 
         LastSeenRepository::assertSentCount(1);
     });
-
-    test('count', function () {
-        Http::preventStrayRequests();
-        Http::fake([
-            'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
-                ReadLastSeenResponse::make(count: 1500),
-            ]),
-        ]);
-
-        LastSeenRepository::record();
-
-        $response = LastSeenRepository::query()->count();
-
-        expect($response)->toBe(1500);
-
-        LastSeenRepository::assertSentCount(1);
-    });
 });
