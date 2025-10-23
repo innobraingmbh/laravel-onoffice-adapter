@@ -32,4 +32,5 @@ enum OnOfficeResourceType: string
     case Log = 'log';
     case CheckUserRecordsRight = 'checkuserrecordsright';
     case GetLink = 'getlink';
+    case RecordsLastSeen = 'recordsLastSeen';
 }
