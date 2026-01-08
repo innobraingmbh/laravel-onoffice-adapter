@@ -291,13 +291,14 @@ class Builder implements BuilderInterface
                 if ($ids === []) {
                     $responseBody = $response->json();
                     data_set($responseBody, $resultPath, []);
+                    $psrResponse = $response->toPsrResponse();
 
                     return new Response(new Psr7Response(
-                        $response->getStatusCode(),
-                        $response->getHeaders(),
+                        $psrResponse->getStatusCode(),
+                        $psrResponse->getHeaders(),
                         json_encode($responseBody),
-                        $response->getProtocolVersion(),
-                        $response->getReasonPhrase(),
+                        $psrResponse->getProtocolVersion(),
+                        $psrResponse->getReasonPhrase(),
                     ));
                 }
 
@@ -325,13 +326,14 @@ class Builder implements BuilderInterface
 
                 $responseBody = $response->json();
                 data_set($responseBody, $resultPath, array_values($records));
+                $psrResponse = $response->toPsrResponse();
 
                 return new Response(new Psr7Response(
-                    $response->getStatusCode(),
-                    $response->getHeaders(),
+                    $psrResponse->getStatusCode(),
+                    $psrResponse->getHeaders(),
                     json_encode($responseBody),
-                    $response->getProtocolVersion(),
-                    $response->getReasonPhrase(),
+                    $psrResponse->getProtocolVersion(),
+                    $psrResponse->getReasonPhrase(),
                 ));
             },
             $action,
