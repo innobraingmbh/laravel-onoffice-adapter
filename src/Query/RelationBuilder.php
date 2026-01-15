@@ -14,6 +14,7 @@ use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonSelectable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\RelationTypes;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Override;
 use Throwable;
 
 class RelationBuilder extends Builder
@@ -24,8 +25,13 @@ class RelationBuilder extends Builder
     use RelationTypes;
 
     /**
+     * Returns relation mappings (parent ID => child ID pairs).
+     * Note: This returns a different shape than the parent interface declares,
+     * as relations return ID mappings rather than entity records.
+     *
      * @throws OnOfficeException
      */
+    #[Override]
     public function get(): Collection
     {
         $request = new OnOfficeRequest(
@@ -42,7 +48,11 @@ class RelationBuilder extends Builder
         $records = $this->requestAll($request);
 
         // $records is always an array containing a single element
-        return collect(data_get($records->first(), 'elements'));
+        /** @var array<string, mixed> $elements */
+        $elements = data_get($records->first(), 'elements', []);
+
+        /** @var Collection<int, array<string, mixed>> */
+        return collect($elements);
     }
 
     /**

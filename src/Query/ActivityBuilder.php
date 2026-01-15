@@ -22,6 +22,9 @@ class ActivityBuilder extends Builder
 
     public ?int $estateId = null;
 
+    /**
+     * @var array<int, int>
+     */
     public array $addressIds = [];
 
     /**
@@ -120,6 +123,9 @@ class ActivityBuilder extends Builder
     }
 
     /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
      * @throws Throwable<OnOfficeException>
      */
     public function create(array $data): array
@@ -209,6 +215,9 @@ class ActivityBuilder extends Builder
         return $this;
     }
 
+    /**
+     * @param  int|array<int, int>  $addressIds
+     */
     public function addressIds(int|array $addressIds): static
     {
         $this->addressIds = Arr::wrap($addressIds);
@@ -219,6 +228,8 @@ class ActivityBuilder extends Builder
     /**
      * Function is used to deprecate the usage of recordIdsAsEstate() and recordIdsAsAddress()
      * without breaking changes.
+     *
+     * @return array<string, mixed>
      */
     private function prepareEstateOrAddressParameters(bool $create = false): array
     {
