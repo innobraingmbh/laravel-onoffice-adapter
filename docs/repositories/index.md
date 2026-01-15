@@ -10,12 +10,14 @@ Repositories are the primary entry point for retrieving and modifying data in on
 5. [Field](./field-repository.md)
 6. [File](./file-repository.md)
 7. [Filter](./filter-repository.md)
-8. [Macro](./macro-repository.md)
-9. [Marketplace](./marketplace-repository.md)
-10. [Relation](./relation-repository.md)
-11. [Search Criteria](./search-criteria-repository.md)
-12. [Setting](./setting-repository.md)
-13. [Log](./log-repository.md)
+8. [Last Seen](./last-seen-repository.md)
+9. [Link](./link-repository.md)
+10. [Log](./log-repository.md)
+11. [Macro](./macro-repository.md)
+12. [Marketplace](./marketplace-repository.md)
+13. [Relation](./relation-repository.md)
+14. [Search Criteria](./search-criteria-repository.md)
+15. [Setting](./setting-repository.md)
 
 ## Usage Example
 

@@ -1,32 +1,32 @@
 # Log Repository
 
-Manage log data from onOffice.
+Read API log entries for debugging and auditing.
 
-## Querying Logs
+## Usage
+
 ```php
 use Innobrain\OnOfficeAdapter\Facades\LogRepository;
 
-// Basic query
+$logs = LogRepository::query()->get();
+$log = LogRepository::query()->find(100);
+
 $logs = LogRepository::query()
+    ->withModule('estate')
+    ->withAction('create')
+    ->withUserId(5)
     ->get();
 
-// First log entry
-$log = LogRepository::query()
-    ->first();
+$count = LogRepository::query()->withModule('estate')->count();
 
-// Find by ID
-$log = LogRepository::query()
-    ->find(100);
+LogRepository::query()->each(fn ($logs) => /* process */);
 ```
 
-### Counting
-```php
-$count = LogRepository::query()
-    ->where('objektart', 'haus')
-    ->count();
-```
+## Response
 
-## Additional Methods
-- **`withModule()`**: Filter logs by module.
-- **`withAction()`**: Filter logs by action.
-- **`withUserId()`**: Filter logs by user ID.
+| Field | Description |
+|-------|-------------|
+| `id` | Log entry ID |
+| `module` | Module name |
+| `action` | Action performed |
+| `user_id` | User ID |
+| `timestamp` | When action occurred |

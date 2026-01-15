@@ -1,38 +1,35 @@
 # Filter Repository
 
-Retrieve filter definitions for the `address` or `estate` modules.
+Retrieve predefined filters from onOffice enterprise.
 
 ## Usage
+
 ```php
 use Innobrain\OnOfficeAdapter\Facades\FilterRepository;
 
-// Estate filters
-$filters = FilterRepository::query()
-    ->estate()
-    ->get();
-
-// Address filters
-$filters = FilterRepository::query()
-    ->address()
-    ->get();
+$filters = FilterRepository::query()->estate()->get();
+$filters = FilterRepository::query()->address()->get();
+$filter = FilterRepository::query()->estate()->first();
 ```
 
 ::: warning
-You **must** specify a module (`estate()` or `address()`) before calling `get()`, `first()`, or `each()`.
+Must specify module (`estate()` or `address()`) before `get()`, `first()`, or `each()`.
 :::
 
-## Example
-```php
-$filter = FilterRepository::query()
-    ->estate()
-    ->first();
+## Using Filters
 
-FilterRepository::query()
-    ->address()
-    ->each(function (array $filters) {
-        // handle each page chunk of filters
-    });
+```php
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+
+$estates = EstateRepository::query()
+    ->parameters(['filterid' => 109])
+    ->get();
 ```
 
-If you fail to set a module, an `OnOfficeQueryException` is thrown.
-Use filters to see the available filter options in onOffice for each module.
+## Response
+
+| Field | Description |
+|-------|-------------|
+| `id` | Filter ID for `parameters(['filterid' => id])` |
+| `name` | Filter name |
+| `scope` | Visibility |

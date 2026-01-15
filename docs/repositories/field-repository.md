@@ -1,46 +1,45 @@
 # Field Repository
 
-List available fields for different modules. This helps you discover which fields exist in your onOffice client, as these can vary.
+Query available fields. The resource type is `fields`.
 
 ## Basic Usage
+
 ```php
 use Innobrain\OnOfficeAdapter\Facades\FieldRepository;
 
-// Multiple modules
-$fields = FieldRepository::query()
-    ->withModules(['estate', 'address'])
-    ->get();
-
-// Single module
-$estateFields = FieldRepository::query()
-    ->withModules('estate')
-    ->get();
+$fields = FieldRepository::query()->withModules(['estate', 'address'])->get();
+$fields = FieldRepository::query()->withModules('estate')->get();
 ```
 
-## Including Labels / Language
+## Modules
+
+`address`, `estate`, `agentsLog`, `calendar`, `email`, `file`, `task`, `user`
+
+## Options
+
 ```php
 $fields = FieldRepository::query()
     ->withModules('estate')
     ->parameters([
-        'language' => 'ENG',
-        'labels'   => true,
+        'labels' => true,
+        'language' => 'DEU',
+        'showfieldfilters' => true,
+        'showfielddependencies' => true,
+        'showFieldMeasureFormat' => true,
+        'fieldList' => ['kaufpreis', 'wohnflaeche'],
     ])
     ->get();
 ```
 
+## Response Fields
+
+| Property | Description |
+|----------|-------------|
+| `type` | `singleselect`, `multiselect`, `freetext`, `float`, etc. |
+| `permittedvalues` | Allowed values for select fields |
+| `label` | GUI label |
+| `fieldMeasureFormat` | Data type (`DATA_TYPE_MONETARY`, `DATA_TYPE_AREA`, etc.) |
+
 ::: tip
-Fields often differ per onOffice client. Always query first to confirm which fields exist.
+Cache field responses - they can take several seconds.
 :::
-
-## Chunks and Single Retrieval
-```php
-$field = FieldRepository::query()
-    ->withModules('estate')
-    ->first();
-
-FieldRepository::query()
-    ->withModules(['estate'])
-    ->each(function (array $fields) {
-        // handle chunk of fields
-    });
-```
