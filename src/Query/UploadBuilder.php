@@ -61,6 +61,9 @@ class UploadBuilder extends Builder
     /**
      * Returns the linked file data.
      *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
      * @throws Throwable<OnOfficeException>
      */
     public function link(string $tmpUploadId, array $data = []): array
@@ -82,6 +85,9 @@ class UploadBuilder extends Builder
     /**
      * File content as base64-encoded binary data.
      * Returns the linked file data.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
      *
      * @throws Throwable<OnOfficeException>
      */

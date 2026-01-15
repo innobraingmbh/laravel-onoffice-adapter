@@ -32,16 +32,22 @@ class Builder implements BuilderInterface
 
     /**
      * An array of columns to be selected.
+     *
+     * @var array<int, string>
      */
     public array $columns = [];
 
     /**
      * An array of filters.
+     *
+     * @var array<string, array<int, array{0: string, 1: mixed}>>
      */
     public array $filters = [];
 
     /**
      * An array of modify parameters.
+     *
+     * @var array<string, mixed>
      */
     public array $modifies = [];
 
@@ -58,6 +64,8 @@ class Builder implements BuilderInterface
     /**
      * An array of columns to order by.
      * Each element should be an array with the column name and the direction.
+     *
+     * @var array<int, array{0: string, 1: string}>
      */
     public array $orderBy = [];
 
@@ -68,11 +76,15 @@ class Builder implements BuilderInterface
 
     /**
      * An array of custom parameters.
+     *
+     * @var array<string, mixed>
      */
     public array $customParameters = [];
 
     /**
      * The stub callables that will be used to fake the responses.
+     *
+     * @var Collection<int, OnOfficeResponse>
      */
     protected Collection $stubCallables;
 
@@ -94,11 +106,15 @@ class Builder implements BuilderInterface
 
     /**
      * The before sending middlewares.
+     *
+     * @var array<int, callable>
      */
     protected array $beforeSendingCallbacks = [];
 
     /**
      * The after sending middlewares.
+     *
+     * @var array<int, callable|array<int, mixed>>
      */
     protected array $afterSendingCallbacks = [];
 
@@ -148,6 +164,9 @@ class Builder implements BuilderInterface
         return $this;
     }
 
+    /**
+     * @param  Collection<int, OnOfficeResponse>  $stubCallable
+     */
     public function stub(Collection $stubCallable): self
     {
         $this->stubCallables = $stubCallable;
@@ -172,6 +191,8 @@ class Builder implements BuilderInterface
     /**
      * If $callback is an array, the first element
      * is considered the callable, and the rest are parameters to be passed to the callable.
+     *
+     * @param  callable|array<int, mixed>  $callback
      *
      * @return $this
      */
@@ -318,11 +339,12 @@ class Builder implements BuilderInterface
                 $allowedIds = $userRightsResponse->json('response.results.0.data.records.0.elements', []);
                 $allowedIds = array_map(static fn (string $element): int => (int) $element, $allowedIds);
 
+                /** @var array<int, array{id: string|int}> $records */
                 $records = $response->json($resultPath, []);
 
-                $records = collect($records)->filter(function (array $record) use ($allowedIds) {
+                $records = array_filter($records, static function (array $record) use ($allowedIds): bool {
                     return in_array((int) $record['id'], $allowedIds, true);
-                })->all();
+                });
 
                 $responseBody = $response->json();
                 data_set($responseBody, $resultPath, array_values($records));
@@ -343,6 +365,8 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * @return Collection<int, array<string, mixed>>
+     *
      * @throws OnOfficeException
      */
     protected function requestAll(OnOfficeRequest $request): Collection
@@ -413,6 +437,9 @@ class Builder implements BuilderInterface
         return new Response($response);
     }
 
+    /**
+     * @param  array<int, string>|string  $columns
+     */
     public function select(array|string $columns = ['ID']): static
     {
         $this->columns = Arr::wrap($columns);
@@ -420,6 +447,9 @@ class Builder implements BuilderInterface
         return $this;
     }
 
+    /**
+     * @param  array<int, string>|string  $column
+     */
     public function addSelect(array|string $column): static
     {
         $column = Arr::wrap($column);
@@ -443,6 +473,9 @@ class Builder implements BuilderInterface
         return $this->orderBy($column, 'desc');
     }
 
+    /**
+     * @param  string|array<string, mixed>  $column
+     */
     public function addModify(string|array $column, mixed $value = null): static
     {
         if (is_array($column)) {
@@ -501,11 +534,17 @@ class Builder implements BuilderInterface
         return $this->where($column, '!=', $value);
     }
 
+    /**
+     * @param  array<int, mixed>  $values
+     */
     public function whereIn(string $column, array $values): static
     {
         return $this->where($column, 'in', $values);
     }
 
+    /**
+     * @param  array<int, mixed>  $values
+     */
     public function whereNotIn(string $column, array $values): static
     {
         return $this->where($column, 'not in', $values);
@@ -526,6 +565,9 @@ class Builder implements BuilderInterface
         return $this->where($column, 'not like', $value);
     }
 
+    /**
+     * @return array<string, array<int, array{op: string, val: mixed}>>
+     */
     protected function getFilters(): array
     {
         return collect($this->filters)->mapWithKeys(fn (array $value, string $column) => [
@@ -540,6 +582,9 @@ class Builder implements BuilderInterface
         ])->toArray();
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function getOrderBy(): array
     {
         return collect($this->orderBy)->mapWithKeys(function ($value) {
@@ -558,6 +603,9 @@ class Builder implements BuilderInterface
         return $this;
     }
 
+    /**
+     * @param  array<string, mixed>  $parameters
+     */
     public function parameters(array $parameters): static
     {
         $this->customParameters = array_replace_recursive($this->customParameters, $parameters);
@@ -566,6 +614,8 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * @return Collection<int, array<string, mixed>>
+     *
      * @throws OnOfficeException
      */
     public function get(): Collection
@@ -574,6 +624,8 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * @return Collection<int, array<string, mixed>>
+     *
      * @throws OnOfficeException
      */
     public function call(OnOfficeRequest $request): Collection
@@ -582,6 +634,8 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * @return array<string, mixed>|null
+     *
      * @throws OnOfficeException
      */
     public function first(): ?array
@@ -598,6 +652,8 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * @return array<string, mixed>|null
+     *
      * @throws OnOfficeException
      */
     public function find(int $id): ?array

@@ -19,6 +19,8 @@ class BaseRepository
 {
     /**
      * The stub callables that will be used to fake the responses.
+     *
+     * @var Collection<int, OnOfficeResponse>
      */
     protected Collection $stubCallables;
 
@@ -35,6 +37,8 @@ class BaseRepository
 
     /**
      * The recorded requests.
+     *
+     * @var array<int, array{0: OnOfficeRequest, 1: array<string, mixed>}>
      */
     protected array $recorded = [];
 
@@ -43,6 +47,9 @@ class BaseRepository
         $this->stubCallables = new Collection;
     }
 
+    /**
+     * @param  OnOfficeResponsePage|OnOfficeResponse|array<int, OnOfficeResponsePage|OnOfficeResponse|array<int, OnOfficeResponsePage>>|null  $responses
+     */
     public function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $responses): static
     {
         $this->record();
@@ -55,7 +62,8 @@ class BaseRepository
             foreach ($responses as $fake) {
                 if ($fake instanceof OnOfficeResponse) {
                     $this->stubCallables->push($fake);
-                } elseif ($fake instanceof OnOfficeResponsePage || is_array($fake)) {
+                } else {
+                    // $fake is OnOfficeResponsePage or array<int, OnOfficeResponsePage>
                     $this->stubCallables->push(new OnOfficeResponse(collect(Arr::wrap($fake))));
                 }
             }
@@ -74,6 +82,9 @@ class BaseRepository
         return $this;
     }
 
+    /**
+     * @return array<int, OnOfficeResponse>
+     */
     public function sequence(OnOfficeResponse $response, int $times = 1): array
     {
         return collect()
@@ -83,6 +94,9 @@ class BaseRepository
             ->toArray();
     }
 
+    /**
+     * @param  array<int, OnOfficeResponsePage>  $pages
+     */
     public function response(array $pages = []): OnOfficeResponse
     {
         if ($pages === []) {
@@ -92,6 +106,9 @@ class BaseRepository
         return new OnOfficeResponse(collect($pages));
     }
 
+    /**
+     * @param  array<int, \Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory>  $recordFactories
+     */
     public function page(
         OnOfficeAction $actionId = OnOfficeAction::Read,
         OnOfficeResourceType|string $resourceType = OnOfficeResourceType::Estate,
@@ -140,8 +157,10 @@ class BaseRepository
     /**
      * Create a new builder instance from the given class.
      * The parameters will be passed to the builder's constructor.
+     *
+     * @param  mixed  ...$parameter
      */
-    protected function createBuilderFromClass(string $class, ...$parameter): Builder
+    protected function createBuilderFromClass(string $class, mixed ...$parameter): Builder
     {
         return tap(new $class(...$parameter), function (Builder $builder) {
             $builder
@@ -175,6 +194,9 @@ class BaseRepository
         return $this->record(false);
     }
 
+    /**
+     * @param  array<string, mixed>  $response
+     */
     public function recordRequestResponsePair(OnOfficeRequest $request, array $response): static
     {
         if ($this->recording) {
@@ -184,6 +206,9 @@ class BaseRepository
         return $this;
     }
 
+    /**
+     * @return array{0: OnOfficeRequest, 1: array<string, mixed>}|null
+     */
     public function lastRecorded(): ?array
     {
         return collect($this->recorded)->last();
@@ -194,6 +219,9 @@ class BaseRepository
         return collect($this->recorded)->last()[0] ?? null;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function lastRecordedResponse(): ?array
     {
         return collect($this->recorded)->last()[1] ?? null;
@@ -201,6 +229,8 @@ class BaseRepository
 
     /**
      * Get a collection of the request / response pairs matching the given truth test.
+     *
+     * @return Collection<int, array{0: OnOfficeRequest, 1: array<string, mixed>}>
      */
     public function recorded(?callable $callback = null): Collection
     {

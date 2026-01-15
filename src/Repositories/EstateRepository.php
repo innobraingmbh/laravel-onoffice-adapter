@@ -26,6 +26,8 @@ class EstateRepository extends BaseRepository
 
     /**
      * Returns a new estate picture builder instance.
+     *
+     * @param  int|array<int, int>  $estateId
      */
     public function pictures(int|array $estateId): EstatePictureBuilder
     {

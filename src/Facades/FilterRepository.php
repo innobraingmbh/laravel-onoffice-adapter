@@ -16,6 +16,9 @@ use Innobrain\OnOfficeAdapter\Repositories\FilterRepository as RootRepository;
  */
 class FilterRepository extends BaseRepository
 {
+    /**
+     * @param  OnOfficeResponsePage|OnOfficeResponse|array<int, OnOfficeResponsePage|OnOfficeResponse|array<int, OnOfficeResponsePage>>|null  $stubCallables
+     */
     public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {
         return tap(static::getFacadeRoot(), static function (RootRepository $fake) use ($stubCallables) {

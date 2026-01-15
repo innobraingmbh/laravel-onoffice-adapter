@@ -44,7 +44,7 @@ class MacroBuilder extends Builder
     /**
      * Set estate IDs for context
      *
-     * @param  array<int>  $ids
+     * @param  int|array<int, int>  $ids
      */
     public function estateIds(int|array $ids): static
     {
@@ -54,7 +54,7 @@ class MacroBuilder extends Builder
     /**
      * Set address IDs for context
      *
-     * @param  array<int>  $ids
+     * @param  int|array<int, int>  $ids
      */
     public function addressIds(int|array $ids): static
     {
@@ -64,7 +64,7 @@ class MacroBuilder extends Builder
     /**
      * Set appointment IDs for context
      *
-     * @param  array<int>  $ids
+     * @param  int|array<int, int>  $ids
      */
     public function appointmentIds(int|array $ids): static
     {
@@ -74,7 +74,7 @@ class MacroBuilder extends Builder
     /**
      * Set agent log IDs for context
      *
-     * @param  array<int>  $ids
+     * @param  int|array<int, int>  $ids
      */
     public function agentLogIds(int|array $ids): static
     {

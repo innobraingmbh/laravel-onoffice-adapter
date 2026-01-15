@@ -152,6 +152,8 @@ class OnOfficeService
      * the total count of records,
      * of the first request.
      *
+     * @return Collection<int, array<string, mixed>>
+     *
      * @throws OnOfficeException
      */
     public function requestAll(

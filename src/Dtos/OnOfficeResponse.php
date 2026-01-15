@@ -8,6 +8,9 @@ use Illuminate\Support\Collection;
 
 readonly class OnOfficeResponse
 {
+    /**
+     * @param  Collection<int, OnOfficeResponsePage>  $pages
+     */
     public function __construct(
         protected Collection $pages,
     ) {}

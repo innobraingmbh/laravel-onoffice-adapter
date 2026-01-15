@@ -20,6 +20,9 @@ class SearchCriteriaBuilder extends Builder
     private int $addressId;
 
     /**
+     * @param  int|array<int, int>  $id
+     * @return array<string, mixed>|null
+     *
      * @throws Throwable<OnOfficeException>
      */
     public function find(int|array $id): ?array
@@ -39,6 +42,9 @@ class SearchCriteriaBuilder extends Builder
     }
 
     /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
      * @throws Throwable<OnOfficeException>
      */
     public function create(array $data): array
