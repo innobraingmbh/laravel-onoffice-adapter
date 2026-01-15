@@ -1,42 +1,64 @@
 # File Repository
 
-Easily handle file uploads and linking in onOffice. Large files can be uploaded in chunks to avoid memory issues.
+Handle file uploads. The resource type is `uploadfile`.
 
-## Chunked Uploads
+## Upload & Link
+
 ```php
 use Innobrain\OnOfficeAdapter\Facades\FileRepository;
 
-// Break file content into chunks (default 20480 characters)
+// Upload in chunks, then link
 $tmpId = FileRepository::upload()
     ->uploadInBlocks(20480)
-    ->save(base64_encode($fileContent));
-```
+    ->save(base64_encode($content));
 
-## Linking Files
-```php
+FileRepository::upload()->link($tmpId, [
+    'module' => 'estate',
+    'relatedRecordId' => 409,
+    'file' => 'document.pdf',
+    'Art' => 'Dokument',
+]);
+
+// Or combined
 FileRepository::upload()
-    ->link($tmpId, [
+    ->uploadInBlocks()
+    ->saveAndLink(base64_encode($content), [
         'module' => 'estate',
-        'relatedRecordId' => '12345',
+        'relatedRecordId' => 409,
+        'file' => 'photo.jpg',
+        'Art' => 'Foto',
+        'setDefaultPublicationRights' => true,
     ]);
 ```
 
-## Combined Save & Link
+## Modules
+
+`estate`, `address`, `agentsLog`, `task`, `tmpUpload`
+
+## Estate File Types
+
+**Pictures**: `Titelbild`, `Foto`, `Foto_gross`, `Grundriss`, `Lageplan`, `Panorama`
+
+**Documents**: `Expose`, `Dokument`, `Energieausweis`
+
+**Links**: `Link`, `Ogulo-Link`, `Film-Link`, `Objekt-Link`
+
+## Upload Links
+
 ```php
-FileRepository::upload()
-    ->uploadInBlocks(20480)
-    ->saveAndLink(base64_encode($fileContent), [
-        'module' => 'estate',
-        'relatedRecordId' => '12345',
-        'file' => 'filename.pdf',
-    ]);
+FileRepository::upload()->saveAndLink(null, [
+    'module' => 'estate',
+    'relatedRecordId' => 2651,
+    'Art' => 'Ogulo-Link',
+    'url' => 'https://example.com/tour',
+]);
 ```
 
-## Return Values
-- **`save()`**: Temporary upload ID
-- **`link()`**: File data array
-- **`saveAndLink()`**: File data array
+## Estate Options
 
-::: info
-If an upload is very large, consider adjusting chunk size with caution.
-:::
+| Option | Description |
+|--------|-------------|
+| `Art` | File type (required for estate) |
+| `position` | Position in Files tab |
+| `documentAttribute` | Special attribute (one per estate) |
+| `applyWaterMark` | Add watermark |

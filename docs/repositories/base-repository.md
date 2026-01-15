@@ -38,16 +38,13 @@ BaseRepository::query()
     );
 ```
 
-## Check User Rights
+## Check User Record Rights
 ```php
 BaseRepository::query()
-    ->checkUserRights('edit', 'estate', 1)
+    ->checkUserRecordsRight('edit', 'estate', 1)
     ->get();
 ```
-Note this is not a possible request in the BaseRepository, but rather a showoff of the `after` callback of the request.
-We can use this chainable method to check if the given user has the rights to the results of the request.
-This is important if we are using the Master User for the request, but acting as a different user in the application.
-The method is using the request response and removes every record that the user does not have rights to and returning a copied but filtered response object.
+This chainable method checks if the given user has rights to the records in the response. It removes every record that the user does not have access to from the response. This is useful when using the Master User credentials for requests but acting as a different user in the application.
 
 ## Debug Tools
 - **`dd()`**: Dump request and die

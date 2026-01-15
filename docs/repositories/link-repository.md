@@ -1,28 +1,29 @@
 # Link Repository
 
-Manage link data from onOffice.
+Get URLs for editing records in onOffice enterprise.
 
-## Querying Links
+## Usage
+
 ```php
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Facades\LinkRepository;
 
 $link = LinkRepository::query()
     ->withResourceId(OnOfficeResourceId::Estate)
-    ->recordId(1)
+    ->recordId(100)
     ->get();
 
 $link = LinkRepository::query()
-    ->withResourceId(OnOfficeResourceId::Estate)
-    ->recordId(1)
-    ->first();
+    ->withResourceId(OnOfficeResourceId::Address)
+    ->recordId(10505)
+    ->get();
 
-// Find by ID
 $link = LinkRepository::query()
-    ->withResourceId(OnOfficeResourceId::Estate)
-    ->find(1);
+    ->withResourceId(OnOfficeResourceId::AgentsLog)
+    ->recordId(67075)
+    ->get();
 ```
 
-## Additional Methods
-- **`withResourceId()`**: Add resource ID to the query.
-- **`recordId()`**: Add record ID to the query.
+## Resource Types
+
+`OnOfficeResourceId::Estate`, `OnOfficeResourceId::Address`, `OnOfficeResourceId::AgentsLog`

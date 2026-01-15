@@ -1,47 +1,42 @@
 # Search Criteria Repository
 
-Manage onOffice Search Criteria. Commonly used to store user-defined search conditions.
+Manage search criteria. The resource type is `searchcriterias`.
 
-## Configuration
+## Modes
 
-### Mode
+| Mode | Description |
+|------|-------------|
+| `internal` | By internal address ID (Datensatznummer) |
+| `external` | By customer number (KdNr) |
+| `searchcriteria` | By search criteria ID |
+
+## Querying
+
 ```php
-SearchCriteriaRepository::query()
-    ->mode('internal'); // can also be 'external' or others
+use Innobrain\OnOfficeAdapter\Facades\SearchCriteriaRepository;
+
+$criteria = SearchCriteriaRepository::query()->mode('searchcriteria')->find(29);
+$criteria = SearchCriteriaRepository::query()->mode('searchcriteria')->find([29, 30]);
+$criteria = SearchCriteriaRepository::query()->mode('internal')->find(1214);
 ```
 
-### Address ID
-```php
-SearchCriteriaRepository::query()
-    ->addressId(1214);
-```
-::: warning
-`addressId` is **required** when creating a search criteria.
-:::
+## Creating
 
-## Operations
-
-### Find
-```php
-$searchCriteria = SearchCriteriaRepository::query()
-    ->mode('internal')
-    ->find(1);
-
-$multiple = SearchCriteriaRepository::query()
-    ->mode('internal')
-    ->find([1, 2, 3]);
-```
-
-### Create
 ```php
 $created = SearchCriteriaRepository::query()
-    ->addressId(1214)
+    ->addressId(1214) // Required
     ->create([
-        // search criteria data
+        'vermarktungsart' => ['kauf'],
+        'objektart' => ['haus', 'wohnung'],
+        'range_kaufpreis' => [100000, 500000],
     ]);
 ```
 
-- **`find()`**: Returns single or multiple criteria objects.
-- **`create()`**: Requires an `addressId`.
+## Response Structure
 
-Use these methods to manage specialized saved searches in onOffice.
+Field values by type:
+- **Multiselect**: `fieldname: [value_1, ..., value_n]`
+- **Range**: `range_fieldname: [from, to]`
+- **Normal**: `fieldname: value`
+
+Meta fields in `_meta`: `internaladdressid`, `externaladdressid`, `kocriterias`, `status`, `creationdate`, `editdate`

@@ -1,50 +1,63 @@
 # Activity Repository
 
-Manage activities related to addresses or estates.
+Manage agents log / activities. The resource type is `agentslog`.
 
-## Basic Queries
+## Querying Activities
+
 ```php
 use Innobrain\OnOfficeAdapter\Facades\ActivityRepository;
 
-// Query by address
+$activities = ActivityRepository::query()->addressIds([34, 35])->get();
+$activities = ActivityRepository::query()->estateId(2507)->get();
+$activity = ActivityRepository::query()->find(67075);
+```
+
+## Selecting & Filtering
+
+```php
 $activities = ActivityRepository::query()
-    ->addressIds([1, 2])
+    ->select(['Aktionsart', 'Aktionstyp', 'Datum', 'Bemerkung'])
+    ->estateId(2507)
+    ->where('Aktionsart', 'Email')
+    ->whereBetween('created', '2024-01-01', '2024-12-31')
+    ->orderByDesc('Datum')
     ->get();
-
-// Query by estate
-$estateActivities = ActivityRepository::query()
-    ->estateId(10)
-    ->get();
-
-// Single activity
-$activity = ActivityRepository::query()
-    ->find(42);
 ```
 
-## Chunking & Counting
+::: warning
+Cannot filter by: `Benutzer`, `Adress_nr`, `Objekt_nr`, `dauer`. Use `addressIds()` and `estateId()` instead.
+:::
+
+## Creating Activities
+
 ```php
-ActivityRepository::query()
-    ->addressIds(1)
-    ->each(function (array $activities) {
-        // process each chunk
-    });
-
-$count = ActivityRepository::query()
-    ->estateId(10)
-    ->count();
+ActivityRepository::query()->create([
+    'addressids' => [34],
+    'estateid' => 41,
+    'actionkind' => 'Email',
+    'actiontype' => 'Ausgang',
+    'note' => 'Contract sent',
+    'advisorylevel' => 'B',      // A-G levels
+    'cost' => 2.45,
+    'duration' => 3000,          // seconds
+]);
 ```
 
-## Create an Activity
+## Advisory Levels
+
+| Level | Description |
+|-------|-------------|
+| A | Contract signed |
+| B | Written commitment |
+| C | Intensive discussion |
+| D | Still checking |
+| E | Documentation received |
+| F | Documentation ordered |
+| G | Cancellation (allows `reasoncancellation`) |
+
+## Count & Chunked
+
 ```php
-ActivityRepository::query()
-    ->addressIds([1, 2, 3])
-    ->create([
-        'note' => 'This is a note',
-        'datetime' => '2023-05-01 10:00:00'
-    ]);
+$count = ActivityRepository::query()->estateId(10)->count();
+ActivityRepository::query()->addressIds([1])->each(fn ($activities) => /* process */);
 ```
-
-- **`estateId()`** or **`addressIds()`**: define the context.
-- **`create()`**: Add a new activity record in onOffice.
-
-Use filters (`where()`, `whereLike()`, etc.) for advanced queries as needed.
