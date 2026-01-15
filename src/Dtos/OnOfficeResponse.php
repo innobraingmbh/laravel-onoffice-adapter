@@ -17,6 +17,7 @@ readonly class OnOfficeResponse
 
     public function shift(): OnOfficeResponsePage
     {
+        /** @var OnOfficeResponsePage */
         return $this->pages->shift();
     }
 

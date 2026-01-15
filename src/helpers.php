@@ -35,6 +35,7 @@ if (! function_exists('clear_elements')) {
             return $cleaned->all();
         }
 
+        /** @var array{id: string, type: string, elements: array<string, mixed>} */
         return $cleaned->first();
     }
 }

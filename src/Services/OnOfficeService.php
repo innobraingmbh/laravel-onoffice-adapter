@@ -143,6 +143,7 @@ class OnOfficeService
             $this->throwIfResponseIsFailed($response);
         }, $this->getRetryDelay(), $retryOnlyOnConnectionError);
 
+        /** @var Response $response */
         return $response;
     }
 

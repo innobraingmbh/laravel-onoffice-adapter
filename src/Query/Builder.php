@@ -323,7 +323,7 @@ class Builder implements BuilderInterface
                 }
 
                 $userRightsResponse = BaseRepositoryFacade::query()
-                    ->when($this->credentials, fn (Builder $query) => $query->withCredentials($this->credentials))
+                    ->when($this->credentials, fn (Builder $query, OnOfficeApiCredentials $credentials) => $query->withCredentials($credentials))
                     ->requestApi(new OnOfficeRequest(
                         actionId: OnOfficeAction::Get,
                         resourceType: OnOfficeResourceType::CheckUserRecordsRight,
