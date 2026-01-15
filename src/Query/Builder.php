@@ -193,7 +193,6 @@ class Builder implements BuilderInterface
      * is considered the callable, and the rest are parameters to be passed to the callable.
      *
      * @param  callable|array<int, mixed>  $callback
-     *
      * @return $this
      */
     public function after(callable|array $callback): static
@@ -317,7 +316,7 @@ class Builder implements BuilderInterface
                     return new Response(new Psr7Response(
                         $psrResponse->getStatusCode(),
                         $psrResponse->getHeaders(),
-                        json_encode($responseBody),
+                        json_encode($responseBody, JSON_THROW_ON_ERROR),
                         $psrResponse->getProtocolVersion(),
                         $psrResponse->getReasonPhrase(),
                     ));
@@ -353,7 +352,7 @@ class Builder implements BuilderInterface
                 return new Response(new Psr7Response(
                     $psrResponse->getStatusCode(),
                     $psrResponse->getHeaders(),
-                    json_encode($responseBody),
+                    json_encode($responseBody, JSON_THROW_ON_ERROR),
                     $psrResponse->getProtocolVersion(),
                     $psrResponse->getReasonPhrase(),
                 ));

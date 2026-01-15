@@ -53,7 +53,7 @@ class BaseRepository extends Facade
     }
 
     /**
-     * @param  array<int, \Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory>  $recordFactories
+     * @param  array<int, Testing\RecordFactories\BaseFactory>  $recordFactories
      */
     public static function page(
         OnOfficeAction $actionId = OnOfficeAction::Read,

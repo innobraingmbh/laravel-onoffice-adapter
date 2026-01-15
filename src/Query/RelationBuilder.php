@@ -14,6 +14,7 @@ use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonSelectable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\RelationTypes;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Override;
 use Throwable;
 
 class RelationBuilder extends Builder
@@ -30,7 +31,7 @@ class RelationBuilder extends Builder
      *
      * @throws OnOfficeException
      */
-    #[\Override]
+    #[Override]
     public function get(): Collection
     {
         $request = new OnOfficeRequest(

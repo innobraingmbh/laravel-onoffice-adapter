@@ -158,16 +158,18 @@ class BaseRepository
      * Create a new builder instance from the given class.
      * The parameters will be passed to the builder's constructor.
      *
-     * @param  mixed  ...$parameter
+     * @param  class-string<Builder>  $class
      */
     protected function createBuilderFromClass(string $class, mixed ...$parameter): Builder
     {
-        return tap(new $class(...$parameter), function (Builder $builder) {
-            $builder
-                ->stub($this->stubCallables)
-                ->preventStrayRequests($this->preventStrayRequests)
-                ->setRepository($this);
-        });
+        $builder = new $class(...$parameter);
+
+        $builder
+            ->stub($this->stubCallables)
+            ->preventStrayRequests($this->preventStrayRequests)
+            ->setRepository($this);
+
+        return $builder;
     }
 
     public function preventStrayRequests(bool $value = true): static
