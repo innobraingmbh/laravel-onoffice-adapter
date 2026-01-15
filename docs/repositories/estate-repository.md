@@ -7,189 +7,158 @@ Manage real estate data from onOffice. The resource type is `estate`.
 ```php
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 
-// Basic query - returns all estates
-$estates = EstateRepository::query()
-    ->get();
-
-// First estate
-$estate = EstateRepository::query()
-    ->first();
-
-// Find by ID (resourceid)
-$estate = EstateRepository::query()
-    ->find(100);
-```
-
-## Filtering
-
-Use the `where()` method to filter estates. Available operators: `=`, `>`, `<`, `>=`, `<=`, `!=`, `<>`, `between`, `like`, `not like`, `in`, `not in`.
-
-```php
-// Active estates with purchase price < 300000
-$estates = EstateRepository::query()
-    ->where('status', 1) // 1 = Active, 2 = Pending, 0 = Archive
-    ->where('kaufpreis', '<', 300000)
-    ->get();
-
-// Filter by property type using IN operator
-$estates = EstateRepository::query()
-    ->whereIn('objektart', ['haus', 'wohnung'])
-    ->get();
-
-// Filter by date range
-$estates = EstateRepository::query()
-    ->where('geaendert_am', '>', '2024-01-01 00:00')
-    ->get();
-
-// Using whereBetween
-$estates = EstateRepository::query()
-    ->whereBetween('kaufpreis', 100000, 500000)
-    ->get();
+$estates = EstateRepository::query()->get();
+$estate = EstateRepository::query()->first();
+$estate = EstateRepository::query()->find(100);
 ```
 
 ## Selecting Fields
 
-Specify which fields to retrieve using `select()`:
-
 ```php
 $estates = EstateRepository::query()
-    ->select(['Id', 'kaufpreis', 'lage', 'objekttitel', 'wohnflaeche'])
-    ->where('status', 1)
-    ->get();
-
-// Marketing status fields
-$estates = EstateRepository::query()
-    ->select(['Id', 'verkauft', 'reserviert'])
-    // verkauft=1: Sold/Rented, reserviert=1: Reserved, both=0: Open
+    ->select(['Id', 'kaufpreis', 'objekttitel'])
+    ->addSelect('wohnflaeche')
     ->get();
 ```
 
-## Sorting
+## Filtering
+
+Operators: `=`, `>`, `<`, `>=`, `<=`, `!=`, `<>`, `between`, `like`, `not like`, `in`, `not in`.
+
+```php
+$estates = EstateRepository::query()
+    ->where('status', 1)
+    ->where('kaufpreis', '<', 300000)
+    ->whereIn('objektart', ['haus', 'wohnung'])
+    ->whereNot('reserviert', 1)
+    ->whereBetween('wohnflaeche', 50, 150)
+    ->whereLike('objekttitel', '%Villa%')
+    ->get();
+```
+
+## Conditional Queries
+
+```php
+$estates = EstateRepository::query()
+    ->when($minPrice, fn ($q) => $q->where('kaufpreis', '>=', $minPrice))
+    ->get();
+```
+
+## Sorting & Pagination
 
 ```php
 $estates = EstateRepository::query()
     ->orderBy('kaufpreis')
-    ->orderByDesc('warmmiete')
+    ->orderByDesc('geaendert_am')
+    ->offset(100)
+    ->limit(50)
+    ->pageSize(100) // Records per API call (max 500)
     ->get();
 ```
 
 ## Search
 
-The `search()` method uses the onOffice quick search endpoint for estate address, owner, and external estate number:
+Quick search for estate address, owner, or external estate number:
 
 ```php
 $estates = EstateRepository::query()
-    ->setInput('Karmelitenstr.') // Search term
-    ->where('objektart', 'haus')
+    ->setInput('Karmelitenstr.')
     ->search();
 ```
 
 ## Create & Modify
 
 ```php
-// Create a new estate
-$newEstate = EstateRepository::query()
+$estate = EstateRepository::query()
     ->create([
         'objektart' => 'haus',
         'nutzungsart' => 'wohnen',
         'vermarktungsart' => 'kauf',
-        'objekttyp' => 'einfamilienhaus',
-        'plz' => 52068,
-        'ort' => 'Aachen',
-        'land' => 'DEU', // ISO 3166-1 alpha-3
         'kaufpreis' => 200000,
-        'wohnflaeche' => 75,
-        'anzahl_zimmer' => 3,
     ]);
 
-// Modify an existing estate
 EstateRepository::query()
-    ->addModify('kaufpreis', 180000)
-    ->addModify('status', 1)
-    ->modify(100); // Estate ID
+    ->addModify(['kaufpreis' => 180000, 'status' => 1])
+    ->modify(100);
 ```
-
-::: tip
-System fields like `erstellt_am`, `erstellt_von`, `provisionsbetrag` are set automatically.
-:::
 
 ## Estate Files
 
 ```php
-// Retrieve files
 $files = EstateRepository::files(100)->get();
+$file = EstateRepository::files(100)->find(12);
 
-// Modify file metadata
 EstateRepository::files(100)
     ->addModify('Art', 'Titelbild')
-    ->modify(12); // File ID
+    ->modify(12);
 
-// Delete a file
 EstateRepository::files(100)->delete(12);
 ```
 
 ## Estate Pictures
 
 ```php
-// Retrieve pictures published on homepage
 $pictures = EstateRepository::pictures(100)->get();
+$pictures = EstateRepository::pictures([100, 101])->get();
 
-// For multiple estates
-$pictures = EstateRepository::pictures([100, 101, 102])->get();
+$pictures = EstateRepository::pictures(100)
+    ->category(['Titelbild', 'Foto'])
+    ->size(800, 600)
+    ->language('en')
+    ->get();
 ```
+
+Categories: `Titelbild`, `Foto`, `Foto_gross`, `Grundriss`, `Lageplan`, `Epass_Skala`, `Panorama`, `Link`, `Film-Link`, `Ogulo-Link`, `Objekt-Link`, `Expose`
 
 ## Custom Parameters
 
-For API features not directly exposed by the builder, use `parameters()`:
-
 ```php
-// Geo range search
 $estates = EstateRepository::query()
     ->parameters([
-        'georangesearch' => [
-            'country' => 'DEU',
-            'zip' => '52068',
-            'radius' => 10
-        ]
+        'georangesearch' => ['country' => 'DEU', 'zip' => '52068', 'radius' => 10],
     ])
     ->get();
 
-// Multilingual estates
 $estates = EstateRepository::query()
-    ->parameters([
-        'estatelanguage' => 'ENG',
-        'addestatelanguage' => true,
-        'addMainLangId' => true,
-    ])
-    ->find(4457);
-
-// Using a predefined filter from enterprise
-$estates = EstateRepository::query()
-    ->parameters(['filterid' => 109])
+    ->parameters(['estatelanguage' => 'ENG', 'filterid' => 109])
     ->get();
 ```
 
-## Counting
+## Counting & Chunked Processing
 
 ```php
-$count = EstateRepository::query()
-    ->where('objektart', 'haus')
-    ->where('status', 1)
-    ->count();
-```
+$count = EstateRepository::query()->where('status', 1)->count();
 
-## Chunked Processing
-
-For large datasets:
-
-```php
 EstateRepository::query()
     ->where('status', 1)
     ->each(function (array $estates) {
-        foreach ($estates as $estate) {
-            // Process each estate
-        }
+        // Process chunk
     });
+```
+
+## Debugging
+
+```php
+EstateRepository::query()->dump()->get();  // Dump request
+EstateRepository::query()->dd()->get();    // Dump and die
+EstateRepository::query()->raw()->get();   // Dump raw array
+```
+
+## Middleware
+
+```php
+EstateRepository::query()
+    ->before(fn ($request) => Log::info('Sending', ['r' => $request]))
+    ->after(fn ($response) => Log::info('Received', ['s' => $response->status()]))
+    ->get();
+```
+
+## Alternative Credentials
+
+```php
+$estates = EstateRepository::query()
+    ->withCredentials($token, $secret, $apiClaim)
+    ->get();
 ```
 
 ## Common Field Names
@@ -197,7 +166,7 @@ EstateRepository::query()
 | Field | Description |
 |-------|-------------|
 | `status` | 1 = Active, 2 = Pending, 0 = Archive |
-| `objektart` | Property type (haus, wohnung, grundstueck, etc.) |
+| `objektart` | Property type (haus, wohnung, grundstueck) |
 | `nutzungsart` | Type of use (wohnen, gewerbe) |
 | `vermarktungsart` | Marketing type (kauf, miete) |
 | `kaufpreis` | Purchase price |
@@ -205,9 +174,8 @@ EstateRepository::query()
 | `wohnflaeche` | Living area |
 | `grundstuecksflaeche` | Plot area |
 | `anzahl_zimmer` | Number of rooms |
-| `verkauft` | Sold/rented status (1 = yes) |
-| `reserviert` | Reserved status (1 = yes) |
+| `verkauft` | Sold/rented (1 = yes) |
+| `reserviert` | Reserved (1 = yes) |
 | `geaendert_am` | Last modified date |
-| `veroeffentlichen` | Publish on homepage |
 
-Learn more about file handling in the [File Repository](./file-repository.md).
+See also: [File Repository](./file-repository.md)
