@@ -10,3 +10,6 @@ vendor
 node_modules
 docs/.vitepress/dist
 docs/.vitepress/cache
+.env
+onoffice-docs/apidoc-html
+onoffice-docs/apidoc-text
