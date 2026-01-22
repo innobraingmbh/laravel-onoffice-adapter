@@ -7,7 +7,7 @@
 
 A fluent query builder for the onOffice API, designed to feel like Eloquent.
 
-**[View Full Documentation](https://innobraingmbh.github.io/laravel-onoffice-adapter/)**
+**[View Full Documentation](https://oo-adapter.innobra.in/)**
 
 ## Features
 
@@ -257,7 +257,7 @@ EstateRepository::fake(EstateRepository::sequence(
 ));
 ```
 
-See the [Testing Documentation](https://innobraingmbh.github.io/laravel-onoffice-adapter/testing/factories) for factories, assertions, and advanced patterns.
+See the [Testing Documentation](https://oo-adapter.innobra.in/testing/factories) for factories, assertions, and advanced patterns.
 
 ## Development
 
