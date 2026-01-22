@@ -5,114 +5,140 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/innobraingmbh/laravel-onoffice-adapter/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/innobraingmbh/laravel-onoffice-adapter/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/innobrain/laravel-onoffice-adapter.svg?style=flat-square)](https://packagist.org/packages/innobrain/laravel-onoffice-adapter)
 
-An onOffice adapter for Laravel
+A fluent query builder for the onOffice API, designed to feel like Eloquent.
+
+**[View Full Documentation](https://innobraingmbh.github.io/laravel-onoffice-adapter/)**
+
+## Features
+
+- **ORM-like Querying** - Use familiar Laravel Eloquent-style methods like `where()`, `select()`, `orderBy()`
+- **Comprehensive Repositories** - Access estates, addresses, activities, search criteria, files, and more
+- **Pagination & Chunking** - Handle large datasets with `each()`, `limit()`, and automatic pagination
+- **Middlewares** - Insert custom logic before requests for logging, modification, or validation
+- **Testing Support** - Built-in fake system with factories for easy unit testing
+- **File Management** - Upload, chunk, and link files with onOffice
 
 ## Installation
-
-You can install the package via composer:
 
 ```bash
 composer require innobrain/laravel-onoffice-adapter
 ```
 
-You can publish the config file with:
+Add your onOffice API credentials to `.env`:
 
-```bash
-php artisan vendor:publish --tag="onoffice-adapter-config"
+```
+ON_OFFICE_TOKEN=your-token
+ON_OFFICE_SECRET=your-secret
 ```
 
-This is the contents of the published config file:
+For advanced configuration (retry settings, custom headers), publish the config file:
 
-```php
-return [
-    /**
-     * The base URL of the OnOffice API.
-     * Change that if you are using a different version of the API.
-     */
-    'base_url' => 'https://api.onoffice.de/api/stable/api.php',
-
-    /**
-     * The headers to be sent with the request.
-     * Override this if you need to send additional headers.
-     */
-    'headers' => [
-        'Content-Type' => 'application/json',
-        'Accept' => 'application/json',
-    ],
-
-    /**
-     * Retry
-     */
-    'retry' => [
-        'count' => 3,
-        'delay' => 200,
-        'only_on_connection_error' => true,
-    ],
-
-    /**
-     * The token and secret to be used for authentication with the OnOffice API.
-     */
-    'token' => env('ON_OFFICE_TOKEN', ''),
-    'secret' => env('ON_OFFICE_SECRET', ''),
-];
+```bash
+php artisan vendor:publish --tag="laravel-onoffice-adapter-config"
 ```
 
 ## Usage
 
-### Repositories
-* ActivityRepository
-* AddressRepository
-* EstateRepository
-* FieldRepository
-* FileRepository
-* MarketplaceRepository
-* RelationRepository
-* SearchCriteriaRepository
-* SettingRepository
+### Basic Queries
 
-### Syntax for typical queries
+```php
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+
+// Get all estates
+$estates = EstateRepository::query()->get();
+
+// Find by ID
+$estate = EstateRepository::query()->find(123);
+
+// Get first result
+$estate = EstateRepository::query()->first();
+
+// Count results
+$count = EstateRepository::query()->count();
+```
+
+### Building Queries
+
+Chain methods to filter, sort, and limit results:
+
 ```php
 $estates = EstateRepository::query()
-    ->select('Id')
+    ->select(['Id', 'kaufpreis', 'lage'])
     ->where('status', 1)
-    ->where('kaufpreis', '<', 30_000)
-    ->orderBy('kaufpreis')
-    ->orderByDesc('warmmiete')
-    ->get();
-
-$users = UserRepository::query()
-    ->select([
-        'Anrede',
-        'Vorname',
-        'Nachname',
-        'Mobil',
-    ])
-    ->where('Nr', $this->userId)
+    ->where('kaufpreis', '<', 500000)
+    ->orderByDesc('kaufpreis')
+    ->limit(10)
     ->get();
 ```
 
-### Unusual queries
+### Available Methods
+
+| Method | Description |
+|--------|-------------|
+| `select($fields)` | Fields to retrieve |
+| `where($field, $op, $value)` | Filter by condition |
+| `whereIn($field, $values)` | Filter by array of values |
+| `whereLike($field, $pattern)` | Pattern matching |
+| `whereBetween($field, $min, $max)` | Range filter |
+| `orderBy($field)` | Sort ascending |
+| `orderByDesc($field)` | Sort descending |
+| `limit($n)` | Max results |
+| `offset($n)` | Skip results |
+
+### Large Datasets
+
+Handle large datasets without memory issues using chunked processing:
+
 ```php
-$success = MarketplaceRepository::query()
-    ->unlockProvider($parameterCacheId, $extendedClaim);
+EstateRepository::query()
+    ->each(function (array $estates) {
+        foreach ($estates as $estate) {
+            // Process chunk
+        }
+    });
 ```
+
+### Available Repositories
+
+| Repository | Description |
+|------------|-------------|
+| `EstateRepository` | Real estate properties |
+| `AddressRepository` | Contacts and addresses |
+| `ActivityRepository` | Activity logs |
+| `SearchCriteriaRepository` | Buyer search profiles |
+| `FieldRepository` | Field metadata |
+| `FileRepository` | File uploads and downloads |
+| `FilterRepository` | Saved filters |
+| `RelationRepository` | Record relationships |
+| `SettingRepository` | System settings |
+| `MarketplaceRepository` | Marketplace integration |
+| `LinkRepository` | URL links |
+| `LogRepository` | Log entries |
+| `MacroRepository` | Macros |
+| `LastSeenRepository` | Recently viewed records |
+
+### File Uploads
+
 ```php
 $tmpUploadId = FileRepository::upload()
     ->save(base64_encode($fileContent));
-$success = FileRepository::upload()->link($tmpUploadId, [
+
+FileRepository::upload()->link($tmpUploadId, [
     'module' => 'estate',
     'relatedRecordId' => '12345',
 ]);
 
-// or
-
-$success = FileRepository::upload()
+// Or upload in blocks and link in one call
+FileRepository::upload()
     ->uploadInBlocks()
     ->saveAndLink(base64_encode($fileContent), [
         'module' => 'estate',
         'relatedRecordId' => '12345',
     ]);
 ```
+
+### Creating Activities
+
 ```php
 ActivityRepository::query()
     ->addressIds($recordIds)
@@ -125,198 +151,120 @@ ActivityRepository::query()
     ]);
 ```
 
-```php
-Config::set('onoffice.token', 'token');
-Config::set('onoffice.secret', 'secret');
-Config::set('onoffice.api_claim', 'api_claim');
-```
+## Middlewares
 
-### Middlewares
+Inject custom logic before each request:
+
 ```php
-use Illuminate\Support\Facades\Log;
 use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 
 BaseRepository::query()
-    ->before(static function (OnOfficeRequest $request) {
-        Log::info('About to send request', [
-            'request' => $request->toArray(),
-        ]);
+    ->before(function (OnOfficeRequest $request) {
+        Log::info('Sending request', ['request' => $request->toArray()]);
     })
-    ->call(new OnOfficeRequest(
-        OnOfficeAction::Read,
-        OnOfficeResourceType::Estate,
-    ));
+    ->call(new OnOfficeRequest(/* ... */));
 ```
 
-### Debugging
-```php
-use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
+## Debugging
 
-BaseRepository::query()
-    ->dd()
-    ->call(new OnOfficeRequest(
-        OnOfficeAction::Read,
-        OnOfficeResourceType::Estate,
-    ));
-```
 ```php
-use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
+// Dump and die
+BaseRepository::query()->dd()->call(/* ... */);
 
+// Dump without stopping
+BaseRepository::query()->dump()->call(/* ... */);
+
+// Record requests and responses
 BaseRepository::record();
-
-BaseRepository::query()
-    ->call(new OnOfficeRequest(
-        OnOfficeAction::Read,
-        OnOfficeResourceType::Estate,
-    ));
-
-$result = BaseRepository::lastRecorded();
-
-/*
-    $result = [
-        OnOfficeRequest,
-        OnOfficeResponse,
-    ];
-*/
+BaseRepository::query()->call(/* ... */);
+$lastPair = BaseRepository::lastRecorded(); // [OnOfficeRequest, OnOfficeResponse]
 ```
 
-### Default Fields
-Sometimes, it can be useful to have default fields for your queries
-to quickly glance at data. You can find a selection of default fields
-in the OnOfficeService.
+## Helpers
+
+Use default fields and clean empty values:
 
 ```php
-use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 
 $estates = EstateRepository::query()
     ->select(OnOfficeService::DEFAULT_ESTATE_INFO_FIELDS)
     ->get();
-```
 
-### Helpers
-When using default fields, you might find it helpful to hide all
-empty fields. To do so, use the `clean_elements` helper.
-It will work with both `find` and `get` responses.
-
-```php
-use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
-use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
- 
-$estates = EstateRepository::query()
-    ->select(OnOfficeService::DEFAULT_ESTATE_INFO_FIELDS)
-    ->get();
-    
-// will leave out fields with empty values like "", "0.00", [], or null.
+// Remove fields with empty values ("", "0.00", [], null)
 $estates = clean_elements($estates);
 ```
 
-### Usage in tests
-```php
-use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
-
-EstateRepository::fake(EstateRepository::response([
-    EstateRepository::page(recordFactories: [
-        EstateFactory::make()
-            ->id(1),
-    ]),
-]));
-
-$response = EstateRepository::query()->get();
-
-expect($response->count())->toBe(1)
-    ->and($response->first()['id'])->toBe(1);
-
-EstateRepository::assertSentCount(1);
-```
-```php
-use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
-
-EstateRepository::fake(EstateRepository::response([
-    EstateRepository::page(recordFactories: [
-        EstateFactory::make()
-            ->id(1),
-    ]),
-    EstateRepository::page(recordFactories: [
-        EstateFactory::make()
-            ->id(2),
-    ]),
-]));
-
-$response = EstateRepository::query()->get();
-
-expect($response->count())->toBe(2)
-    ->and($response->first()['id'])->toBe(1)
-    ->and($response->last()['id'])->toBe(2);
-
-EstateRepository::assertSentCount(2);
-```
-```php
-use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
-
-EstateRepository::preventStrayRequests();
-EstateRepository::fake([
-    EstateRepository::response([
-        EstateRepository::page(recordFactories: [
-            EstateFactory::make()
-                ->id(1),
-        ]),
-        EstateRepository::page(recordFactories: [
-            EstateFactory::make()
-                ->id(2),
-        ]),
-    ]),
-    EstateRepository::response([
-        EstateRepository::page(recordFactories: [
-            EstateFactory::make()
-                ->id(3),
-        ]),
-        EstateRepository::page(recordFactories: [
-            EstateFactory::make()
-                ->id(4),
-        ]),
-    ]),
-]);
-
-$response = EstateRepository::query()->get();
-
-expect($response->count())->toBe(2)
-    ->and($response->first()['id'])->toBe(1)
-    ->and($response->last()['id'])->toBe(2);
-
-$response = EstateRepository::query()->get();
-
-expect($response->count())->toBe(2)
-    ->and($response->first()['id'])->toBe(3)
-    ->and($response->last()['id'])->toBe(4);
-
-EstateRepository::assertSentCount(4);
-
-$response = EstateRepository::query()->get(); // throws StrayRequestException
-```
-```php
-use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
-
-EstateRepository::preventStrayRequests();
-EstateRepository::fake(EstateRepository::sequence(
-    EstateRepository::response([
-        EstateRepository::page(recordFactories: EstateFactory::times(20)),
-    ]),
-    times: 30,
-));
-
-for ($i = 0; $i < 30; ++$i) {
-    $response = EstateRepository::query()->get();
-
-    expect($response->count())->toBe(20);
-}
-```
-
-
 ## Testing
 
+The package includes a built-in fake system for testing:
+
+```php
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
+
+EstateRepository::fake(EstateRepository::response([
+    EstateRepository::page(recordFactories: [
+        EstateFactory::make()->id(1)->set('kaufpreis', 250000),
+        EstateFactory::make()->id(2)->set('kaufpreis', 300000),
+    ]),
+]));
+
+$estates = EstateRepository::query()->get();
+
+expect($estates)->toHaveCount(2);
+EstateRepository::assertSentCount(1);
+```
+
+### Prevent Unstubbed Requests
+
+```php
+EstateRepository::preventStrayRequests();
+EstateRepository::fake(/* ... */);
+
+// Any unstubbed request will throw StrayRequestException
+```
+
+### Multiple Pages
+
+```php
+EstateRepository::fake(EstateRepository::response([
+    EstateRepository::page(recordFactories: [
+        EstateFactory::make()->id(1),
+    ]),
+    EstateRepository::page(recordFactories: [
+        EstateFactory::make()->id(2),
+    ]),
+]));
+
+$estates = EstateRepository::query()->get();
+expect($estates)->toHaveCount(2);
+```
+
+### Sequences (Multiple Calls)
+
+```php
+EstateRepository::fake([
+    EstateRepository::response([/* first call */]),
+    EstateRepository::response([/* second call */]),
+]);
+
+// Or repeat the same response
+EstateRepository::fake(EstateRepository::sequence(
+    EstateRepository::response([/* ... */]),
+    times: 30,
+));
+```
+
+See the [Testing Documentation](https://innobraingmbh.github.io/laravel-onoffice-adapter/testing/factories) for factories, assertions, and advanced patterns.
+
+## Development
+
 ```bash
-composer test
+composer test       # Run tests
+composer analyse    # Static analysis (PHPStan)
+composer format     # Code formatting (Laravel Pint)
 ```
 
 ## Changelog
