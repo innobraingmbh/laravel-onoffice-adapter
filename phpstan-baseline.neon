@@ -1,0 +1,6 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Call to an undefined static method Illuminate\\\\Support\\\\Facades\\\\Http\\:\\:onOffice\\(\\)\\.$#"
+			count: 1
+			path: src/Services/OnOfficeService.php
