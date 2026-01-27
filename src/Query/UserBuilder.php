@@ -16,6 +16,7 @@ use Throwable;
 class UserBuilder extends Builder
 {
     use Paginate;
+
     /**
      * @throws OnOfficeException
      */
