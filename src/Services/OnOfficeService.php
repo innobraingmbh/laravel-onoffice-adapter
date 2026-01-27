@@ -143,6 +143,7 @@ class OnOfficeService
             $this->throwIfResponseIsFailed($response);
         }, $this->getRetryDelay(), $retryOnlyOnConnectionError);
 
+        /** @var Response $response */
         return $response;
     }
 
@@ -151,6 +152,8 @@ class OnOfficeService
      * With a max page calculation based on
      * the total count of records,
      * of the first request.
+     *
+     * @return Collection<int, array<string, mixed>>
      *
      * @throws OnOfficeException
      */

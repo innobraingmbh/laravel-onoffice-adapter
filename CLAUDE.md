@@ -14,7 +14,7 @@ vendor/bin/pest tests/Repositories/EstateRepositoryTest.php
 # Run a single test by name
 vendor/bin/pest --filter "test name"
 
-# Static analysis (PHPStan level 5)
+# Static analysis (PHPStan level 8)
 composer analyse
 
 # Code formatting (Laravel Pint)

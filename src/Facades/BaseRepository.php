@@ -21,6 +21,9 @@ use Innobrain\OnOfficeAdapter\Repositories\BaseRepository as RootRepository;
  */
 class BaseRepository extends Facade
 {
+    /**
+     * @param  OnOfficeResponsePage|OnOfficeResponse|array<int, OnOfficeResponsePage|OnOfficeResponse|array<int, OnOfficeResponsePage>>|null  $stubCallables
+     */
     public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {
         return tap(static::getFacadeRoot(), static function (RootRepository $fake) use ($stubCallables) {
@@ -33,16 +36,25 @@ class BaseRepository extends Facade
         return RootRepository::class;
     }
 
+    /**
+     * @return array<int, OnOfficeResponse>
+     */
     public static function sequence(OnOfficeResponse $response, int $times = 1): array
     {
         return static::getFacadeRoot()->sequence($response, $times);
     }
 
+    /**
+     * @param  array<int, OnOfficeResponsePage>  $pages
+     */
     public static function response(array $pages = []): OnOfficeResponse
     {
         return static::getFacadeRoot()->response($pages);
     }
 
+    /**
+     * @param  array<int, Testing\RecordFactories\BaseFactory>  $recordFactories
+     */
     public static function page(
         OnOfficeAction $actionId = OnOfficeAction::Read,
         OnOfficeResourceType|string $resourceType = OnOfficeResourceType::Estate,
@@ -88,6 +100,9 @@ class BaseRepository extends Facade
         return static::getFacadeRoot()->stopRecording();
     }
 
+    /**
+     * @return array{0: OnOfficeRequest, 1: array<string, mixed>}|null
+     */
     public static function lastRecorded(): ?array
     {
         return static::getFacadeRoot()->lastRecorded();
@@ -98,6 +113,9 @@ class BaseRepository extends Facade
         return static::getFacadeRoot()->lastRecordedRequest();
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public static function lastRecordedResponse(): ?array
     {
         return static::getFacadeRoot()->lastRecordedResponse();

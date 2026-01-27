@@ -9,12 +9,21 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeRelationType;
 
 trait RelationTypes
 {
+    /**
+     * @var array<int, int>
+     */
     public array $parentIds = [];
 
+    /**
+     * @var array<int, int>
+     */
     public array $childIds = [];
 
     public OnOfficeRelationType|string $relationType;
 
+    /**
+     * @param  int|array<int, int>  $parentIds
+     */
     public function parentIds(int|array $parentIds): static
     {
         $this->parentIds = Arr::wrap($parentIds);
@@ -22,6 +31,9 @@ trait RelationTypes
         return $this;
     }
 
+    /**
+     * @param  int|array<int, int>  $parentIds
+     */
     public function addParentIds(int|array $parentIds): static
     {
         $this->parentIds = array_merge($this->parentIds, Arr::wrap($parentIds));
@@ -29,6 +41,9 @@ trait RelationTypes
         return $this;
     }
 
+    /**
+     * @param  int|array<int, int>  $childIds
+     */
     public function childIds(int|array $childIds): static
     {
         $this->childIds = Arr::wrap($childIds);
@@ -36,6 +51,9 @@ trait RelationTypes
         return $this;
     }
 
+    /**
+     * @param  int|array<int, int>  $childIds
+     */
     public function addChildIds(int|array $childIds): static
     {
         $this->childIds = array_merge($this->childIds, Arr::wrap($childIds));

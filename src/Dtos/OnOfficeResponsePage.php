@@ -12,6 +12,9 @@ use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\BaseFactory;
 
 readonly class OnOfficeResponsePage
 {
+    /**
+     * @param  Collection<int, BaseFactory>  $recordFactories
+     */
     public function __construct(
         private OnOfficeAction $actionId,
         private OnOfficeResourceType|string $resourceType,
@@ -27,6 +30,9 @@ readonly class OnOfficeResponsePage
         private string $messageResult = 'OK',
     ) {}
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toResponse(): array
     {
         $records = $this->recordFactories

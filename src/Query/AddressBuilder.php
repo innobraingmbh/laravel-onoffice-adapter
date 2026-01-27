@@ -167,6 +167,9 @@ class AddressBuilder extends Builder
     }
 
     /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
      * @throws Throwable<OnOfficeException>
      */
     public function create(array $data): array
@@ -182,6 +185,8 @@ class AddressBuilder extends Builder
     }
 
     /**
+     * @return Collection<int, array<string, mixed>>
+     *
      * @throws OnOfficeException
      */
     public function search(): Collection
