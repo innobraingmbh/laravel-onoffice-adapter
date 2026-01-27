@@ -9,11 +9,13 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class UserBuilder extends Builder
 {
+    use Paginate;
     /**
      * @throws OnOfficeException
      */
@@ -114,5 +116,28 @@ class UserBuilder extends Builder
 
         return $this->requestApi($request)
             ->json('response.results.0.data.meta.cntabsolute', 0);
+    }
+
+    /**
+     * Fetch a single page of results.
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    protected function getPage(): Collection
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::User,
+            parameters: [
+                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::SORTBY => $this->getOrderBy(),
+                OnOfficeService::LISTLIMIT => $this->pageSize,
+                OnOfficeService::LISTOFFSET => $this->offset,
+                ...$this->customParameters,
+            ],
+        );
+
+        return collect($this->requestApi($request)->json('response.results.0.data.records', []));
     }
 }

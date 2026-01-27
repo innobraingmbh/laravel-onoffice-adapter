@@ -11,6 +11,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Input;
+use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
@@ -18,6 +19,7 @@ use Throwable;
 class AddressBuilder extends Builder
 {
     use Input;
+    use Paginate;
     use RecordIds;
 
     /**
@@ -157,6 +159,36 @@ class AddressBuilder extends Builder
 
         return $this->requestApi($request)
             ->json('response.results.0.data.meta.cntabsolute', 0);
+    }
+
+    /**
+     * Fetch a single page of results.
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    protected function getPage(): Collection
+    {
+        $orderBy = $this->getOrderBy();
+
+        $sortBy = data_get(array_keys($orderBy), 0);
+        $sortOrder = data_get($orderBy, 0);
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Address,
+            parameters: [
+                OnOfficeService::RECORDIDS => $this->recordIds,
+                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::SORTBY => $sortBy,
+                OnOfficeService::SORTORDER => $sortOrder,
+                OnOfficeService::LISTLIMIT => $this->pageSize,
+                OnOfficeService::LISTOFFSET => $this->offset,
+                ...$this->customParameters,
+            ],
+        );
+
+        return collect($this->requestApi($request)->json('response.results.0.data.records', []));
     }
 
     public function addCountryIsoCodeType(string $countryIsoCodeType): static
