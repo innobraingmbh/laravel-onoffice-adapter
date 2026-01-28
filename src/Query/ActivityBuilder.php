@@ -7,15 +7,18 @@ namespace Innobrain\OnOfficeAdapter\Query;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Dtos\PaginatedResponse;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class ActivityBuilder extends Builder
 {
+    use Paginate;
     use RecordIds;
 
     public string $estateOrAddress = 'estate';
@@ -160,6 +163,48 @@ class ActivityBuilder extends Builder
 
         return $this->requestApi($request)
             ->json('response.results.0.data.meta.cntabsolute', 0);
+    }
+
+    /**
+     * Fetch a single page of results.
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    protected function getPage(): Collection
+    {
+        return $this->getPageWithMeta()->items;
+    }
+
+    /**
+     * Fetch a single page of results with metadata (total count).
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    protected function getPageWithMeta(): PaginatedResponse
+    {
+        $orderBy = $this->getOrderBy();
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Activity,
+            parameters: [
+                ...$this->prepareEstateOrAddressParameters(),
+                OnOfficeService::DATA => $this->columns,
+                OnOfficeService::FILTER => $this->getFilters(),
+                OnOfficeService::SORTBY => data_get(array_keys($orderBy), 0),
+                OnOfficeService::SORTORDER => data_get($orderBy, 0),
+                OnOfficeService::LISTLIMIT => $this->pageSize,
+                OnOfficeService::LISTOFFSET => $this->offset,
+                ...$this->customParameters,
+            ]
+        );
+
+        $response = $this->requestApi($request);
+
+        return new PaginatedResponse(
+            items: collect($response->json('response.results.0.data.records', [])),
+            total: $response->json('response.results.0.data.meta.cntabsolute', 0),
+        );
     }
 
     /**
