@@ -73,11 +73,8 @@ describe('forPage', function () {
 
 describe('paginate on EstateRepository', function () {
     it('should return a LengthAwarePaginator', function () {
-        // First response is for count(), second is for getPage()
+        // Single response contains both records and total count (cntabsolute)
         EstateRepository::fake([
-            EstateRepository::response([
-                EstateRepository::page(recordFactories: [], countAbsolute: 50),
-            ]),
             EstateRepository::response([
                 EstateRepository::page(recordFactories: [
                     EstateFactory::make()->id(1),
@@ -96,15 +93,12 @@ describe('paginate on EstateRepository', function () {
             ->and($result->currentPage())->toBe(1)
             ->and($result->count())->toBe(2);
 
-        EstateRepository::assertSentCount(2);
+        EstateRepository::assertSentCount(1);
     });
 
     it('should paginate with ordering preserved', function () {
-        // First response is for count(), second is for getPage()
+        // Single response contains both records and total count (cntabsolute)
         EstateRepository::fake([
-            EstateRepository::response([
-                EstateRepository::page(recordFactories: [], countAbsolute: 10),
-            ]),
             EstateRepository::response([
                 EstateRepository::page(recordFactories: [
                     EstateFactory::make()->id(2),
@@ -122,7 +116,7 @@ describe('paginate on EstateRepository', function () {
             ->and($result->total())->toBe(10)
             ->and($result->count())->toBe(2);
 
-        EstateRepository::assertSentCount(2);
+        EstateRepository::assertSentCount(1);
     });
 });
 
@@ -177,11 +171,8 @@ describe('simplePaginate on EstateRepository', function () {
 
 describe('paginate on AddressRepository', function () {
     it('should return a LengthAwarePaginator', function () {
-        // First response is for count(), second is for getPage()
+        // Single response contains both records and total count (cntabsolute)
         AddressRepository::fake([
-            AddressRepository::response([
-                AddressRepository::page(recordFactories: [], countAbsolute: 25),
-            ]),
             AddressRepository::response([
                 AddressRepository::page(recordFactories: [
                     AddressFactory::make()->id(1),
@@ -200,7 +191,7 @@ describe('paginate on AddressRepository', function () {
             ->and($result->currentPage())->toBe(1)
             ->and($result->count())->toBe(2);
 
-        AddressRepository::assertSentCount(2);
+        AddressRepository::assertSentCount(1);
     });
 
     it('should simplePaginate correctly', function () {
@@ -229,11 +220,8 @@ describe('paginate on AddressRepository', function () {
 
 describe('paginate on ActivityRepository', function () {
     it('should return a LengthAwarePaginator', function () {
-        // First response is for count(), second is for getPage()
+        // Single response contains both records and total count (cntabsolute)
         ActivityRepository::fake([
-            ActivityRepository::response([
-                ActivityRepository::page(recordFactories: [], countAbsolute: 30),
-            ]),
             ActivityRepository::response([
                 ActivityRepository::page(recordFactories: [
                     ActivityFactory::make()->id(1),
@@ -251,7 +239,7 @@ describe('paginate on ActivityRepository', function () {
             ->and($result->perPage())->toBe(2)
             ->and($result->count())->toBe(2);
 
-        ActivityRepository::assertSentCount(2);
+        ActivityRepository::assertSentCount(1);
     });
 
     it('should simplePaginate correctly', function () {
@@ -283,8 +271,7 @@ describe('paginate with real HTTP responses', function () {
         Http::preventStrayRequests();
         Http::fake([
             'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
-                ReadEstateResponse::make(count: 100), // count() response
-                ReadEstateResponse::make(count: 100), // getPage() response
+                ReadEstateResponse::make(count: 100), // Single response with records and total
             ]),
         ]);
 
@@ -298,16 +285,13 @@ describe('paginate with real HTTP responses', function () {
             ->and($result->total())->toBe(100)
             ->and($result->perPage())->toBe(15);
 
-        EstateRepository::assertSentCount(2);
+        EstateRepository::assertSentCount(1);
     });
 });
 
 describe('pagination parameters', function () {
     it('should cap perPage at 500', function () {
         EstateRepository::fake([
-            EstateRepository::response([
-                EstateRepository::page(recordFactories: [], countAbsolute: 1000),
-            ]),
             EstateRepository::response([
                 EstateRepository::page(
                     recordFactories: array_map(
@@ -328,9 +312,6 @@ describe('pagination parameters', function () {
 
     it('should use default perPage of 15', function () {
         EstateRepository::fake([
-            EstateRepository::response([
-                EstateRepository::page(recordFactories: [], countAbsolute: 100),
-            ]),
             EstateRepository::response([
                 EstateRepository::page(
                     recordFactories: array_map(

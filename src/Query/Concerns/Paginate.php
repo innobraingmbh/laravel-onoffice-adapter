@@ -9,6 +9,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator as LengthAwarePaginatorImpl;
 use Illuminate\Pagination\Paginator as PaginatorImpl;
 use Illuminate\Support\Collection;
+use Innobrain\OnOfficeAdapter\Dtos\PaginatedResponse;
 
 trait Paginate
 {
@@ -16,7 +17,7 @@ trait Paginate
      * Paginate the results.
      *
      * Returns a LengthAwarePaginator with total count.
-     * This requires 2 API calls: one for count and one for the page.
+     * This requires 1 API call that returns both records and total count.
      *
      * @param  int|null  $perPage  Number of items per page (max 500)
      * @param  string  $pageName  Query string parameter name for page number
@@ -27,12 +28,11 @@ trait Paginate
         $perPage = $this->normalizePerPage($perPage);
         $page = $page ?? $this->resolveCurrentPage($pageName);
 
-        $total = $this->count();
-        $results = $this->forPage($page, $perPage)->getPage();
+        $response = $this->forPage($page, $perPage)->getPageWithMeta();
 
         return new LengthAwarePaginatorImpl(
-            $results,
-            $total,
+            $response->items,
+            $response->total,
             $perPage,
             $page,
             [
@@ -96,6 +96,12 @@ trait Paginate
      * Must be implemented by each builder.
      */
     abstract protected function getPage(): Collection;
+
+    /**
+     * Fetch a single page of results with metadata (total count).
+     * Must be implemented by each builder.
+     */
+    abstract protected function getPageWithMeta(): PaginatedResponse;
 
     /**
      * Get the total count of records matching the query.
