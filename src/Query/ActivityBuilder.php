@@ -7,6 +7,7 @@ namespace Innobrain\OnOfficeAdapter\Query;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Dtos\PaginatedResponse;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
@@ -177,6 +178,16 @@ class ActivityBuilder extends Builder
      */
     protected function getPage(): Collection
     {
+        return $this->getPageWithMeta()->items;
+    }
+
+    /**
+     * Fetch a single page of results with metadata (total count).
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    protected function getPageWithMeta(): PaginatedResponse
+    {
         $orderBy = $this->getOrderBy();
 
         $request = new OnOfficeRequest(
@@ -194,7 +205,12 @@ class ActivityBuilder extends Builder
             ]
         );
 
-        return collect($this->requestApi($request)->json('response.results.0.data.records', []));
+        $response = $this->requestApi($request);
+
+        return new PaginatedResponse(
+            items: collect($response->json('response.results.0.data.records', [])),
+            total: $response->json('response.results.0.data.meta.cntabsolute', 0),
+        );
     }
 
     /**
