@@ -8,12 +8,16 @@ use Illuminate\Support\Collection;
 
 readonly class OnOfficeResponse
 {
+    /**
+     * @param  Collection<int, OnOfficeResponsePage>  $pages
+     */
     public function __construct(
         protected Collection $pages,
     ) {}
 
     public function shift(): OnOfficeResponsePage
     {
+        /** @var OnOfficeResponsePage */
         return $this->pages->shift();
     }
 
