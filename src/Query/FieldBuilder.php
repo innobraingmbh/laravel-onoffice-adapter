@@ -14,6 +14,9 @@ use Throwable;
 
 class FieldBuilder extends Builder
 {
+    /**
+     * @var array<int, string>
+     */
     public array $modules = [];
 
     /**
@@ -68,6 +71,9 @@ class FieldBuilder extends Builder
         $this->requestAllChunked($request, $callback);
     }
 
+    /**
+     * @param  array<int, string>|string  $modules
+     */
     public function withModules(array|string $modules): static
     {
         $this->modules = array_merge($this->modules, Arr::wrap($modules));

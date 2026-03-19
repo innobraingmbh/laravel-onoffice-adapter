@@ -17,9 +17,13 @@ class OnOfficeRequest
         public OnOfficeResourceType|string $resourceType,
         public OnOfficeResourceId|string|int $resourceId = OnOfficeResourceId::None,
         public string|int $identifier = '',
+        /** @var array<string, mixed> */
         public array $parameters = []
     ) {}
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [
@@ -33,6 +37,9 @@ class OnOfficeRequest
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toRequestArray(): array
     {
         /** @var OnOfficeService $onOfficeService */
