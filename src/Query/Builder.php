@@ -341,9 +341,7 @@ class Builder implements BuilderInterface
                 /** @var array<int, array{id: string|int}> $records */
                 $records = $response->json($resultPath, []);
 
-                $records = array_filter($records, static function (array $record) use ($allowedIds): bool {
-                    return in_array((int) $record['id'], $allowedIds, true);
-                });
+                $records = array_filter($records, static fn (array $record): bool => in_array((int) $record['id'], $allowedIds, true));
 
                 $responseBody = $response->json();
                 data_set($responseBody, $resultPath, array_values($records));

@@ -66,6 +66,9 @@ class ActivityBuilder extends Builder
     }
 
     /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
      * @throws Throwable<OnOfficeException>
      */
     public function create(array $data): array

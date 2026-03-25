@@ -77,6 +77,7 @@ trait Paginate
      * @param  int|null  $perPage  Number of items per page (max 500)
      * @param  string  $pageName  Query string parameter name for page number
      * @param  int|null  $page  Current page number (reads from request if null)
+     * @return LengthAwarePaginator<array<string, mixed>>
      *
      * @throws OnOfficeException
      * @throws Throwable
@@ -84,7 +85,7 @@ trait Paginate
     public function paginate(?int $perPage = 15, string $pageName = 'page', ?int $page = null): LengthAwarePaginator
     {
         $perPage = $this->normalizePerPage($perPage);
-        $page = $page ?? $this->resolveCurrentPage($pageName);
+        $page ??= $this->resolveCurrentPage($pageName);
 
         $response = $this->forPage($page, $perPage)->getPageWithMeta();
 
@@ -109,6 +110,7 @@ trait Paginate
      * @param  int|null  $perPage  Number of items per page (max 500)
      * @param  string  $pageName  Query string parameter name for page number
      * @param  int|null  $page  Current page number (reads from request if null)
+     * @return Paginator<array<string, mixed>>
      *
      * @throws OnOfficeException
      * @throws Throwable
@@ -116,7 +118,7 @@ trait Paginate
     public function simplePaginate(?int $perPage = 15, string $pageName = 'page', ?int $page = null): Paginator
     {
         $perPage = $this->normalizePerPage($perPage);
-        $page = $page ?? $this->resolveCurrentPage($pageName);
+        $page ??= $this->resolveCurrentPage($pageName);
 
         // Fetch one extra record to determine if there are more pages
         // The Paginator constructor will check if count > perPage to set hasMore,
@@ -155,6 +157,8 @@ trait Paginate
     /**
      * Fetch a single page of results.
      *
+     * @return Collection<int, array<string, mixed>>
+     *
      * @throws OnOfficeException
      * @throws Throwable
      */
@@ -177,8 +181,11 @@ trait Paginate
 
         $response = $this->requestApi($request);
 
+        /** @var array<int, array<string, mixed>> $records */
+        $records = $response->json('response.results.0.data.records', []);
+
         return new PaginatedResponse(
-            items: collect($response->json('response.results.0.data.records', [])),
+            items: collect($records),
             total: $response->json('response.results.0.data.meta.cntabsolute', 0),
         );
     }
@@ -188,7 +195,7 @@ trait Paginate
      */
     private function normalizePerPage(?int $perPage): int
     {
-        $perPage = $perPage ?? 15;
+        $perPage ??= 15;
         $perPage = max(1, $perPage);
 
         return min(500, $perPage);
