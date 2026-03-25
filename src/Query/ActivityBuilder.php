@@ -5,33 +5,34 @@ declare(strict_types=1);
 namespace Innobrain\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class ActivityBuilder extends Builder
 {
+    use Paginate;
     use RecordIds;
 
     public string $estateOrAddress = 'estate';
 
     public ?int $estateId = null;
 
+    /**
+     * @var array<int, int>
+     */
     public array $addressIds = [];
 
-    /**
-     * @throws OnOfficeException
-     */
-    public function get(): Collection
+    protected function buildReadRequest(): OnOfficeRequest
     {
         $orderBy = $this->getOrderBy();
 
-        $request = new OnOfficeRequest(
+        return new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Activity,
             parameters: [
@@ -43,35 +44,6 @@ class ActivityBuilder extends Builder
                 ...$this->customParameters,
             ]
         );
-
-        return $this->requestAll($request);
-    }
-
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function first(): ?array
-    {
-        $orderBy = $this->getOrderBy();
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Activity,
-            parameters: [
-                ...$this->prepareEstateOrAddressParameters(),
-                OnOfficeService::DATA => $this->columns,
-                OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::LISTLIMIT => $this->limit > 0 ? $this->limit : $this->pageSize,
-                OnOfficeService::LISTOFFSET => $this->offset,
-                OnOfficeService::SORTBY => data_get(array_keys($orderBy), 0),
-                OnOfficeService::SORTORDER => data_get($orderBy, 0),
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
-
     }
 
     /**
@@ -94,32 +66,9 @@ class ActivityBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        $orderBy = $this->getOrderBy();
-
-        $sortBy = data_get(array_keys($orderBy), 0);
-        $sortOrder = data_get($orderBy, 0);
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Activity,
-            parameters: [
-                ...$this->prepareEstateOrAddressParameters(),
-                OnOfficeService::DATA => $this->columns,
-                OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::SORTBY => $sortBy,
-                OnOfficeService::SORTORDER => $sortOrder,
-                ...$this->customParameters,
-            ],
-        );
-
-        $this->requestAllChunked($request, $callback);
-    }
-
-    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
      * @throws Throwable<OnOfficeException>
      */
     public function create(array $data): array
@@ -136,30 +85,6 @@ class ActivityBuilder extends Builder
 
         return $this->requestApi($request)
             ->json('response.results.0.data.records.0');
-    }
-
-    /**
-     * Returns the number of records that match the query. This number is from the API
-     * and might be lower than the actual number of records when queried with get().
-     *
-     * @throws OnOfficeException
-     */
-    public function count(): int
-    {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Activity,
-            parameters: [
-                ...$this->prepareEstateOrAddressParameters(),
-                OnOfficeService::DATA => [],
-                OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::LISTLIMIT => 1,
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.meta.cntabsolute', 0);
     }
 
     /**
@@ -209,6 +134,9 @@ class ActivityBuilder extends Builder
         return $this;
     }
 
+    /**
+     * @param  int|array<int, int>  $addressIds
+     */
     public function addressIds(int|array $addressIds): static
     {
         $this->addressIds = Arr::wrap($addressIds);
@@ -219,6 +147,8 @@ class ActivityBuilder extends Builder
     /**
      * Function is used to deprecate the usage of recordIdsAsEstate() and recordIdsAsAddress()
      * without breaking changes.
+     *
+     * @return array<string, mixed>
      */
     private function prepareEstateOrAddressParameters(bool $create = false): array
     {

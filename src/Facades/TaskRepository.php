@@ -6,19 +6,16 @@ namespace Innobrain\OnOfficeAdapter\Facades;
 
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
-use Innobrain\OnOfficeAdapter\Query\FieldBuilder;
-use Innobrain\OnOfficeAdapter\Repositories\FieldRepository as RootRepository;
+use Innobrain\OnOfficeAdapter\Query\TaskBuilder;
+use Innobrain\OnOfficeAdapter\Repositories\TaskRepository as RootRepository;
 
 /**
  * @see RootRepository
  *
- * @method static FieldBuilder query()
+ * @method static TaskBuilder query()
  */
-class FieldRepository extends BaseRepository
+class TaskRepository extends BaseRepository
 {
-    /**
-     * @param  OnOfficeResponsePage|OnOfficeResponse|array<int, OnOfficeResponsePage|OnOfficeResponse|array<int, OnOfficeResponsePage>>|null  $stubCallables
-     */
     public static function fake(OnOfficeResponsePage|OnOfficeResponse|array|null $stubCallables): RootRepository
     {
         return tap(static::getFacadeRoot(), static function (RootRepository $fake) use ($stubCallables) {

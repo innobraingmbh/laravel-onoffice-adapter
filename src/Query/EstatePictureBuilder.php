@@ -29,10 +29,19 @@ class EstatePictureBuilder extends Builder
         'Expose',
     ];
 
+    /**
+     * @var array<int, int>
+     */
     public array $estateIds;
 
+    /**
+     * @var array<int, string>
+     */
     public array $categories = [];
 
+    /**
+     * @param  int|array<int, int>  $estateId
+     */
     public function __construct(
         int|array $estateId,
     ) {
@@ -87,6 +96,9 @@ class EstatePictureBuilder extends Builder
         $this->requestAllChunked($request, $callback);
     }
 
+    /**
+     * @param  string|array<int, string>  $category
+     */
     public function category(string|array $category): self
     {
         $this->categories = Arr::wrap($category);

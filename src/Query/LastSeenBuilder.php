@@ -4,30 +4,27 @@ declare(strict_types=1);
 
 namespace Innobrain\OnOfficeAdapter\Query;
 
-use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class LastSeenBuilder extends Builder
 {
+    use Paginate;
+
     public string $module = '';
 
     public int $userId = -1;
 
-    /**
-     * @throws OnOfficeException
-     * @throws Throwable
-     */
-    public function get(): Collection
+    protected function buildReadRequest(): OnOfficeRequest
     {
         $parameters = [
             OnOfficeService::MODULE => $this->module,
             OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => $this->limit,
             ...$this->customParameters,
         ];
 
@@ -35,40 +32,11 @@ class LastSeenBuilder extends Builder
             $parameters['user'] = $this->userId;
         }
 
-        $request = new OnOfficeRequest(
+        return new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::RecordsLastSeen,
             parameters: $parameters,
         );
-
-        return $this->requestAll($request);
-    }
-
-    /**
-     * @throws OnOfficeException
-     * @throws Throwable
-     */
-    public function first(): ?array
-    {
-        $parameters = [
-            OnOfficeService::MODULE => $this->module,
-            OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => 1,
-            ...$this->customParameters,
-        ];
-
-        if ($this->userId > 0) {
-            $parameters['user'] = $this->userId;
-        }
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::RecordsLastSeen,
-            parameters: $parameters,
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
     }
 
     /**
@@ -80,35 +48,9 @@ class LastSeenBuilder extends Builder
     }
 
     /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        $parameters = [
-            OnOfficeService::MODULE => $this->module,
-            OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => $this->limit,
-            ...$this->customParameters,
-        ];
-
-        if ($this->userId > 0) {
-            $parameters['user'] = $this->userId;
-        }
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::RecordsLastSeen,
-            parameters: $parameters,
-        );
-
-        $this->requestAllChunked($request, $callback);
-    }
-
-    /**
-     * Returns the number of records that match the query. This number is from the API
-     * and might be lower than the actual number of records when queried with get().
+     * Count is not supported for LastSeen records.
      *
-     * @throws Throwable<OnOfficeException>
+     * @throws OnOfficeException
      */
     public function count(): int
     {

@@ -38,4 +38,5 @@ enum OnOfficeResourceType: string
     case AppointmentConflicts = 'appointmentConflicts';
     case AppointmentAffirmation = 'appointmentAffirmation';
     case CalendarResources = 'calendarResources';
+    case Task = 'task';
 }

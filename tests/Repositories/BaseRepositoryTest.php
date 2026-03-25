@@ -28,7 +28,6 @@ describe('stray requests', function () {
         $builder->preventStrayRequests();
 
         $m = new ReflectionProperty($builder, 'preventStrayRequests');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder))->toBe(true);
     });
@@ -39,7 +38,6 @@ describe('stray requests', function () {
         $builder->preventStrayRequests($value);
 
         $m = new ReflectionProperty($builder, 'preventStrayRequests');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder))->toBe($value);
     })->with([true, false]);
@@ -51,7 +49,6 @@ describe('stray requests', function () {
         $builder->preventStrayRequests(false);
 
         $m = new ReflectionProperty($builder, 'preventStrayRequests');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder))->toBe(false);
     });
@@ -64,7 +61,6 @@ describe('record', function () {
         $builder->record();
 
         $m = new ReflectionProperty($builder, 'recording');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder))->toBe(true);
     });
@@ -76,7 +72,6 @@ describe('record', function () {
         $builder->stopRecording();
 
         $m = new ReflectionProperty($builder, 'recording');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder))->toBe(false);
     });
@@ -87,7 +82,6 @@ describe('record', function () {
         $builder->record($value);
 
         $m = new ReflectionProperty($builder, 'recording');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder))->toBe($value);
     })->with([true, false]);
@@ -99,7 +93,6 @@ describe('record', function () {
         $builder->recordRequestResponsePair(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate), ['response']);
 
         $m = new ReflectionProperty($builder, 'recorded');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder))->toBeArray()
             ->and($m->getValue($builder)[0][0]->toArray())->toBe((new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate))->toArray())
@@ -112,7 +105,6 @@ describe('record', function () {
         $builder->recordRequestResponsePair(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate), ['response']);
 
         $m = new ReflectionProperty($builder, 'recorded');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder))->toBe([]);
     });
@@ -167,7 +159,6 @@ describe('fake', function () {
         $builder->fake(new OnOfficeResponse(collect()));
 
         $m = new ReflectionProperty($builder, 'stubCallables');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder)->toArray()[0])->toBeInstanceOf(OnOfficeResponse::class);
     });
@@ -178,7 +169,6 @@ describe('fake', function () {
         $builder->fake([new OnOfficeResponse(collect())]);
 
         $m = new ReflectionProperty($builder, 'stubCallables');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder)->toArray()[0])->toBeInstanceOf(OnOfficeResponse::class);
     });
@@ -192,7 +182,6 @@ describe('fake', function () {
         ));
 
         $m = new ReflectionProperty($builder, 'stubCallables');
-        $m->setAccessible(true);
 
         expect($m->getValue($builder)->toArray())->toHaveCount(20);
     });
@@ -583,7 +572,6 @@ describe('custom credentials', function () {
             ->withCredentials('token', 'secret', 'claim');
 
         $m = new ReflectionMethod($builder, 'getOnOfficeService');
-        $m->setAccessible(true);
         /* @var OnOfficeService $onOfficeService */
         $onOfficeService = $m->invoke($builder);
 
@@ -604,7 +592,6 @@ describe('custom credentials', function () {
             ->withCredentials('token2', 'secret2', 'claim2');
 
         $m = new ReflectionMethod($builder, 'getOnOfficeService');
-        $m->setAccessible(true);
         /* @var OnOfficeService $onOfficeService */
         $onOfficeService = $m->invoke($builder);
 
@@ -624,7 +611,6 @@ describe('custom credentials', function () {
             ->query();
 
         $m = new ReflectionMethod($builder, 'getOnOfficeService');
-        $m->setAccessible(true);
 
         /* @var OnOfficeService $onOfficeService */
         $onOfficeService = $m->invoke($builder);

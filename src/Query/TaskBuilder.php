@@ -12,21 +12,29 @@ use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
-class UserBuilder extends Builder
+class TaskBuilder extends Builder
 {
     use Paginate;
+
+    public ?int $relatedAddressId = null;
+
+    public ?int $relatedEstateId = null;
+
+    public ?int $relatedProjectId = null;
 
     protected function buildReadRequest(): OnOfficeRequest
     {
         return new OnOfficeRequest(
             OnOfficeAction::Read,
-            OnOfficeResourceType::User,
-            parameters: [
+            OnOfficeResourceType::Task,
+            parameters: array_filter([
                 OnOfficeService::DATA => $this->columns,
                 OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::SORTBY => $this->getOrderBy(),
+                'relatedAddressId' => $this->relatedAddressId,
+                'relatedEstateId' => $this->relatedEstateId,
+                'relatedProjectIds' => $this->relatedProjectId,
                 ...$this->customParameters,
-            ],
+            ], fn ($v) => ! is_null($v)),
         );
     }
 
@@ -37,15 +45,36 @@ class UserBuilder extends Builder
     {
         $request = new OnOfficeRequest(
             OnOfficeAction::Read,
-            OnOfficeResourceType::User,
+            OnOfficeResourceType::Task,
             $id,
             parameters: [
                 OnOfficeService::DATA => $this->columns,
                 ...$this->customParameters,
-            ]
+            ],
         );
 
         return $this->requestApi($request)
             ->json('response.results.0.data.records.0');
+    }
+
+    public function relatedAddress(int $id): static
+    {
+        $this->relatedAddressId = $id;
+
+        return $this;
+    }
+
+    public function relatedEstate(int $id): static
+    {
+        $this->relatedEstateId = $id;
+
+        return $this;
+    }
+
+    public function relatedProject(int $id): static
+    {
+        $this->relatedProjectId = $id;
+
+        return $this;
     }
 }
