@@ -21,8 +21,10 @@ class AppointmentBuilder extends Builder
 
     public ?string $endDate = null;
 
+    /** @var array<int, int> */
     public array $userIds = [];
 
+    /** @var array<int, int> */
     public array $groupIds = [];
 
     public ?bool $showCancelled = null;
@@ -39,6 +41,9 @@ class AppointmentBuilder extends Builder
         return $this;
     }
 
+    /**
+     * @param  array<int, int>|int  $userIds
+     */
     public function users(array|int $userIds): static
     {
         $this->userIds = Arr::wrap($userIds);
@@ -46,6 +51,9 @@ class AppointmentBuilder extends Builder
         return $this;
     }
 
+    /**
+     * @param  array<int, int>|int  $groupIds
+     */
     public function groups(array|int $groupIds): static
     {
         $this->groupIds = Arr::wrap($groupIds);
@@ -109,6 +117,10 @@ class AppointmentBuilder extends Builder
     /**
      * @throws Throwable<OnOfficeException>
      */
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     public function create(array $data): array
     {
         $request = new OnOfficeRequest(
@@ -165,6 +177,10 @@ class AppointmentBuilder extends Builder
     /**
      * @throws Throwable<OnOfficeException>
      */
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<int, mixed>
+     */
     public function conflicts(array $data): array
     {
         $request = new OnOfficeRequest(
@@ -182,6 +198,9 @@ class AppointmentBuilder extends Builder
 
     /**
      * @throws Throwable<OnOfficeException>
+     */
+    /**
+     * @return array<int, mixed>
      */
     public function sendConfirmation(int $calendarId, bool $useDefaultMailAccount = false): array
     {
@@ -202,6 +221,10 @@ class AppointmentBuilder extends Builder
     /**
      * @throws Throwable<OnOfficeException>
      */
+    /**
+     * @param  array<string, mixed>|null  $filter
+     * @return \Illuminate\Support\Collection<int, array<string, mixed>>
+     */
     public function resources(?array $filter = null): \Illuminate\Support\Collection
     {
         $parameters = [...$this->customParameters];
@@ -219,6 +242,9 @@ class AppointmentBuilder extends Builder
         return $this->requestAll($request);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function buildAppointmentListFilter(): array
     {
         $filter = [];
