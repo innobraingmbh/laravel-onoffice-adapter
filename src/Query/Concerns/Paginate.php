@@ -74,9 +74,10 @@ trait Paginate
      * Returns a LengthAwarePaginator with total count.
      * This requires 1 API call that returns both records and total count.
      *
-     * @param int|null $perPage Number of items per page (max 500)
-     * @param string $pageName Query string parameter name for page number
-     * @param int|null $page Current page number (reads from request if null)
+     * @param  int|null  $perPage  Number of items per page (max 500)
+     * @param  string  $pageName  Query string parameter name for page number
+     * @param  int|null  $page  Current page number (reads from request if null)
+     *
      * @throws OnOfficeException
      * @throws Throwable
      */
@@ -105,9 +106,10 @@ trait Paginate
      * Returns a Paginator without total count (only hasMorePages).
      * This requires 1 API call, fetching perPage+1 items to detect more pages.
      *
-     * @param int|null $perPage Number of items per page (max 500)
-     * @param string $pageName Query string parameter name for page number
-     * @param int|null $page Current page number (reads from request if null)
+     * @param  int|null  $perPage  Number of items per page (max 500)
+     * @param  string  $pageName  Query string parameter name for page number
+     * @param  int|null  $page  Current page number (reads from request if null)
+     *
      * @throws OnOfficeException
      * @throws Throwable
      */
