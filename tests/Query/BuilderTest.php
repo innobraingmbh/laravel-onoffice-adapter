@@ -407,7 +407,6 @@ describe('getFilters', function () {
         $builder->where('ID', '=', 1);
 
         $m = new ReflectionMethod($builder, 'getFilters');
-        $m->setAccessible(true);
         $filters = $m->invoke($builder);
 
         expect($filters)->toBe([
@@ -427,7 +426,6 @@ describe('getFilters', function () {
         $builder->where('Name', 'LIKE', 'John');
 
         $m = new ReflectionMethod($builder, 'getFilters');
-        $m->setAccessible(true);
         $filters = $m->invoke($builder);
 
         expect($filters)->toBe([
@@ -454,7 +452,6 @@ describe('getOrderBy', function () {
         $builder->orderBy('ID', 'desc');
 
         $m = new ReflectionMethod($builder, 'getOrderBy');
-        $m->setAccessible(true);
         $orderBy = $m->invoke($builder);
 
         expect($orderBy)->toBe([
@@ -469,7 +466,6 @@ describe('getOrderBy', function () {
         $builder->orderBy('Name');
 
         $m = new ReflectionMethod($builder, 'getOrderBy');
-        $m->setAccessible(true);
         $orderBy = $m->invoke($builder);
 
         expect($orderBy)->toBe([

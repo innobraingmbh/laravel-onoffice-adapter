@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Innobrain\OnOfficeAdapter\Dtos;
 
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
@@ -43,7 +43,7 @@ class OnOfficeRequest
     public function toRequestArray(): array
     {
         /** @var OnOfficeService $onOfficeService */
-        $onOfficeService = app(OnOfficeService::class);
+        $onOfficeService = resolve(OnOfficeService::class);
 
         if (! empty($onOfficeService->getApiClaim())) {
             $this->parameters = array_replace([OnOfficeService::EXTENDEDCLAIM => $onOfficeService->getApiClaim()], $this->parameters);
@@ -62,7 +62,7 @@ class OnOfficeRequest
                             ? $this->resourceType->value
                             : $this->resourceType,
                         'identifier' => $this->identifier,
-                        'timestamp' => Carbon::now()->timestamp,
+                        'timestamp' => Date::now()->timestamp,
                         'hmac' => $onOfficeService->getHmac($this->actionId, $this->resourceType),
                         'hmac_version' => 2,
                         'parameters' => $this->parameters,

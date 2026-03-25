@@ -23,7 +23,7 @@ class FilterBuilder extends Builder
      */
     public function get(): Collection
     {
-        throw_unless(isset($this->module), new OnOfficeQueryException('Filter Builder module is not set'));
+        throw_unless(isset($this->module), OnOfficeQueryException::class, 'Filter Builder module is not set');
 
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
@@ -42,7 +42,7 @@ class FilterBuilder extends Builder
      */
     public function first(): ?array
     {
-        throw_unless(isset($this->module), new OnOfficeQueryException('Filter Builder module is not set'));
+        throw_unless(isset($this->module), OnOfficeQueryException::class, 'Filter Builder module is not set');
 
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
@@ -63,7 +63,7 @@ class FilterBuilder extends Builder
      */
     public function each(callable $callback): void
     {
-        throw_unless(isset($this->module), new OnOfficeQueryException('Filter Builder module is not set'));
+        throw_unless(isset($this->module), OnOfficeQueryException::class, 'Filter Builder module is not set');
 
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,

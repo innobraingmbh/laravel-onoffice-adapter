@@ -77,7 +77,7 @@ trait Paginate
      * @param  int|null  $perPage  Number of items per page (max 500)
      * @param  string  $pageName  Query string parameter name for page number
      * @param  int|null  $page  Current page number (reads from request if null)
-     * @return LengthAwarePaginator<array<string, mixed>>
+     * @return LengthAwarePaginator<int, array<string, mixed>>
      *
      * @throws OnOfficeException
      * @throws Throwable
@@ -110,7 +110,7 @@ trait Paginate
      * @param  int|null  $perPage  Number of items per page (max 500)
      * @param  string  $pageName  Query string parameter name for page number
      * @param  int|null  $page  Current page number (reads from request if null)
-     * @return Paginator<array<string, mixed>>
+     * @return Paginator<int, array<string, mixed>>
      *
      * @throws OnOfficeException
      * @throws Throwable

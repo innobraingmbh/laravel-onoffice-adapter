@@ -7,9 +7,9 @@ namespace Innobrain\OnOfficeAdapter\Services;
 use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeApiCredentials;
@@ -99,7 +99,7 @@ class OnOfficeService
                 implode(
                     '',
                     [
-                        'timestamp' => Carbon::now()->timestamp,
+                        'timestamp' => Date::now()->timestamp,
                         'token' => $this->getToken(),
                         'resourcetype' => $resourceType instanceof OnOfficeResourceType
                             ? $resourceType->value
@@ -304,7 +304,7 @@ class OnOfficeService
             $token = $this->getToken();
             $secret = $this->getSecret();
 
-            throw_if(strlen($token) !== 32 || strlen($secret) !== 64, new OnOfficeException('The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.', $statusErrorCode, isResponseError: true));
+            throw_if(strlen($token) !== 32 || strlen($secret) !== 64, OnOfficeException::class, 'The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.', $statusErrorCode, isResponseError: true);
         }
 
         match (true) {
