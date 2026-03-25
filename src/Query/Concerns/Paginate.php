@@ -9,19 +9,76 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator as LengthAwarePaginatorImpl;
 use Illuminate\Pagination\Paginator as PaginatorImpl;
 use Illuminate\Support\Collection;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\PaginatedResponse;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Throwable;
 
 trait Paginate
 {
+    /**
+     * Build the base read request for this builder.
+     * Each builder implements this once; all terminal methods call it.
+     */
+    abstract protected function buildReadRequest(): OnOfficeRequest;
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function get(): Collection
+    {
+        return $this->requestAll($this->buildReadRequest());
+    }
+
+    /**
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    public function first(): ?array
+    {
+        $request = $this->buildReadRequest();
+        data_set($request->parameters, OnOfficeService::LISTLIMIT, $this->limit > 0 ? $this->limit : $this->pageSize);
+        data_set($request->parameters, OnOfficeService::LISTOFFSET, $this->offset);
+
+        return $this->requestApi($request)->json('response.results.0.data.records.0');
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function each(callable $callback): void
+    {
+        $this->requestAllChunked($this->buildReadRequest(), $callback);
+    }
+
+    /**
+     * Returns the number of records that match the query. This number is from the API
+     * and might be lower than the actual number of records when queried with get().
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    public function count(): int
+    {
+        $request = $this->buildReadRequest();
+        data_set($request->parameters, OnOfficeService::DATA, []);
+        data_set($request->parameters, OnOfficeService::LISTLIMIT, 1);
+
+        return $this->requestApi($request)->json('response.results.0.data.meta.cntabsolute', 0);
+    }
+
     /**
      * Paginate the results.
      *
      * Returns a LengthAwarePaginator with total count.
      * This requires 1 API call that returns both records and total count.
      *
-     * @param  int|null  $perPage  Number of items per page (max 500)
-     * @param  string  $pageName  Query string parameter name for page number
-     * @param  int|null  $page  Current page number (reads from request if null)
+     * @param int|null $perPage Number of items per page (max 500)
+     * @param string $pageName Query string parameter name for page number
+     * @param int|null $page Current page number (reads from request if null)
+     * @throws OnOfficeException
+     * @throws Throwable
      */
     public function paginate(?int $perPage = 15, string $pageName = 'page', ?int $page = null): LengthAwarePaginator
     {
@@ -48,9 +105,11 @@ trait Paginate
      * Returns a Paginator without total count (only hasMorePages).
      * This requires 1 API call, fetching perPage+1 items to detect more pages.
      *
-     * @param  int|null  $perPage  Number of items per page (max 500)
-     * @param  string  $pageName  Query string parameter name for page number
-     * @param  int|null  $page  Current page number (reads from request if null)
+     * @param int|null $perPage Number of items per page (max 500)
+     * @param string $pageName Query string parameter name for page number
+     * @param int|null $page Current page number (reads from request if null)
+     * @throws OnOfficeException
+     * @throws Throwable
      */
     public function simplePaginate(?int $perPage = 15, string $pageName = 'page', ?int $page = null): Paginator
     {
@@ -93,21 +152,34 @@ trait Paginate
 
     /**
      * Fetch a single page of results.
-     * Must be implemented by each builder.
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
      */
-    abstract protected function getPage(): Collection;
+    protected function getPage(): Collection
+    {
+        return $this->getPageWithMeta()->items;
+    }
 
     /**
      * Fetch a single page of results with metadata (total count).
-     * Must be implemented by each builder.
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
      */
-    abstract protected function getPageWithMeta(): PaginatedResponse;
+    protected function getPageWithMeta(): PaginatedResponse
+    {
+        $request = $this->buildReadRequest();
+        data_set($request->parameters, OnOfficeService::LISTLIMIT, $this->pageSize);
+        data_set($request->parameters, OnOfficeService::LISTOFFSET, $this->offset);
 
-    /**
-     * Get the total count of records matching the query.
-     * Must be implemented by each builder.
-     */
-    abstract public function count(): int;
+        $response = $this->requestApi($request);
+
+        return new PaginatedResponse(
+            items: collect($response->json('response.results.0.data.records', [])),
+            total: $response->json('response.results.0.data.meta.cntabsolute', 0),
+        );
+    }
 
     /**
      * Normalize the per-page value, capping at API maximum of 500.

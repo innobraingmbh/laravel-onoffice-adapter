@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Innobrain\OnOfficeAdapter\Query;
 
-use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
-use Innobrain\OnOfficeAdapter\Dtos\PaginatedResponse;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
@@ -18,12 +16,9 @@ class UserBuilder extends Builder
 {
     use Paginate;
 
-    /**
-     * @throws OnOfficeException
-     */
-    public function get(): Collection
+    protected function buildReadRequest(): OnOfficeRequest
     {
-        $request = new OnOfficeRequest(
+        return new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::User,
             parameters: [
@@ -33,30 +28,6 @@ class UserBuilder extends Builder
                 ...$this->customParameters,
             ],
         );
-
-        return $this->requestAll($request);
-    }
-
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function first(): ?array
-    {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::User,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::LISTLIMIT => $this->limit,
-                OnOfficeService::LISTOFFSET => $this->offset,
-                OnOfficeService::SORTBY => $this->getOrderBy(),
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
     }
 
     /**
@@ -76,85 +47,5 @@ class UserBuilder extends Builder
 
         return $this->requestApi($request)
             ->json('response.results.0.data.records.0');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::User,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::SORTBY => $this->getOrderBy(),
-                ...$this->customParameters,
-            ]
-        );
-
-        $this->requestAllChunked($request, $callback);
-    }
-
-    /**
-     * Returns the number of records that match the query. This number is from the API
-     * and might be lower than the actual number of records when queried with get().
-     *
-     * @throws OnOfficeException
-     */
-    public function count(): int
-    {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::User,
-            parameters: [
-                OnOfficeService::DATA => [],
-                OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::LISTLIMIT => 1,
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.meta.cntabsolute', 0);
-    }
-
-    /**
-     * Fetch a single page of results.
-     *
-     * @throws Throwable<OnOfficeException>
-     */
-    protected function getPage(): Collection
-    {
-        return $this->getPageWithMeta()->items;
-    }
-
-    /**
-     * Fetch a single page of results with metadata (total count).
-     *
-     * @throws Throwable<OnOfficeException>
-     */
-    protected function getPageWithMeta(): PaginatedResponse
-    {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::User,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::SORTBY => $this->getOrderBy(),
-                OnOfficeService::LISTLIMIT => $this->pageSize,
-                OnOfficeService::LISTOFFSET => $this->offset,
-                ...$this->customParameters,
-            ],
-        );
-
-        $response = $this->requestApi($request);
-
-        return new PaginatedResponse(
-            items: collect($response->json('response.results.0.data.records', [])),
-            total: $response->json('response.results.0.data.meta.cntabsolute', 0),
-        );
     }
 }
