@@ -81,11 +81,11 @@ class EstateFileBuilder extends Builder
 
         $result = $response->json('response.results.0.data.records.0');
 
-        throw_unless($result, new OnOfficeException(
+        throw_unless($result,
+            OnOfficeException::class,
             OnOfficeError::File_Not_Found->toString(),
             OnOfficeError::File_Not_Found->value,
-            isResponseError: true,
-        ));
+            isResponseError: true);
 
         return $result;
     }

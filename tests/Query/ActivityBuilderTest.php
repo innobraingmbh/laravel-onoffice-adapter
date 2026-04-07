@@ -16,7 +16,6 @@ describe('deprecated estate/address methods', function () {
         $builder->recordIds([1, 2, 3]);
 
         $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
         expect($parameters)->toBe(['estateid' => [1, 2, 3]]);
@@ -29,7 +28,6 @@ describe('deprecated estate/address methods', function () {
         $builder->recordIds([1, 2, 3]);
 
         $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
         expect($parameters)->toBe(['addressid' => [1, 2, 3]]);
@@ -42,7 +40,6 @@ describe('deprecated estate/address methods', function () {
         $builder->recordIds([1, 2, 3]);
 
         $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
         expect($parameters)->toBe(['estateid' => [1, 2, 3]]);
@@ -55,7 +52,6 @@ describe('deprecated estate/address methods', function () {
         $builder->recordIds([1, 2, 3]);
 
         $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
         expect($parameters)->toBe(['addressid' => [1, 2, 3]]);
@@ -69,7 +65,6 @@ describe('new estate/address methods', function () {
         $builder->estateId(123);
 
         $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
         expect($parameters)->toBe(['estateid' => 123]);
@@ -81,7 +76,6 @@ describe('new estate/address methods', function () {
         $builder->addressIds(123);
 
         $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
         expect($parameters)->toBe(['addressid' => [123]]);
@@ -93,7 +87,6 @@ describe('new estate/address methods', function () {
         $builder->addressIds([1, 2, 3]);
 
         $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
         expect($parameters)->toBe(['addressid' => [1, 2, 3]]);
@@ -105,7 +98,6 @@ describe('new estate/address methods', function () {
         $builder->addressIds([1, 2, 3]);
 
         $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $m->setAccessible(true);
         $parameters = $m->invoke($builder, true);
 
         expect($parameters)->toBe(['addressids' => [1, 2, 3]]);
@@ -119,7 +111,6 @@ describe('new estate/address methods', function () {
             ->addressIds([1, 2, 3]);
 
         $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $m->setAccessible(true);
         $parameters = $m->invoke($builder);
 
         expect($parameters)->toBe([

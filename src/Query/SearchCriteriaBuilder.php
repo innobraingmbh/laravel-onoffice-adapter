@@ -49,7 +49,7 @@ class SearchCriteriaBuilder extends Builder
      */
     public function create(array $data): array
     {
-        throw_unless(isset($this->addressId), new OnOfficeQueryException('Address ID is required to create a search criteria'));
+        throw_unless(isset($this->addressId), OnOfficeQueryException::class, 'Address ID is required to create a search criteria');
 
         $request = new OnOfficeRequest(
             OnOfficeAction::Create,

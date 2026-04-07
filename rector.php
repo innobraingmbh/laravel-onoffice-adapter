@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-use Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector;
 use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\LevelSetList;
-use RectorLaravel\Rector\Expr\AppEnvironmentComparisonToParameterRector;
 use RectorLaravel\Rector\FuncCall\RemoveDumpDataDeadCodeRector;
 
 return RectorConfig::configure()
@@ -19,13 +17,10 @@ return RectorConfig::configure()
         deadCode: true,
         codeQuality: true,
         earlyReturn: true,
-        strictBooleans: true,
         carbon: true,
     )
     ->withRules([
-        InlineConstructorDefaultToPropertyRector::class,
         RemoveDumpDataDeadCodeRector::class,
-        AppEnvironmentComparisonToParameterRector::class,
     ])
     ->withSets([
         LevelSetList::UP_TO_PHP_82,

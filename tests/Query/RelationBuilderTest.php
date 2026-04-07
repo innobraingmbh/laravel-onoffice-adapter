@@ -9,7 +9,7 @@ use Innobrain\OnOfficeAdapter\Repositories\RelationRepository;
 describe('childIds', function () {
     it('should set the childIds property to the given childIds', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $builder->childIds([1]);
 
@@ -18,7 +18,7 @@ describe('childIds', function () {
 
     it('should wrap the given childIds in an array if it is a int', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $builder->childIds(1);
 
@@ -27,7 +27,7 @@ describe('childIds', function () {
 
     it('should return the builder instance', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $result = $builder->childIds([1]);
 
@@ -36,7 +36,7 @@ describe('childIds', function () {
 
     it('should add the given childId to the childIds property', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $builder->childIds([1]);
         $builder->addChildIds([2]);
@@ -46,7 +46,7 @@ describe('childIds', function () {
 
     it('should wrap the given childId in an array if it is a int', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $builder->childIds([1]);
         $builder->addChildIds(2);
@@ -58,7 +58,7 @@ describe('childIds', function () {
 describe('parentIds', function () {
     it('should set the parentIds property to the given parentIds', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $builder->parentIds([1]);
 
@@ -67,7 +67,7 @@ describe('parentIds', function () {
 
     it('should wrap the given parentIds in an array if it is a int', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $builder->parentIds(1);
 
@@ -76,7 +76,7 @@ describe('parentIds', function () {
 
     it('should return the builder instance', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $result = $builder->parentIds([1]);
 
@@ -85,7 +85,7 @@ describe('parentIds', function () {
 
     it('should add the given parentId to the parentIds property', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $builder->parentIds([1]);
         $builder->addParentIds([2]);
@@ -95,7 +95,7 @@ describe('parentIds', function () {
 
     it('should wrap the given parentId in an array if it is a int', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $builder->parentIds([1]);
         $builder->addParentIds(2);
@@ -107,7 +107,7 @@ describe('parentIds', function () {
 describe('relationType', function () {
     it('should set the relationType property to the given relationType', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $builder->relationType(OnOfficeRelationType::Buyer);
 
@@ -116,7 +116,7 @@ describe('relationType', function () {
 
     it('should return the builder instance', function () {
         $builder = new RelationBuilder;
-        $builder->setRepository(app(RelationRepository::class));
+        $builder->setRepository(resolve(RelationRepository::class));
 
         $result = $builder->relationType(OnOfficeRelationType::Buyer);
 

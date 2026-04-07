@@ -8,7 +8,7 @@ use Innobrain\OnOfficeAdapter\Repositories\FilterRepository;
 describe('withModule', function () {
     it('should set the module property to the given module', function () {
         $builder = new FilterBuilder;
-        $builder->setRepository(app(FilterRepository::class));
+        $builder->setRepository(resolve(FilterRepository::class));
 
         $builder->estate();
 
@@ -17,7 +17,7 @@ describe('withModule', function () {
 
     it('should return the builder instance', function () {
         $builder = new FilterBuilder;
-        $builder->setRepository(app(FilterRepository::class));
+        $builder->setRepository(resolve(FilterRepository::class));
 
         $result = $builder->address();
 
@@ -26,7 +26,7 @@ describe('withModule', function () {
 
     it('should overwrite module in the module property', function () {
         $builder = new FilterBuilder;
-        $builder->setRepository(app(FilterRepository::class));
+        $builder->setRepository(resolve(FilterRepository::class));
 
         $builder->estate();
         $builder->address();

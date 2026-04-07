@@ -11,19 +11,18 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Input;
+use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class EstateBuilder extends Builder
 {
     use Input;
+    use Paginate;
 
-    /**
-     * @throws OnOfficeException
-     */
-    public function get(): Collection
+    protected function buildReadRequest(): OnOfficeRequest
     {
-        $request = new OnOfficeRequest(
+        return new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Estate,
             parameters: [
@@ -33,30 +32,6 @@ class EstateBuilder extends Builder
                 ...$this->customParameters,
             ]
         );
-
-        return $this->requestAll($request);
-    }
-
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function first(): ?array
-    {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Estate,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::LISTLIMIT => $this->limit,
-                OnOfficeService::LISTOFFSET => $this->offset,
-                OnOfficeService::SORTBY => $this->getOrderBy(),
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
     }
 
     /**
@@ -76,25 +51,6 @@ class EstateBuilder extends Builder
 
         return $this->requestApi($request)
             ->json('response.results.0.data.records.0');
-    }
-
-    /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Estate,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::SORTBY => $this->getOrderBy(),
-                ...$this->customParameters,
-            ]
-        );
-
-        $this->requestAllChunked($request, $callback);
     }
 
     /**
@@ -159,28 +115,5 @@ class EstateBuilder extends Builder
         );
 
         return $this->requestAll($request);
-    }
-
-    /**
-     * Returns the number of records that match the query. This number is from the API
-     * and might be lower than the actual number of records when queried with get().
-     *
-     * @throws OnOfficeException
-     */
-    public function count(): int
-    {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Estate,
-            parameters: [
-                OnOfficeService::DATA => [],
-                OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::LISTLIMIT => 1,
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.meta.cntabsolute', 0);
     }
 }

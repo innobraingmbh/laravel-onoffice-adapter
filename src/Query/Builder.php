@@ -154,7 +154,7 @@ class Builder implements BuilderInterface
 
     protected function createOnOfficeService(): OnOfficeService
     {
-        return app(OnOfficeService::class);
+        return resolve(OnOfficeService::class);
     }
 
     public function setRepository(BaseRepository $repository): static
@@ -238,7 +238,7 @@ class Builder implements BuilderInterface
         $response = $this->getStubCallable($request);
 
         if (is_null($response)) {
-            throw_if($this->preventStrayRequests, new StrayRequestException(request: $request));
+            throw_if($this->preventStrayRequests, StrayRequestException::class, request: $request);
 
             $response = $this->getOnOfficeService()->requestApi($request);
         } else {
@@ -341,9 +341,7 @@ class Builder implements BuilderInterface
                 /** @var array<int, array{id: string|int}> $records */
                 $records = $response->json($resultPath, []);
 
-                $records = array_filter($records, static function (array $record) use ($allowedIds): bool {
-                    return in_array((int) $record['id'], $allowedIds, true);
-                });
+                $records = array_filter($records, static fn (array $record): bool => in_array((int) $record['id'], $allowedIds, true));
 
                 $responseBody = $response->json();
                 data_set($responseBody, $resultPath, array_values($records));
@@ -577,8 +575,8 @@ class Builder implements BuilderInterface
                     'op' => $operator,
                     'val' => $value,
                 ];
-            })->toArray(),
-        ])->toArray();
+            })->all(),
+        ])->all();
     }
 
     /**
@@ -592,7 +590,7 @@ class Builder implements BuilderInterface
             return [
                 $column => $direction,
             ];
-        })->toArray();
+        })->all();
     }
 
     public function parameter(string $key, mixed $value): static

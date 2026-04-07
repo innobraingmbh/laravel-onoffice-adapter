@@ -8,7 +8,7 @@ use Innobrain\OnOfficeAdapter\Repositories\AddressRepository;
 describe('recordIds', function () {
     it('should set the recordIds property to the given recordIds', function () {
         $builder = new AddressBuilder;
-        $builder->setRepository(app(AddressRepository::class));
+        $builder->setRepository(resolve(AddressRepository::class));
 
         $builder->recordIds([1]);
 
@@ -17,7 +17,7 @@ describe('recordIds', function () {
 
     it('should wrap the given recordIds in an array if it is a int', function () {
         $builder = new AddressBuilder;
-        $builder->setRepository(app(AddressRepository::class));
+        $builder->setRepository(resolve(AddressRepository::class));
 
         $builder->recordIds(1);
 
@@ -26,7 +26,7 @@ describe('recordIds', function () {
 
     it('should return the builder instance', function () {
         $builder = new AddressBuilder;
-        $builder->setRepository(app(AddressRepository::class));
+        $builder->setRepository(resolve(AddressRepository::class));
 
         $result = $builder->recordIds([1]);
 
@@ -35,7 +35,7 @@ describe('recordIds', function () {
 
     it('should add the given recordId to the recordIds property', function () {
         $builder = new AddressBuilder;
-        $builder->setRepository(app(AddressRepository::class));
+        $builder->setRepository(resolve(AddressRepository::class));
 
         $builder->recordIds([1]);
         $builder->addRecordIds([2]);
@@ -45,7 +45,7 @@ describe('recordIds', function () {
 
     it('should wrap the given recordId in an array if it is a int', function () {
         $builder = new AddressBuilder;
-        $builder->setRepository(app(AddressRepository::class));
+        $builder->setRepository(resolve(AddressRepository::class));
 
         $builder->recordIds([1]);
         $builder->addRecordIds(2);
@@ -57,7 +57,7 @@ describe('recordIds', function () {
 describe('customParameters', function () {
     it('should set the country iso code type property to the given type', function () {
         $builder = new AddressBuilder;
-        $builder->setRepository(app(AddressRepository::class));
+        $builder->setRepository(resolve(AddressRepository::class));
 
         $builder->addCountryIsoCodeType('ISO-3166-2');
 
