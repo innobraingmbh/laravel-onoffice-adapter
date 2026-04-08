@@ -109,6 +109,84 @@ describe('CRUD operations', function () {
         });
     });
 
+    it('sends create request with correct action and data', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)->create([
+            'Betreff' => 'Call back',
+            'Prio' => 3,
+        ]);
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $body = json_decode($request->body(), true);
+
+            return data_get($body, 'request.actions.0.actionid') === OnOfficeAction::Create->value
+                && data_get($body, 'request.actions.0.resourcetype') === OnOfficeResourceType::Task->value
+                && data_get($body, 'request.actions.0.parameters.data.Betreff') === 'Call back'
+                && data_get($body, 'request.actions.0.parameters.data.Prio') === 3;
+        });
+    });
+
+    it('forwards related ids at top level on create', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)
+            ->relatedEstate(42)
+            ->relatedAddress(7)
+            ->relatedProject(11)
+            ->create(['Betreff' => 'Linked task']);
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $body = json_decode($request->body(), true);
+            $params = data_get($body, 'request.actions.0.parameters', []);
+
+            return data_get($params, 'relatedEstateId') === 42
+                && data_get($params, 'relatedAddressId') === 7
+                && data_get($params, 'relatedProjectIds') === 11
+                && ! array_key_exists('relatedEstateId', data_get($params, 'data', []))
+                && ! array_key_exists('relatedAddressId', data_get($params, 'data', []));
+        });
+    });
+
+    it('returns the created record from create()', function () {
+        $builder = new TaskBuilder;
+        $result = $builder->setRepository(new TaskRepository)->create(['Betreff' => 'New']);
+
+        expect($result)->toBe(['id' => 1, 'type' => 'task', 'elements' => []]);
+    });
+
+    it('sends modify request with resourceid and data', function () {
+        $builder = new TaskBuilder;
+        $result = $builder->setRepository(new TaskRepository)
+            ->addModify('Status', 4)
+            ->modify(99);
+
+        expect($result)->toBeTrue();
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $body = json_decode($request->body(), true);
+
+            return data_get($body, 'request.actions.0.actionid') === OnOfficeAction::Modify->value
+                && data_get($body, 'request.actions.0.resourcetype') === OnOfficeResourceType::Task->value
+                && data_get($body, 'request.actions.0.resourceid') === 99
+                && data_get($body, 'request.actions.0.parameters.data.Status') === 4;
+        });
+    });
+
+    it('forwards related ids at top level on modify', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)
+            ->relatedEstate(42)
+            ->addModify('Status', 4)
+            ->modify(99);
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $body = json_decode($request->body(), true);
+            $params = data_get($body, 'request.actions.0.parameters', []);
+
+            return data_get($params, 'relatedEstateId') === 42
+                && ! array_key_exists('relatedEstateId', data_get($params, 'data', []));
+        });
+    });
+
     it('sends read request for find()', function () {
         $builder = new TaskBuilder;
         $builder->setRepository(new TaskRepository)->find(5);
