@@ -84,8 +84,8 @@ class AddressFileBuilder extends Builder
         throw_unless($result,
             OnOfficeException::class,
             OnOfficeError::File_Not_Found->toString(),
-            OnOfficeError::File_Not_Found->value,
-            isResponseError: true);
+            OnOfficeError::File_Not_Found->value, // @phpstan-ignore argument.type
+            isResponseError: true); // @phpstan-ignore argument.type
 
         return $result;
     }
