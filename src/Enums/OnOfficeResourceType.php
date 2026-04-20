@@ -33,6 +33,10 @@ enum OnOfficeResourceType: string
     case CheckUserRecordsRight = 'checkuserrecordsright';
     case GetLink = 'getlink';
     case RecordsLastSeen = 'recordsLastSeen';
+    case Calendar = 'calendar';
     case AppointmentList = 'appointmentList';
+    case AppointmentConflicts = 'appointmentConflicts';
+    case AppointmentAffirmation = 'appointmentAffirmation';
+    case CalendarResources = 'calendarResources';
     case Task = 'task';
 }

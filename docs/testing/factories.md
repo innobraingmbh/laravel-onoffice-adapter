@@ -196,6 +196,37 @@ ActivityRepository::fake(ActivityRepository::response([
 ]));
 ```
 
+### Appointments
+
+```php
+use Innobrain\OnOfficeAdapter\Facades\AppointmentRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AppointmentFactory;
+
+AppointmentRepository::fake(AppointmentRepository::response([
+    AppointmentRepository::page(recordFactories: [
+        AppointmentFactory::make()
+            ->id(42)
+            ->data([
+                'id' => '42',
+                'subject' => 'Property Viewing',
+                'notes' => 'Meet at the front door',
+                'type' => ['value' => 'Besichtigung', 'label' => 'Besichtigung'],
+                'status' => ['value' => 'active', 'label' => 'active'],
+                'date' => [
+                    'start' => '2025-06-15T12:00:00+00:00',
+                    'end' => '2025-06-15T13:00:00+00:00',
+                    'allDay' => false,
+                ],
+            ]),
+    ]),
+]));
+
+$appointments = AppointmentRepository::query()
+    ->dateRange('2025-06-01', '2025-06-30')
+    ->select(['id', 'subject', 'date', 'type'])
+    ->get();
+```
+
 ### Search Criteria
 
 ```php
@@ -458,6 +489,7 @@ it('fetches active estates for sale', function () {
 | `EstateFactory` | `estate` | Real estate listings |
 | `AddressFactory` | `address` | Contacts, buyers, owners |
 | `ActivityFactory` | `agentslog` | Activity log entries |
+| `AppointmentFactory` | `calendar` | Calendar appointments |
 | `SearchCriteriaFactory` | - | Buyer search profiles |
 | `RelationFactory` | - | Links between records |
 | `EstatePictureFactory` | `estatepictures` | Estate images (includes defaults) |

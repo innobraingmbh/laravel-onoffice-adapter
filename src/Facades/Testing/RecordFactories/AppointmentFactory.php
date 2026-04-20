@@ -6,5 +6,5 @@ namespace Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories;
 
 class AppointmentFactory extends BaseFactory
 {
-    public string $type = 'appointmentList';
+    public string $type = 'calendar';
 }
