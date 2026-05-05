@@ -49,7 +49,10 @@ describe('get operation', function () {
 
     it('sends get request with correct action and resource type', function () {
         $builder = new AppointmentBuilder;
-        $builder->setRepository(new AppointmentRepository)->get();
+        $builder
+            ->setRepository(new AppointmentRepository)
+            ->dateRange('2026-01-01', '2026-12-31')
+            ->get();
 
         Http::assertSent(function (Request $request) {
             $body = json_decode($request->body(), true);
@@ -78,6 +81,7 @@ describe('get operation', function () {
         $builder = new AppointmentBuilder;
         $builder
             ->setRepository(new AppointmentRepository)
+            ->dateRange('2026-01-01', '2026-12-31')
             ->select(['subject', 'date'])
             ->get();
 
@@ -92,6 +96,7 @@ describe('get operation', function () {
         $builder = new AppointmentBuilder;
         $builder
             ->setRepository(new AppointmentRepository)
+            ->dateRange('2026-01-01', '2026-12-31')
             ->where('type', 'call')
             ->get();
 
@@ -101,5 +106,12 @@ describe('get operation', function () {
 
             return array_key_exists('type', $filter);
         });
+    });
+
+    it('throws when dateRange is missing on list reads', function () {
+        $builder = new AppointmentBuilder;
+
+        expect(fn () => $builder->setRepository(new AppointmentRepository)->get())
+            ->toThrow(\Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException::class);
     });
 });

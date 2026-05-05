@@ -60,6 +60,25 @@ EstateRepository::assertSentCount(1);
 
 Factory classes in `src/Facades/Testing/RecordFactories/` build fake response data.
 
+### Live API Probes
+
+For exploring or debugging endpoints against the real API, use `bootstrap/probe.php`. It boots a Testbench Laravel container, loads `ON_OFFICE_TOKEN` / `ON_OFFICE_SECRET` from the package-root `.env`, registers the service provider, and returns a booted app. Facades work normally afterwards.
+
+Drop one-off scripts into `scratch/` (gitignored):
+
+```php
+<?php
+require __DIR__.'/../bootstrap/probe.php';
+
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+
+dump(EstateRepository::query()->select(['Id', 'kaufpreis'])->first());
+```
+
+Run with `php scratch/whatever.php`. The bootstrap exits with a clear error if credentials are missing — it never falls through silently.
+
+This is for development feedback only, not test infrastructure. Do not commit probes; do not call write endpoints (`create` / `modify` / `delete`) without confirming the target tenant.
+
 ### Key Traits
 
 - `Concerns/Input` - Adds `input()` method for search queries

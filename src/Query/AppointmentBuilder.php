@@ -84,6 +84,12 @@ class AppointmentBuilder extends Builder
 
     protected function buildReadRequest(): OnOfficeRequest
     {
+        if ($this->startDate === null || $this->endDate === null) {
+            throw new OnOfficeException(
+                'Reading the appointment list requires a date range. Call dateRange($startDate, $endDate) before get()/first()/each(), or use find($id) to read a single appointment.',
+            );
+        }
+
         return new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::AppointmentList,
@@ -101,8 +107,8 @@ class AppointmentBuilder extends Builder
     public function find(int $id): ?array
     {
         $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Calendar,
+            OnOfficeAction::Get,
+            OnOfficeResourceType::AppointmentList,
             $id,
             parameters: [
                 OnOfficeService::DATA => $this->columns,

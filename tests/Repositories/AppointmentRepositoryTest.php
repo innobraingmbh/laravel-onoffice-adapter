@@ -60,8 +60,8 @@ describe('fake responses', function () {
         expect($response)->toBeArray()
             ->and($response['id'])->toBe(42);
 
-        AppointmentRepository::assertSent(fn (OnOfficeRequest $request) => $request->actionId === OnOfficeAction::Read
-            && $request->resourceType === OnOfficeResourceType::Calendar
+        AppointmentRepository::assertSent(fn (OnOfficeRequest $request) => $request->actionId === OnOfficeAction::Get
+            && $request->resourceType === OnOfficeResourceType::AppointmentList
             && $request->resourceId === 42
         );
     });
