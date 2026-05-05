@@ -62,22 +62,18 @@ Factory classes in `src/Facades/Testing/RecordFactories/` build fake response da
 
 ### Live API Probes
 
-For exploring or debugging endpoints against the real API, use `bootstrap/probe.php`. It boots a Testbench Laravel container, loads `ON_OFFICE_TOKEN` / `ON_OFFICE_SECRET` from the package-root `.env`, registers the service provider, and returns a booted app. Facades work normally afterwards.
+For exploring or debugging endpoints against the real onOffice API, use Workbench Artisan commands under `workbench/app/Console/Commands/`. The `WorkbenchServiceProvider` loads `ON_OFFICE_TOKEN` / `ON_OFFICE_SECRET` from the package-root `.env` and pushes them into `config('onoffice.*')`, so probes call the real API the same way consumers would.
 
-Drop one-off scripts into `scratch/` (gitignored):
+Run a probe via Testbench:
 
-```php
-<?php
-require __DIR__.'/../bootstrap/probe.php';
-
-use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
-
-dump(EstateRepository::query()->select(['Id', 'kaufpreis'])->first());
+```bash
+vendor/bin/testbench probe:appointments
+vendor/bin/testbench probe:appointments --start=2025-01-01 --end=2025-12-31
 ```
 
-Run with `php scratch/whatever.php`. The bootstrap exits with a clear error if credentials are missing — it never falls through silently.
+Add a new probe by dropping a command into `workbench/app/Console/Commands/` and registering it in `WorkbenchServiceProvider::boot()`. Use the package's facades (`AppointmentRepository::query()->...`) directly inside `handle()`.
 
-This is for development feedback only, not test infrastructure. Do not commit probes; do not call write endpoints (`create` / `modify` / `delete`) without confirming the target tenant.
+This is for development feedback only, not test infrastructure. Probes that hit write endpoints (`create` / `modify` / `delete`) should confirm the target tenant before running.
 
 ### Key Traits
 
