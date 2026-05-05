@@ -57,6 +57,53 @@ class TaskBuilder extends Builder
             ->json('response.results.0.data.records.0');
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    public function create(array $data): array
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Create,
+            OnOfficeResourceType::Task,
+            parameters: array_filter([
+                OnOfficeService::DATA => $data,
+                'relatedAddressId' => $this->relatedAddressId,
+                'relatedEstateId' => $this->relatedEstateId,
+                'relatedProjectIds' => $this->relatedProjectId,
+                ...$this->customParameters,
+            ], fn ($v) => ! is_null($v)),
+        );
+
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
+    }
+
+    /**
+     * @throws Throwable<OnOfficeException>
+     */
+    public function modify(int $id): bool
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Modify,
+            OnOfficeResourceType::Task,
+            $id,
+            parameters: array_filter([
+                OnOfficeService::DATA => $this->modifies,
+                'relatedAddressId' => $this->relatedAddressId,
+                'relatedEstateId' => $this->relatedEstateId,
+                'relatedProjectIds' => $this->relatedProjectId,
+                ...$this->customParameters,
+            ], fn ($v) => ! is_null($v)),
+        );
+
+        $this->requestApi($request);
+
+        return true;
+    }
+
     public function relatedAddress(int $id): static
     {
         $this->relatedAddressId = $id;

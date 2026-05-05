@@ -304,7 +304,7 @@ class OnOfficeService
             $token = $this->getToken();
             $secret = $this->getSecret();
 
-            throw_if(strlen($token) !== 32 || strlen($secret) !== 64, OnOfficeException::class, 'The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.', $statusErrorCode, isResponseError: true);
+            throw_if(strlen($token) !== 32 || strlen($secret) !== 64, OnOfficeException::class, 'The HMAC is invalid. The token must be 32 characters, the secret 64 characters long.', $statusErrorCode, isResponseError: true); // @phpstan-ignore argument.type
         }
 
         match (true) {
