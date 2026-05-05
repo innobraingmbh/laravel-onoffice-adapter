@@ -112,6 +112,6 @@ describe('get operation', function () {
         $builder = new AppointmentBuilder;
 
         expect(fn () => $builder->setRepository(new AppointmentRepository)->get())
-            ->toThrow(\Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException::class);
+            ->toThrow(Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException::class);
     });
 });
