@@ -19,11 +19,6 @@ composer analyse
 
 # Code formatting (Laravel Pint)
 composer format
-
-# Purge generated workbench/skeleton artifacts (testbench.yaml cache, sqlite db,
-# compiled config/route/view caches). Not run automatically on composer install
-# — run manually if probes or workbench builds leave stale state behind.
-composer clear
 ```
 
 ## Architecture
