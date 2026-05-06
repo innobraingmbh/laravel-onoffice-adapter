@@ -7,12 +7,14 @@ namespace Innobrain\OnOfficeAdapter\Facades;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Query\AppointmentBuilder;
+use Innobrain\OnOfficeAdapter\Query\AppointmentFileBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\AppointmentRepository as RootRepository;
 
 /**
  * @see RootRepository
  *
  * @method static AppointmentBuilder query()
+ * @method static AppointmentFileBuilder files(int $appointmentId)
  */
 class AppointmentRepository extends BaseRepository
 {

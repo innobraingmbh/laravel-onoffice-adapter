@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
@@ -9,25 +10,18 @@ use Innobrain\OnOfficeAdapter\Query\AppointmentBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\AppointmentRepository;
 
 describe('date methods', function () {
-    it('sets startDate', function () {
+    it('sets startDate and endDate via dateRange', function () {
         $builder = new AppointmentBuilder;
-        $builder->startDate('2026-01-01');
+        $builder->dateRange('2026-01-01', '2026-12-31');
 
-        expect($builder->startDate)->toBe('2026-01-01');
-    });
-
-    it('sets endDate', function () {
-        $builder = new AppointmentBuilder;
-        $builder->endDate('2026-12-31');
-
-        expect($builder->endDate)->toBe('2026-12-31');
+        expect($builder->startDate)->toBe('2026-01-01')
+            ->and($builder->endDate)->toBe('2026-12-31');
     });
 
     it('returns builder instance for chaining', function () {
         $builder = new AppointmentBuilder;
 
-        expect($builder->startDate('2026-01-01'))->toBeInstanceOf(AppointmentBuilder::class)
-            ->and($builder->endDate('2026-12-31'))->toBeInstanceOf(AppointmentBuilder::class);
+        expect($builder->dateRange('2026-01-01', '2026-12-31'))->toBeInstanceOf(AppointmentBuilder::class);
     });
 });
 
@@ -55,9 +49,12 @@ describe('get operation', function () {
 
     it('sends get request with correct action and resource type', function () {
         $builder = new AppointmentBuilder;
-        $builder->setRepository(new AppointmentRepository)->get();
+        $builder
+            ->setRepository(new AppointmentRepository)
+            ->dateRange('2026-01-01', '2026-12-31')
+            ->get();
 
-        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+        Http::assertSent(function (Request $request) {
             $body = json_decode($request->body(), true);
 
             return data_get($body, 'request.actions.0.actionid') === OnOfficeAction::Get->value
@@ -69,15 +66,14 @@ describe('get operation', function () {
         $builder = new AppointmentBuilder;
         $builder
             ->setRepository(new AppointmentRepository)
-            ->startDate('2026-01-01')
-            ->endDate('2026-12-31')
+            ->dateRange('2026-01-01', '2026-12-31')
             ->get();
 
-        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+        Http::assertSent(function (Request $request) {
             $body = json_decode($request->body(), true);
 
-            return data_get($body, 'request.actions.0.parameters.startDate') === '2026-01-01'
-                && data_get($body, 'request.actions.0.parameters.endDate') === '2026-12-31';
+            return data_get($body, 'request.actions.0.parameters.filter.startDate') === '2026-01-01'
+                && data_get($body, 'request.actions.0.parameters.filter.endDate') === '2026-12-31';
         });
     });
 
@@ -85,10 +81,11 @@ describe('get operation', function () {
         $builder = new AppointmentBuilder;
         $builder
             ->setRepository(new AppointmentRepository)
+            ->dateRange('2026-01-01', '2026-12-31')
             ->select(['subject', 'date'])
             ->get();
 
-        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+        Http::assertSent(function (Request $request) {
             $body = json_decode($request->body(), true);
 
             return data_get($body, 'request.actions.0.parameters.data') === ['subject', 'date'];
@@ -99,14 +96,22 @@ describe('get operation', function () {
         $builder = new AppointmentBuilder;
         $builder
             ->setRepository(new AppointmentRepository)
+            ->dateRange('2026-01-01', '2026-12-31')
             ->where('type', 'call')
             ->get();
 
-        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+        Http::assertSent(function (Request $request) {
             $body = json_decode($request->body(), true);
             $filter = data_get($body, 'request.actions.0.parameters.filter', []);
 
             return array_key_exists('type', $filter);
         });
+    });
+
+    it('throws when dateRange is missing on list reads', function () {
+        $builder = new AppointmentBuilder;
+
+        expect(fn () => $builder->setRepository(new AppointmentRepository)->get())
+            ->toThrow(Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException::class);
     });
 });

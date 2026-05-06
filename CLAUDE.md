@@ -60,6 +60,21 @@ EstateRepository::assertSentCount(1);
 
 Factory classes in `src/Facades/Testing/RecordFactories/` build fake response data.
 
+### Live API Probes
+
+For exploring or debugging endpoints against the real onOffice API, use Workbench Artisan commands under `workbench/app/Console/Commands/`. The `WorkbenchServiceProvider` loads `ON_OFFICE_TOKEN` / `ON_OFFICE_SECRET` from the package-root `.env` and pushes them into `config('onoffice.*')`, so probes call the real API the same way consumers would.
+
+Run a probe via Testbench:
+
+```bash
+vendor/bin/testbench probe:appointments
+vendor/bin/testbench probe:appointments --start=2025-01-01 --end=2025-12-31
+```
+
+Add a new probe by dropping a command into `workbench/app/Console/Commands/` and registering it in `WorkbenchServiceProvider::boot()`. Use the package's facades (`AppointmentRepository::query()->...`) directly inside `handle()`.
+
+This is for development feedback only, not test infrastructure. Probes that hit write endpoints (`create` / `modify` / `delete`) should confirm the target tenant before running.
+
 ### Key Traits
 
 - `Concerns/Input` - Adds `input()` method for search queries
