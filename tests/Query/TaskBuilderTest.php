@@ -200,3 +200,43 @@ describe('CRUD operations', function () {
         });
     });
 });
+
+describe('count', function () {
+    beforeEach(function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
+                'status' => ['code' => 200],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => ['cntabsolute' => 13],
+                                'records' => [],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+    });
+
+    it('requests the maximum page size instead of listlimit=1', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)->count();
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $body = json_decode($request->body(), true);
+            $params = data_get($body, 'request.actions.0.parameters', []);
+
+            return data_get($params, 'listlimit') === 500
+                && data_get($params, 'data') === [];
+        });
+    });
+
+    it('returns the absolute task count from meta', function () {
+        $builder = new TaskBuilder;
+
+        expect($builder->setRepository(new TaskRepository)->count())->toBe(13);
+    });
+});
