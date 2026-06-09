@@ -16,11 +16,40 @@ class TaskBuilder extends Builder
 {
     use Paginate;
 
+    /**
+     * The task read endpoint reports `meta.cntabsolute` as the number of rows
+     * actually returned (i.e. min(listlimit, total)), not a true absolute count.
+     * It also accepts no listoffset, so the largest count it can report is the
+     * API's maximum page size.
+     */
+    private const MAX_LIST_LIMIT = 500;
+
     public ?int $relatedAddressId = null;
 
     public ?int $relatedEstateId = null;
 
     public ?int $relatedProjectId = null;
+
+    /**
+     * Count matching tasks.
+     *
+     * Unlike other resources, the task endpoint's `meta.cntabsolute` equals the
+     * number of records returned for the given listlimit rather than the real
+     * total, so the inherited count() (which forces listlimit=1) always returns
+     * 1. Requesting the maximum page size makes cntabsolute reflect the true
+     * total, capped at MAX_LIST_LIMIT when more tasks exist.
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    public function count(): int
+    {
+        $request = $this->buildReadRequest();
+        data_set($request->parameters, OnOfficeService::DATA, []);
+        data_set($request->parameters, OnOfficeService::LISTLIMIT, self::MAX_LIST_LIMIT);
+
+        return $this->requestApi($request)->json('response.results.0.data.meta.cntabsolute', 0);
+    }
 
     protected function buildReadRequest(): OnOfficeRequest
     {
