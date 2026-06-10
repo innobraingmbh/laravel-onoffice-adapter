@@ -142,7 +142,7 @@ class LogBuilder extends Builder
 
         $request = new OnOfficeRequest(
             OnOfficeAction::Read,
-            OnOfficeResourceType::Address,
+            OnOfficeResourceType::Log,
             parameters: $parameters
         );
 

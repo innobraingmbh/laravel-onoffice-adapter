@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Facades\LogRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\LogFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadLogResponse;
@@ -58,5 +61,8 @@ describe('real responses', function () {
         expect($response)->toBe(1500);
 
         LogRepository::assertSentCount(1);
+        LogRepository::assertSent(fn (OnOfficeRequest $request) => $request->actionId === OnOfficeAction::Read
+            && $request->resourceType === OnOfficeResourceType::Log
+        );
     });
 });
