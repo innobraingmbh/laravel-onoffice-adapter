@@ -4,6 +4,8 @@ A fluent query builder for the onOffice API, designed to feel like Eloquent.
 
 ## Installation
 
+Requires PHP 8.2+ and Laravel 11, 12, or 13.
+
 ```bash
 composer require innobrain/laravel-onoffice-adapter
 ```
@@ -66,26 +68,63 @@ $estates = EstateRepository::query()
 |--------|-------------|
 | `select($fields)` | Fields to retrieve |
 | `where($field, $op, $value)` | Filter by condition |
+| `whereNot($field, $value)` | Negated filter |
 | `whereIn($field, $values)` | Filter by array of values |
+| `whereNotIn($field, $values)` | Exclude array of values |
 | `whereLike($field, $pattern)` | Pattern matching |
+| `whereNotLike($field, $pattern)` | Negated pattern matching |
 | `whereBetween($field, $min, $max)` | Range filter |
 | `orderBy($field)` | Sort ascending |
 | `orderByDesc($field)` | Sort descending |
 | `limit($n)` | Max results |
 | `offset($n)` | Skip results |
 
+## Pagination
+
+Builders that read lists return real Laravel paginators:
+
+```php
+// LengthAwarePaginator, ready for Blade/Livewire pagination links
+$estates = EstateRepository::query()->paginate(perPage: 25);
+
+// Paginator without a total count query
+$estates = EstateRepository::query()->simplePaginate(perPage: 25);
+
+// Just constrain the query to one page
+$estates = EstateRepository::query()->forPage(page: 2, perPage: 25)->get();
+```
+
+For processing large datasets without loading everything into memory, use `each()`:
+
+```php
+EstateRepository::query()->each(function (array $estates) {
+    // Process one page of records per call
+});
+```
+
 ## Available Repositories
 
 | Repository | Description |
 |------------|-------------|
-| `EstateRepository` | Real estate properties |
-| `AddressRepository` | Contacts and addresses |
+| `ActionRepository` | Action types |
 | `ActivityRepository` | Activity logs |
-| `SearchCriteriaRepository` | Buyer search profiles |
+| `AddressRepository` | Contacts and addresses |
+| `AppointmentRepository` | Calendar appointments |
+| `BaseRepository` | Custom requests for uncovered endpoints |
+| `EstateRepository` | Real estate properties |
 | `FieldRepository` | Field metadata |
 | `FileRepository` | File uploads and downloads |
+| `FilterRepository` | Saved filters |
+| `LastSeenRepository` | Recently viewed records |
+| `LinkRepository` | Smart links for records |
+| `LogRepository` | API logs |
+| `MacroRepository` | Macro resolution |
+| `MarketplaceRepository` | Marketplace operations |
 | `RelationRepository` | Record relationships |
-| `SettingRepository` | System settings |
+| `SearchCriteriaRepository` | Buyer search profiles |
+| `SettingRepository` | Users, regions, imprint, actions |
+| `TaskRepository` | Tasks |
+| `UserRepository` | onOffice users |
 
 See [Repositories](./repositories/index.md) for detailed documentation on each.
 

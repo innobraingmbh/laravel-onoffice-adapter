@@ -272,7 +272,7 @@ RelationRepository::fake(RelationRepository::response([
 ]));
 
 $relations = RelationRepository::query()
-    ->relationType(OnOfficeRelationType::EstateBuyer)
+    ->relationType(OnOfficeRelationType::Buyer)
     ->parentIds([5779, 5780])
     ->get();
 ```
@@ -308,22 +308,24 @@ $pictures = EstateRepository::pictures(3729)->get();
 
 ### Files
 
+Fake the response to an upload. `save()` returns the `tmpUploadId` from the faked response:
+
 ```php
 use Innobrain\OnOfficeAdapter\Facades\FileRepository;
-use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\FileFactory;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\FileUploadFactory;
 
 FileRepository::fake(FileRepository::response([
     FileRepository::page(recordFactories: [
-        FileFactory::make()
-            ->ok()  // Sets success status
-            ->data([
-                'tmpUploadId' => 'abc123',
-            ]),
+        FileUploadFactory::make()->tmpUploadId('abc123'),
     ]),
 ]));
 
-FileRepository::query()->save('abc123');
+$tmpUploadId = FileRepository::upload()->save(base64_encode($content));
+
+expect($tmpUploadId)->toBe('abc123');
 ```
+
+Calling `tmpUploadId()` without an argument generates a random UUID.
 
 ## Multiple Pages
 
@@ -368,6 +370,31 @@ EstateRepository::fake([
 
 $first = EstateRepository::query()->get();  // Returns ID 1
 $second = EstateRepository::query()->get(); // Returns ID 2
+```
+
+To repeat the same response several times, use `sequence()`:
+
+```php
+EstateRepository::fake(EstateRepository::sequence(
+    EstateRepository::response([
+        EstateRepository::page(recordFactories: [
+            EstateFactory::make()->id(1),
+        ]),
+    ]),
+    times: 3,
+));
+```
+
+## Stray Requests
+
+By default, requests without a matching stub pass through to the real API. Call `preventStrayRequests()` to make them throw instead:
+
+```php
+// Throw StrayRequestException for requests without a matching stub
+EstateRepository::preventStrayRequests();
+
+// Revert to letting unfaked requests pass through
+EstateRepository::allowStrayRequests();
 ```
 
 ## Error Responses
@@ -505,6 +532,7 @@ it('fetches active estates for sale', function () {
 | `LastSeenFactory` | - | Recently viewed records |
 | `MarketPlaceUnlockProviderFactory` | - | Marketplace data |
 | `ActionFactory` | - | Action types |
+| `TaskFactory` | `task` | Task records |
 
 ## Tips
 

@@ -78,6 +78,10 @@ Each chunk requests the next page automatically.
 If you frequently call a particular endpoint, you can extend `BaseRepository` and implement your own custom builder for specialized logic:
 
 ```php
+use Illuminate\Support\Collection;
+use Innobrain\OnOfficeAdapter\Query\Builder;
+use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
+
 class MySpecialBuilder extends Builder
 {
     public function fetchSomething(): Collection

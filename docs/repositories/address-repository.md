@@ -12,6 +12,8 @@ $address = AddressRepository::query()->find(10505);
 $addresses = AddressRepository::query()->recordIds([1, 2, 3])->get();
 ```
 
+`addRecordIds()` appends to the already set record ids instead of replacing them.
+
 ::: warning
 Record number (Datensatznummer) and customer number (KdNr) are different. The record number is the API ID.
 :::
@@ -88,7 +90,16 @@ AddressRepository::query()
 
 ```php
 $files = AddressRepository::files(100)->get();
+$file = AddressRepository::files(100)->first();
+$file = AddressRepository::files(100)->find(12);
+
+AddressRepository::files(100)
+    ->addModify('Art', 'Dokument')
+    ->modify(12);
+
 AddressRepository::files(100)->delete(12);
+
+AddressRepository::files(100)->each(fn ($files) => /* process */);
 
 $count = AddressRepository::query()->where('Status', 1)->count();
 

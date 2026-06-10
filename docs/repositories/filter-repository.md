@@ -10,6 +10,10 @@ use Innobrain\OnOfficeAdapter\Facades\FilterRepository;
 $filters = FilterRepository::query()->estate()->get();
 $filters = FilterRepository::query()->address()->get();
 $filter = FilterRepository::query()->estate()->first();
+
+FilterRepository::query()->estate()->each(function (array $filters) {
+    // Process chunk
+});
 ```
 
 ::: warning

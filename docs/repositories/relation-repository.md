@@ -21,6 +21,19 @@ $estates = RelationRepository::query()
     ->get();
 ```
 
+`addParentIds()` and `addChildIds()` append to the already set ids instead of replacing them.
+
+## Chunked Processing
+
+```php
+RelationRepository::query()
+    ->relationType(OnOfficeRelationType::ContactPersonAll)
+    ->parentIds([48])
+    ->each(function (array $relations) {
+        // Process chunk
+    });
+```
+
 ## Creating
 
 ```php
@@ -38,10 +51,16 @@ RelationRepository::query()
 | `Buyer` | Buyer of estate |
 | `Tenant` | Renter/tenant |
 | `Owner` | Owner of estate |
+| `Tipster` | Tipster for estate |
 | `ProspectiveBuyer` | Prospective buyer |
 | `ContactPersonAll` | All contact persons |
 | `ContactPersonBroker` | Broker contacts |
+| `EstateOfferAngebot` | Estates offered to address |
+| `EstateContacted` | Estates the address contacted |
+| `EstateMatching` | Estates matching the address |
+| `EstateOffer` | Estate offers from agents log |
 | `ComplexEstateUnits` | Complex units |
+| `AddressHierarchy` | Contact address hierarchy |
 
 Custom URN: `'urn:onoffice-de-ns:smart:2.5:relationTypes:estate:address:buyer'`
 

@@ -24,19 +24,25 @@ export default defineConfig({
             {
                 text: 'Repositories',
                 items: [
+                    {text: 'Action', link: '/repositories/action-repository'},
                     {text: 'Activity', link: '/repositories/activity-repository'},
                     {text: 'Address', link: '/repositories/address-repository'},
+                    {text: 'Appointment', link: '/repositories/appointment-repository'},
                     {text: 'Base', link: '/repositories/base-repository'},
                     {text: 'Estate', link: '/repositories/estate-repository'},
                     {text: 'Field', link: '/repositories/field-repository'},
                     {text: 'File', link: '/repositories/file-repository'},
                     {text: 'Filter', link: '/repositories/filter-repository'},
+                    {text: 'LastSeen', link: '/repositories/last-seen-repository'},
+                    {text: 'Link', link: '/repositories/link-repository'},
                     {text: 'Logs', link: '/repositories/log-repository'},
                     {text: 'Macros', link: '/repositories/macro-repository'},
                     {text: 'Marketplace', link: '/repositories/marketplace-repository'},
                     {text: 'Relation', link: '/repositories/relation-repository'},
                     {text: 'SearchCriteria', link: '/repositories/search-criteria-repository'},
-                    {text: 'Setting', link: '/repositories/setting-repository'}
+                    {text: 'Setting', link: '/repositories/setting-repository'},
+                    {text: 'Task', link: '/repositories/task-repository'},
+                    {text: 'User', link: '/repositories/user-repository'}
                 ]
             },
             {
@@ -48,7 +54,7 @@ export default defineConfig({
             {
                 text: 'Advanced',
                 items: [
-                    {text: 'Advanced Usage', link: 'advanced-usage'},
+                    {text: 'Advanced Usage', link: '/advanced-usage'},
                 ]
             },
         ],

@@ -8,6 +8,7 @@ Read API log entries for debugging and auditing.
 use Innobrain\OnOfficeAdapter\Facades\LogRepository;
 
 $logs = LogRepository::query()->get();
+$log = LogRepository::query()->first();
 $log = LogRepository::query()->find(100);
 
 $logs = LogRepository::query()

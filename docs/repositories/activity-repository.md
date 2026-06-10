@@ -30,17 +30,20 @@ Cannot filter by: `Benutzer`, `Adress_nr`, `Objekt_nr`, `dauer`. Use `addressIds
 
 ## Creating Activities
 
+Set the related records via `addressIds()` and `estateId()` — they take precedence over raw `addressids`/`estateid` keys in the data array:
+
 ```php
-ActivityRepository::query()->create([
-    'addressids' => [34],
-    'estateid' => 41,
-    'actionkind' => 'Email',
-    'actiontype' => 'Ausgang',
-    'note' => 'Contract sent',
-    'advisorylevel' => 'B',      // A-G levels
-    'cost' => 2.45,
-    'duration' => 3000,          // seconds
-]);
+ActivityRepository::query()
+    ->addressIds([34])
+    ->estateId(41)
+    ->create([
+        'actionkind' => 'Email',
+        'actiontype' => 'Ausgang',
+        'note' => 'Contract sent',
+        'advisorylevel' => 'B',      // A-G levels
+        'cost' => 2.45,
+        'duration' => 3000,          // seconds
+    ]);
 ```
 
 ## Advisory Levels

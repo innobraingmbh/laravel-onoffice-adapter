@@ -15,17 +15,25 @@ $users = SettingRepository::users()->where('active', 1)->select(['Name', 'email'
 $count = SettingRepository::users()->count();
 ```
 
+`SettingRepository::users()` and [`UserRepository::query()`](/repositories/user-repository) return the same builder.
+
 ## Regions
 
 ```php
 $regions = SettingRepository::regions()->get();
 $region = SettingRepository::regions()->first();
+
+SettingRepository::regions()->each(function (array $regions) {
+    // Process chunk
+});
 ```
 
 ## Imprint
 
 ```php
 $imprint = SettingRepository::imprint()->get();
+$imprint = SettingRepository::imprint()->first();
+$imprint = SettingRepository::imprint()->find(1);
 ```
 
 ## Actions

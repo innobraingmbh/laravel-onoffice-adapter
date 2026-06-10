@@ -67,7 +67,7 @@ $appointments = AppointmentRepository::query()
 
 ## Finding a Single Appointment
 
-Uses the deprecated `calendar` Read endpoint (the only way to fetch by ID):
+Uses the `appointmentList` Get endpoint with a resource id:
 
 ```php
 $appointment = AppointmentRepository::query()->find(42);

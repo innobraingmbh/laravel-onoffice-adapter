@@ -20,6 +20,10 @@ $criteria = SearchCriteriaRepository::query()->mode('searchcriteria')->find([29,
 $criteria = SearchCriteriaRepository::query()->mode('internal')->find(1214);
 ```
 
+::: warning
+The endpoint cannot list search criteria, so `get()`, `first()`, and `each()` are not supported — use `find()` with one or more ids.
+:::
+
 ## Creating
 
 ```php

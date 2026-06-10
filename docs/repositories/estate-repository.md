@@ -30,9 +30,11 @@ $estates = EstateRepository::query()
     ->where('status', 1)
     ->where('kaufpreis', '<', 300000)
     ->whereIn('objektart', ['haus', 'wohnung'])
+    ->whereNotIn('objekttyp', ['buero'])
     ->whereNot('reserviert', 1)
     ->whereBetween('wohnflaeche', 50, 150)
     ->whereLike('objekttitel', '%Villa%')
+    ->whereNotLike('objekttitel', '%Garage%')
     ->get();
 ```
 
@@ -106,6 +108,10 @@ $pictures = EstateRepository::pictures(100)
     ->size(800, 600)
     ->language('en')
     ->get();
+
+EstateRepository::pictures([100, 101])->each(function (array $pictures) {
+    // Process chunk
+});
 ```
 
 Categories: `Titelbild`, `Foto`, `Foto_gross`, `Grundriss`, `Lageplan`, `Epass_Skala`, `Panorama`, `Link`, `Film-Link`, `Ogulo-Link`, `Objekt-Link`, `Expose`

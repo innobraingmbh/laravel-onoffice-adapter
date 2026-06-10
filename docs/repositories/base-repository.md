@@ -40,7 +40,9 @@ BaseRepository::query()
 
 ## Check User Record Rights
 ```php
-BaseRepository::query()
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+
+EstateRepository::query()
     ->checkUserRecordsRight('edit', 'estate', 1)
     ->get();
 ```
@@ -50,7 +52,9 @@ This chainable method checks if the given user has rights to the records in the 
 - **`dd()`**: Dump request and die
 - **`dump()`**: Dump request without halting execution
 - **`raw()`**: Dump raw request array and die
-- **`record()`** + `lastRecorded()`: Inspect the last request/response
+- **`record()`** + `lastRecorded()`: Inspect the last request/response pair
+- **`lastRecordedRequest()`** / **`lastRecordedResponse()`**: Inspect only the request or only the response
+- **`stopRecording()`**: Stop recording requests
 
 ::: tip
 Use `BaseRepository` when your use case is unique or not yet fully supported by specialized repositories.
