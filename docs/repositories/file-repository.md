@@ -35,6 +35,10 @@ FileRepository::upload()
 
 `estate`, `address`, `agentsLog`, `task`, `tmpUpload`
 
+::: tip
+Files already attached to a record are managed through the record's own repository: [`EstateRepository::files()`](/repositories/estate-repository), [`AddressRepository::files()`](/repositories/address-repository), and [`AppointmentRepository::files()`](/repositories/appointment-repository).
+:::
+
 ## Estate File Types
 
 **Pictures**: `Titelbild`, `Foto`, `Foto_gross`, `Grundriss`, `Lageplan`, `Panorama`
@@ -45,12 +49,13 @@ FileRepository::upload()
 
 ## Upload Links
 
+Links (e.g. `Ogulo-Link`) have no file content, so there is nothing to upload first. Use `linkUrl()`:
+
 ```php
-FileRepository::upload()->saveAndLink(null, [
+FileRepository::upload()->linkUrl('https://example.com/tour', [
     'module' => 'estate',
     'relatedRecordId' => 2651,
     'Art' => 'Ogulo-Link',
-    'url' => 'https://example.com/tour',
 ]);
 ```
 

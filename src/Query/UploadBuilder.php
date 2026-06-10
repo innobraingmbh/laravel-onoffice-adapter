@@ -97,4 +97,30 @@ class UploadBuilder extends Builder
 
         return $this->link($tmpUploadId, $data);
     }
+
+    /**
+     * Link a URL (e.g. an Ogulo, film or object link) to a record.
+     * URLs have no file content, so no upload is needed beforehand.
+     * Returns the linked file data.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    public function linkUrl(string $url, array $data = []): array
+    {
+        $data = array_replace($data, [
+            'url' => $url,
+        ]);
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Do,
+            OnOfficeResourceType::UploadFile,
+            parameters: $data,
+        );
+
+        return $this->requestApi($request)
+            ->json('response.results.0.data.records.0');
+    }
 }
