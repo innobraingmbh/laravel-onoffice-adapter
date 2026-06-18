@@ -38,9 +38,12 @@ class OnOfficeRequest
     }
 
     /**
+     * Returns the action element of the request body,
+     * including the HMAC and timestamp.
+     *
      * @return array<string, mixed>
      */
-    public function toRequestArray(): array
+    public function toActionArray(): array
     {
         /** @var OnOfficeService $onOfficeService */
         $onOfficeService = resolve(OnOfficeService::class);
@@ -50,23 +53,34 @@ class OnOfficeRequest
         }
 
         return [
+            'actionid' => $this->actionId->value,
+            'resourceid' => $this->resourceId instanceof OnOfficeResourceId
+                ? $this->resourceId->value
+                : $this->resourceId,
+            'resourcetype' => $this->resourceType instanceof OnOfficeResourceType
+                ? $this->resourceType->value
+                : $this->resourceType,
+            'identifier' => $this->identifier,
+            'timestamp' => Date::now()->timestamp,
+            'hmac' => $onOfficeService->getHmac($this->actionId, $this->resourceType),
+            'hmac_version' => 2,
+            'parameters' => $this->parameters,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toRequestArray(): array
+    {
+        /** @var OnOfficeService $onOfficeService */
+        $onOfficeService = resolve(OnOfficeService::class);
+
+        return [
             'token' => $onOfficeService->getToken(),
             'request' => [
                 'actions' => [
-                    [
-                        'actionid' => $this->actionId->value,
-                        'resourceid' => $this->resourceId instanceof OnOfficeResourceId
-                            ? $this->resourceId->value
-                            : $this->resourceId,
-                        'resourcetype' => $this->resourceType instanceof OnOfficeResourceType
-                            ? $this->resourceType->value
-                            : $this->resourceType,
-                        'identifier' => $this->identifier,
-                        'timestamp' => Date::now()->timestamp,
-                        'hmac' => $onOfficeService->getHmac($this->actionId, $this->resourceType),
-                        'hmac_version' => 2,
-                        'parameters' => $this->parameters,
-                    ],
+                    $this->toActionArray(),
                 ],
             ],
         ];

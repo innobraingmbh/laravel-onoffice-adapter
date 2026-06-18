@@ -148,6 +148,50 @@ class OnOfficeService
     }
 
     /**
+     * Makes a single request with multiple actions to the onOffice API.
+     * All actions are sent in one HTTP call and the API returns
+     * one result per action, in the same order.
+     *
+     * Read more: https://apidoc.onoffice.de/onoffice-api-request/aufbau/
+     *
+     * @param  array<int, OnOfficeRequest>  $requests
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    public function requestApiBatch(array $requests): Response
+    {
+        $retryOnlyOnConnectionError = static fn ($exception): bool => $exception instanceof ConnectionException;
+
+        if (! $this->retryOnlyOnConnectionError()) {
+            $retryOnlyOnConnectionError = null;
+        }
+
+        /*
+         * All requests have a time-based validation.
+         * If we retry the request, the timestamp will be different.
+         * In this case, the HMAC will be invalid.
+         * To avoid this, we need to retry the request with payload creation until we get a valid response.
+         */
+        $response = null;
+        retry($this->getRetryCount(), function () use ($requests, &$response) {
+            $body = [
+                'token' => $this->getToken(),
+                'request' => [
+                    'actions' => array_map(static fn (OnOfficeRequest $request): array => $request->toActionArray(), $requests),
+                ],
+            ];
+
+            $response = Http::withHeaders(config('onoffice.headers'))->post(config('onoffice.base_url'), $body);
+
+            $this->throwIfBatchResponseIsFailed($response);
+        }, $this->getRetryDelay(), $retryOnlyOnConnectionError);
+
+        /** @var Response $response */
+        return $response;
+    }
+
+    /**
      * Makes a paginated request to the onOffice API.
      * With a max page calculation based on
      * the total count of records,
@@ -286,15 +330,38 @@ class OnOfficeService
      */
     public function throwIfResponseIsFailed(Response $response): void
     {
+        $this->throwIfResultIsFailed($response, 0);
+    }
+
+    /**
+     * Checks the response status and every result of a
+     * multi-action response for errors.
+     *
+     * @throws OnOfficeException
+     */
+    public function throwIfBatchResponseIsFailed(Response $response): void
+    {
+        $resultCount = max(1, count($response->json('response.results', []) ?? []));
+
+        for ($index = 0; $index < $resultCount; $index++) {
+            $this->throwIfResultIsFailed($response, $index);
+        }
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    protected function throwIfResultIsFailed(Response $response, int $index): void
+    {
         $statusCode = $response->json('status.code', 500);
         $statusErrorCode = $response->json('status.errorcode', 0);
-        $responseStatusCode = $response->json('response.results.0.status.errorcode', 0);
+        $responseStatusCode = $response->json("response.results.$index.status.errorcode", 0);
 
         $errorMessage = $response->json('status.message', '');
         if ($errorMessage === '') {
             $errorMessage = "Status code: $statusCode";
         }
-        $responseErrorMessage = $response->json('response.results.0.status.message', '');
+        $responseErrorMessage = $response->json("response.results.$index.status.message", '');
         if ($responseErrorMessage === '') {
             $responseErrorMessage = "Status code: $responseStatusCode";
         }

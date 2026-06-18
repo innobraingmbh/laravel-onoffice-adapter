@@ -53,6 +53,22 @@ trait Paginate
     }
 
     /**
+     * Build the read request this builder would send, without sending it.
+     * Useful for sending multiple requests in one batch. Since a batched
+     * request is never paginated, the limit and offset are baked into the request.
+     */
+    public function toRequest(): OnOfficeRequest
+    {
+        $request = $this->buildReadRequest();
+        data_set($request->parameters, OnOfficeService::LISTLIMIT, $this->limit > 0 ? $this->limit : $this->pageSize);
+        if ($this->supportsListOffset) {
+            data_set($request->parameters, OnOfficeService::LISTOFFSET, $this->offset);
+        }
+
+        return $request;
+    }
+
+    /**
      * Returns the number of records that match the query. This number is from the API
      * and might be lower than the actual number of records when queried with get().
      *
