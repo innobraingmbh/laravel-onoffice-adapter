@@ -240,3 +240,62 @@ describe('count', function () {
         expect($builder->setRepository(new TaskRepository)->count())->toBe(13);
     });
 });
+
+describe('listoffset', function () {
+    beforeEach(function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
+                'status' => ['code' => 200],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => ['cntabsolute' => 1],
+                                'records' => [
+                                    ['id' => 1, 'type' => 'task', 'elements' => []],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+    });
+
+    it('omits listoffset from get() because the task endpoint rejects it', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)->get();
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $params = data_get(json_decode($request->body(), true), 'request.actions.0.parameters', []);
+
+            return array_key_exists('listlimit', $params)
+                && ! array_key_exists('listoffset', $params);
+        });
+    });
+
+    it('omits listoffset from paginate() but keeps listlimit', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)->paginate(perPage: 26, page: 1);
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $params = data_get(json_decode($request->body(), true), 'request.actions.0.parameters', []);
+
+            return data_get($params, 'listlimit') === 26
+                && ! array_key_exists('listoffset', $params);
+        });
+    });
+
+    it('omits listoffset from first()', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)->first();
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $params = data_get(json_decode($request->body(), true), 'request.actions.0.parameters', []);
+
+            return array_key_exists('listlimit', $params)
+                && ! array_key_exists('listoffset', $params);
+        });
+    });
+});

@@ -82,6 +82,13 @@ class Builder implements BuilderInterface
     public array $customParameters = [];
 
     /**
+     * Whether the resource's read endpoint accepts a listoffset parameter.
+     * Most do; a few (e.g. the task endpoint) reject it outright, so their
+     * builders opt out and reads are bounded to a single listlimit page.
+     */
+    protected bool $supportsListOffset = true;
+
+    /**
      * The stub callables that will be used to fake the responses.
      *
      * @var Collection<int, OnOfficeResponse>
@@ -373,7 +380,9 @@ class Builder implements BuilderInterface
          * @throws Throwable
          */ function (int $pageSize, int $offset) use ($request) {
             data_set($request->parameters, OnOfficeService::LISTLIMIT, $pageSize);
-            data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
+            if ($this->supportsListOffset) {
+                data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
+            }
 
             return $this->requestApi($request);
         }, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit, pageOverwrite: $this->getPageOverwrite());
@@ -403,7 +412,9 @@ class Builder implements BuilderInterface
          * @throws Throwable
          */ function (int $pageSize, int $offset) use ($request) {
             data_set($request->parameters, OnOfficeService::LISTLIMIT, $pageSize);
-            data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
+            if ($this->supportsListOffset) {
+                data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
+            }
 
             return $this->requestApi($request);
         }, $callback, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit, pageOverwrite: $this->getPageOverwrite());

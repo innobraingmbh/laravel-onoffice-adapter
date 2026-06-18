@@ -39,7 +39,9 @@ trait Paginate
     {
         $request = $this->buildReadRequest();
         data_set($request->parameters, OnOfficeService::LISTLIMIT, $this->limit > 0 ? $this->limit : $this->pageSize);
-        data_set($request->parameters, OnOfficeService::LISTOFFSET, $this->offset);
+        if ($this->supportsListOffset) {
+            data_set($request->parameters, OnOfficeService::LISTOFFSET, $this->offset);
+        }
 
         return $this->requestApi($request)->json('response.results.0.data.records.0');
     }
@@ -177,7 +179,9 @@ trait Paginate
     {
         $request = $this->buildReadRequest();
         data_set($request->parameters, OnOfficeService::LISTLIMIT, $this->pageSize);
-        data_set($request->parameters, OnOfficeService::LISTOFFSET, $this->offset);
+        if ($this->supportsListOffset) {
+            data_set($request->parameters, OnOfficeService::LISTOFFSET, $this->offset);
+        }
 
         $response = $this->requestApi($request);
 
