@@ -369,6 +369,30 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * Apply the list window (limit and, where supported, offset) to a read request.
+     *
+     * A resource whose endpoint rejects listoffset omits it and can therefore
+     * only read the first page; requesting a later page (a non-zero offset) is a
+     * hard error rather than a silent first-page result.
+     *
+     * @throws OnOfficeException
+     */
+    protected function applyListWindow(OnOfficeRequest $request, int $listLimit, int $offset): void
+    {
+        data_set($request->parameters, OnOfficeService::LISTLIMIT, $listLimit);
+
+        if ($this->supportsListOffset) {
+            data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
+
+            return;
+        }
+
+        throw_if($offset > 0, new OnOfficeException(
+            'This resource does not support offset pagination; only the first page can be read.'
+        ));
+    }
+
+    /**
      * @return Collection<int, array<string, mixed>>
      *
      * @throws OnOfficeException
@@ -379,10 +403,7 @@ class Builder implements BuilderInterface
          * @throws OnOfficeException
          * @throws Throwable
          */ function (int $pageSize, int $offset) use ($request) {
-            data_set($request->parameters, OnOfficeService::LISTLIMIT, $pageSize);
-            if ($this->supportsListOffset) {
-                data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
-            }
+            $this->applyListWindow($request, $pageSize, $offset);
 
             return $this->requestApi($request);
         }, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit, pageOverwrite: $this->getPageOverwrite());
@@ -411,10 +432,7 @@ class Builder implements BuilderInterface
          * @throws OnOfficeException
          * @throws Throwable
          */ function (int $pageSize, int $offset) use ($request) {
-            data_set($request->parameters, OnOfficeService::LISTLIMIT, $pageSize);
-            if ($this->supportsListOffset) {
-                data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
-            }
+            $this->applyListWindow($request, $pageSize, $offset);
 
             return $this->requestApi($request);
         }, $callback, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit, pageOverwrite: $this->getPageOverwrite());

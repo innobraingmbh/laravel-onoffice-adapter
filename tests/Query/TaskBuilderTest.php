@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\TaskBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\TaskRepository;
 
@@ -297,5 +298,12 @@ describe('listoffset', function () {
             return array_key_exists('listlimit', $params)
                 && ! array_key_exists('listoffset', $params);
         });
+    });
+
+    it('throws when a later page is requested because the endpoint cannot offset', function () {
+        $builder = new TaskBuilder;
+
+        expect(fn () => $builder->setRepository(new TaskRepository)->paginate(perPage: 10, page: 3))
+            ->toThrow(OnOfficeException::class, 'does not support offset pagination');
     });
 });
