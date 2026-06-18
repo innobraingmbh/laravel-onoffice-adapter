@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\TaskBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\TaskRepository;
 
@@ -238,5 +239,71 @@ describe('count', function () {
         $builder = new TaskBuilder;
 
         expect($builder->setRepository(new TaskRepository)->count())->toBe(13);
+    });
+});
+
+describe('listoffset', function () {
+    beforeEach(function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
+                'status' => ['code' => 200],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => ['cntabsolute' => 1],
+                                'records' => [
+                                    ['id' => 1, 'type' => 'task', 'elements' => []],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+    });
+
+    it('omits listoffset from get() because the task endpoint rejects it', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)->get();
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $params = data_get(json_decode($request->body(), true), 'request.actions.0.parameters', []);
+
+            return array_key_exists('listlimit', $params)
+                && ! array_key_exists('listoffset', $params);
+        });
+    });
+
+    it('omits listoffset from paginate() but keeps listlimit', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)->paginate(perPage: 26, page: 1);
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $params = data_get(json_decode($request->body(), true), 'request.actions.0.parameters', []);
+
+            return data_get($params, 'listlimit') === 26
+                && ! array_key_exists('listoffset', $params);
+        });
+    });
+
+    it('omits listoffset from first()', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)->first();
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $params = data_get(json_decode($request->body(), true), 'request.actions.0.parameters', []);
+
+            return array_key_exists('listlimit', $params)
+                && ! array_key_exists('listoffset', $params);
+        });
+    });
+
+    it('throws when a later page is requested because the endpoint cannot offset', function () {
+        $builder = new TaskBuilder;
+
+        expect(fn () => $builder->setRepository(new TaskRepository)->paginate(perPage: 10, page: 3))
+            ->toThrow(OnOfficeException::class, 'does not support offset pagination');
     });
 });

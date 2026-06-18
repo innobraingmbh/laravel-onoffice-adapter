@@ -31,6 +31,13 @@ class TaskBuilder extends Builder
     public ?int $relatedProjectId = null;
 
     /**
+     * The task endpoint rejects listoffset outright ("Invalid field in input
+     * data: listoffset"), so reads never send it and are bounded to a single
+     * listlimit page (max 500).
+     */
+    protected bool $supportsListOffset = false;
+
+    /**
      * Count matching tasks.
      *
      * Unlike other resources, the task endpoint's `meta.cntabsolute` equals the
