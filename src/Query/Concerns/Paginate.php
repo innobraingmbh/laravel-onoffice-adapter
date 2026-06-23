@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\PaginatedResponse;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -40,7 +41,7 @@ trait Paginate
         $request = $this->buildReadRequest();
         $this->applyListWindow($request, $this->limit > 0 ? $this->limit : $this->pageSize, $this->offset);
 
-        return $this->requestApi($request)->json('response.results.0.data.records.0');
+        return $this->requestApi($request)->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**
@@ -64,7 +65,7 @@ trait Paginate
         data_set($request->parameters, OnOfficeService::DATA, []);
         data_set($request->parameters, OnOfficeService::LISTLIMIT, 1);
 
-        return $this->requestApi($request)->json('response.results.0.data.meta.cntabsolute', 0);
+        return $this->requestApi($request)->json(OnOfficeResponsePath::META_COUNT_ABSOLUTE, 0);
     }
 
     /**
@@ -180,11 +181,11 @@ trait Paginate
         $response = $this->requestApi($request);
 
         /** @var array<int, array<string, mixed>> $records */
-        $records = $response->json('response.results.0.data.records', []);
+        $records = $response->json(OnOfficeResponsePath::RECORDS, []);
 
         return new PaginatedResponse(
             items: collect($records),
-            total: $response->json('response.results.0.data.meta.cntabsolute', 0),
+            total: $response->json(OnOfficeResponsePath::META_COUNT_ABSOLUTE, 0),
         );
     }
 

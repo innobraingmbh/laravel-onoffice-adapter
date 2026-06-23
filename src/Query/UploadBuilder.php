@@ -12,6 +12,7 @@ use Innobrain\OnOfficeAdapter\Query\Concerns\NonFilterable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonSelectable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\UploadInBlocks;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -52,7 +53,7 @@ class UploadBuilder extends Builder
                 );
 
                 $tmpUploadId = $this->requestApi($request)
-                    ->json('response.results.0.data.records.0.elements.tmpUploadId');
+                    ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_TMP_UPLOAD_ID);
             });
 
         return $tmpUploadId;
@@ -79,7 +80,7 @@ class UploadBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**
@@ -121,6 +122,6 @@ class UploadBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 }

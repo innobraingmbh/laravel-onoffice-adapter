@@ -10,6 +10,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -117,7 +118,7 @@ class AppointmentBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**
@@ -139,7 +140,7 @@ class AppointmentBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**
@@ -159,7 +160,7 @@ class AppointmentBuilder extends Builder
 
         $response = $this->requestApi($request);
 
-        return $response->json('response.results.0.data.records.0.elements') !== null;
+        return $response->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS) !== null;
     }
 
     /**
@@ -177,7 +178,7 @@ class AppointmentBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0.elements.success') === 'success';
+            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_SUCCESS) === 'success';
     }
 
     /**
@@ -199,7 +200,7 @@ class AppointmentBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records', []);
+            ->json(OnOfficeResponsePath::RECORDS, []);
     }
 
     /**
@@ -221,7 +222,7 @@ class AppointmentBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records', []);
+            ->json(OnOfficeResponsePath::RECORDS, []);
     }
 
     /**

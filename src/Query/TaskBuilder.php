@@ -9,6 +9,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -55,7 +56,7 @@ class TaskBuilder extends Builder
         data_set($request->parameters, OnOfficeService::DATA, []);
         data_set($request->parameters, OnOfficeService::LISTLIMIT, self::MAX_LIST_LIMIT);
 
-        return $this->requestApi($request)->json('response.results.0.data.meta.cntabsolute', 0);
+        return $this->requestApi($request)->json(OnOfficeResponsePath::META_COUNT_ABSOLUTE, 0);
     }
 
     protected function buildReadRequest(): OnOfficeRequest
@@ -90,7 +91,7 @@ class TaskBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**
@@ -114,7 +115,7 @@ class TaskBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**

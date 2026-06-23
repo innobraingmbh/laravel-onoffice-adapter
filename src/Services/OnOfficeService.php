@@ -159,8 +159,8 @@ class OnOfficeService
      */
     public function requestAll(
         callable $request,
-        string $resultPath = 'response.results.0.data.records',
-        string $countPath = 'response.results.0.data.meta.cntabsolute',
+        string $resultPath = OnOfficeResponsePath::RECORDS,
+        string $countPath = OnOfficeResponsePath::META_COUNT_ABSOLUTE,
         int $pageSize = 500,
         int $offset = 0,
         int $limit = -1,
@@ -223,8 +223,8 @@ class OnOfficeService
     public function requestAllChunked(
         callable $request,
         callable $callback,
-        string $resultPath = 'response.results.0.data.records',
-        string $countPath = 'response.results.0.data.meta.cntabsolute',
+        string $resultPath = OnOfficeResponsePath::RECORDS,
+        string $countPath = OnOfficeResponsePath::META_COUNT_ABSOLUTE,
         int $pageSize = 500,
         int $offset = 0,
         int $limit = -1,
@@ -288,13 +288,13 @@ class OnOfficeService
     {
         $statusCode = $response->json('status.code', 500);
         $statusErrorCode = $response->json('status.errorcode', 0);
-        $responseStatusCode = $response->json('response.results.0.status.errorcode', 0);
+        $responseStatusCode = $response->json(OnOfficeResponsePath::STATUS_ERROR_CODE, 0);
 
         $errorMessage = $response->json('status.message', '');
         if ($errorMessage === '') {
             $errorMessage = "Status code: $statusCode";
         }
-        $responseErrorMessage = $response->json('response.results.0.status.message', '');
+        $responseErrorMessage = $response->json(OnOfficeResponsePath::STATUS_MESSAGE, '');
         if ($responseErrorMessage === '') {
             $responseErrorMessage = "Status code: $responseStatusCode";
         }

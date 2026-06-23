@@ -11,6 +11,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -58,7 +59,7 @@ class AddressFileBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**
@@ -79,7 +80,7 @@ class AddressFileBuilder extends Builder
 
         $response = $this->requestApi($request);
 
-        $result = $response->json('response.results.0.data.records.0');
+        $result = $response->json(OnOfficeResponsePath::FIRST_RECORD);
 
         throw_unless($result,
             OnOfficeException::class,
@@ -126,7 +127,7 @@ class AddressFileBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0.elements.success') === 'success';
+            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_SUCCESS) === 'success';
     }
 
     /**
@@ -146,6 +147,6 @@ class AddressFileBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0.elements.success') === 'success';
+            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_SUCCESS) === 'success';
     }
 }
