@@ -93,7 +93,7 @@ class ActivityBuilder extends Builder
      */
     public function estate(): static
     {
-        $this->estateOrAddress = 'estateid';
+        $this->estateOrAddress = OnOfficeService::ESTATEID;
 
         return $this;
     }
@@ -103,7 +103,7 @@ class ActivityBuilder extends Builder
      */
     public function address(): static
     {
-        $this->estateOrAddress = 'addressid';
+        $this->estateOrAddress = OnOfficeService::ADDRESSID;
 
         return $this;
     }
@@ -161,13 +161,13 @@ class ActivityBuilder extends Builder
         }
 
         if (! is_null($this->estateId)) {
-            $parameters['estateid'] = $this->estateId;
+            $parameters[OnOfficeService::ESTATEID] = $this->estateId;
         }
 
         if ($this->addressIds !== []) {
             $key = match ($create) {
-                true => 'addressids',
-                false => 'addressid',
+                true => OnOfficeService::ADDRESSIDS,
+                false => OnOfficeService::ADDRESSID,
             };
 
             $parameters[$key] = $this->addressIds;

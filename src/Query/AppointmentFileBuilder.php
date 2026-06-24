@@ -36,7 +36,7 @@ class AppointmentFileBuilder extends Builder
             OnOfficeResourceType::File,
             'appointment',
             parameters: [
-                'appointmentid' => $this->appointmentId,
+                OnOfficeService::APPOINTMENTID => $this->appointmentId,
                 OnOfficeService::LISTLIMIT => $this->limit,
                 OnOfficeService::LISTOFFSET => $this->offset,
                 ...$this->customParameters,

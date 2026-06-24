@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Innobrain\OnOfficeAdapter\Query;
 
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 
 class AddressFileBuilder extends FileBuilder
 {
@@ -21,7 +22,7 @@ class AddressFileBuilder extends FileBuilder
 
     protected function parentIdParameter(): string
     {
-        return 'addressid';
+        return OnOfficeService::ADDRESSID;
     }
 
     protected function relationType(): string
