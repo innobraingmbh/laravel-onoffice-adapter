@@ -1,6 +1,7 @@
 # Changelog
 
 ## main
+- feat: add `SearchCriteriaBuilder::get()` to read multiple search criteria by id in a single request (`recordIds([...])->get()`); `find()` still returns only the first record
 - TODO: Remove old activity repository code in next major release
 
 ## v1.8.2
