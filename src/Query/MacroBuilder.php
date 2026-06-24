@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 
 class MacroBuilder extends Builder
 {
@@ -22,7 +23,7 @@ class MacroBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0.elements.resolvedtext');
+            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_RESOLVED_TEXT);
     }
 
     /**

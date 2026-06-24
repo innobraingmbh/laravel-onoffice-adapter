@@ -12,6 +12,7 @@ use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonFilterable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonSelectable;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Throwable;
 
 class RegionBuilder extends Builder
@@ -46,7 +47,7 @@ class RegionBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**

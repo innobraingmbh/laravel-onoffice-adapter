@@ -21,6 +21,7 @@ use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
 use Innobrain\OnOfficeAdapter\Facades\BaseRepository as BaseRepositoryFacade;
 use Innobrain\OnOfficeAdapter\Query\Concerns\BuilderInterface;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use JsonException;
 use Symfony\Component\VarDumper\VarDumper;
@@ -302,10 +303,10 @@ class Builder implements BuilderInterface
      * @param  string  $module  The module name to check rights in (e.g. 'estate', 'address').
      * @param  int  $userId  The ID of the user whose rights are being checked.
      * @param  string  $resultPath  The dot-notated path to the records in the response body.
-     *                              Defaults to 'response.results.0.data.records'.
+     *                              Defaults to OnOfficeResponsePath::RECORDS.
      * @return self Returns the current Builder instance for method chaining.
      */
-    public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = 'response.results.0.data.records'): self
+    public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = OnOfficeResponsePath::RECORDS): self
     {
         return $this->after([
             function (Response $response, string $action, string $module, int $userId) use ($resultPath): ?Response {
@@ -313,7 +314,7 @@ class Builder implements BuilderInterface
                     return null;
                 }
 
-                $ids = $response->json('response.results.0.data.records.*.id', []);
+                $ids = $response->json(OnOfficeResponsePath::RECORD_IDS, []);
 
                 if ($ids === []) {
                     $responseBody = $response->json();
@@ -342,7 +343,7 @@ class Builder implements BuilderInterface
                         ],
                     ));
 
-                $allowedIds = $userRightsResponse->json('response.results.0.data.records.0.elements', []);
+                $allowedIds = $userRightsResponse->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS, []);
                 $allowedIds = array_map(static fn (string $element): int => (int) $element, $allowedIds);
 
                 /** @var array<int, array{id: string|int}> $records */
