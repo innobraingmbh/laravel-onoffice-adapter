@@ -5,17 +5,22 @@ declare(strict_types=1);
 namespace Innobrain\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeQueryException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
+use Override;
 use Throwable;
 
 class SearchCriteriaBuilder extends Builder
 {
+    use RecordIds;
+
     private string $mode = 'internal';
 
     private int $addressId;
@@ -40,6 +45,30 @@ class SearchCriteriaBuilder extends Builder
 
         return $this->requestApi($request)
             ->json(OnOfficeResponsePath::FIRST_RECORD, []);
+    }
+
+    /**
+     * @return Collection<int, array<string, mixed>>
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    #[Override]
+    public function get(): Collection
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::GetSearchCriteria,
+            parameters: [
+                OnOfficeService::MODE => $this->mode,
+                OnOfficeService::IDS => $this->recordIds,
+                ...$this->customParameters,
+            ],
+        );
+
+        /** @var array<int, array<string, mixed>> $records */
+        $records = $this->requestApi($request)->json(OnOfficeResponsePath::RECORDS, []);
+
+        return collect($records);
     }
 
     /**
