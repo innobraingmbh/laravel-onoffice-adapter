@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\Http;
 
 class GetRegionsResponse
 {
-    public static function make(array $data = []): PromiseInterface
+    public static function make(array $data = [], ?int $cntabsolute = null): PromiseInterface
     {
-        return Http::response(self::getBody($data));
+        $body = self::getBody($data);
+
+        data_set($body, 'response.results.0.data.meta.cntabsolute', $cntabsolute);
+
+        return Http::response($body);
     }
 
     private static function getBody(array $data): array
