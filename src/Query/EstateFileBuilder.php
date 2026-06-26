@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Innobrain\OnOfficeAdapter\Query;
 
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 
 class EstateFileBuilder extends FileBuilder
 {
@@ -21,7 +22,7 @@ class EstateFileBuilder extends FileBuilder
 
     protected function parentIdParameter(): string
     {
-        return 'estateid';
+        return OnOfficeService::ESTATEID;
     }
 
     protected function relationType(): string

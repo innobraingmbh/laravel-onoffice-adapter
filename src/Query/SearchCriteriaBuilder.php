@@ -85,7 +85,7 @@ class SearchCriteriaBuilder extends Builder
             OnOfficeAction::Create,
             OnOfficeResourceType::SearchCriteria,
             parameters: [
-                'addressid' => $this->addressId,
+                OnOfficeService::ADDRESSID => $this->addressId,
                 OnOfficeService::DATA => $data,
             ],
         );

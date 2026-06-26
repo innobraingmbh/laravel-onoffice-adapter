@@ -87,7 +87,7 @@ abstract class FileBuilder extends Builder
             $this->resourceId(),
             parameters: [
                 $this->parentIdParameter() => $this->parentId(),
-                'fileid' => $id,
+                OnOfficeService::FILEID => $id,
                 ...$this->customParameters,
             ],
         );
@@ -130,8 +130,8 @@ abstract class FileBuilder extends Builder
     {
         $parameters = array_replace($this->modifies, [
             'fileId' => $id,
-            'parentid' => $this->parentId(),
-            'relationtype' => $this->relationType(),
+            OnOfficeService::PARENTID => $this->parentId(),
+            OnOfficeService::RELATIONTYPE => $this->relationType(),
         ]);
 
         $request = new OnOfficeRequest(
@@ -154,8 +154,8 @@ abstract class FileBuilder extends Builder
             OnOfficeResourceType::FileRelation,
             parameters: [
                 'fileId' => $id,
-                'parentid' => $this->parentId(),
-                'relationtype' => $this->relationType(),
+                OnOfficeService::PARENTID => $this->parentId(),
+                OnOfficeService::RELATIONTYPE => $this->relationType(),
                 ...$this->customParameters,
             ],
         );
