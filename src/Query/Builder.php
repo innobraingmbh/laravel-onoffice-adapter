@@ -679,6 +679,29 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * Build and send a request to read a single record by its id.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @throws OnOfficeException
+     */
+    protected function requestFind(OnOfficeAction $action, OnOfficeResourceType $resourceType, int $id): ?array
+    {
+        $request = new OnOfficeRequest(
+            $action,
+            $resourceType,
+            $id,
+            parameters: [
+                OnOfficeService::DATA => $this->columns,
+                ...$this->customParameters,
+            ],
+        );
+
+        return $this->requestApi($request)
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
+    }
+
+    /**
      * @return array<string, mixed>|null
      *
      * @throws OnOfficeException
