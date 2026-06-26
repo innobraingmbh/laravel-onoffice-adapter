@@ -107,18 +107,7 @@ class AppointmentBuilder extends Builder
      */
     public function find(int $id): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::AppointmentList,
-            $id,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->requestFind(OnOfficeAction::Get, OnOfficeResourceType::AppointmentList, $id);
     }
 
     /**

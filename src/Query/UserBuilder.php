@@ -9,7 +9,6 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
-use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -36,17 +35,6 @@ class UserBuilder extends Builder
      */
     public function find(int $id): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::User,
-            $id,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->requestFind(OnOfficeAction::Read, OnOfficeResourceType::User, $id);
     }
 }
