@@ -45,6 +45,12 @@ trait OnOfficeParameterConst
 
     public const APPOINTMENTID = 'appointmentid';
 
+    public const RELATEDADDRESSID = 'relatedAddressId';
+
+    public const RELATEDESTATEID = 'relatedEstateId';
+
+    public const RELATEDPROJECTIDS = 'relatedProjectIds';
+
     public const FILEID = 'fileid';
 
     public const PARAMETERCACHEID = 'parameterCacheId';
