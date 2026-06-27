@@ -67,9 +67,7 @@ class TaskBuilder extends Builder
             parameters: array_filter([
                 OnOfficeService::DATA => $this->columns,
                 OnOfficeService::FILTER => $this->getFilters(),
-                'relatedAddressId' => $this->relatedAddressId,
-                'relatedEstateId' => $this->relatedEstateId,
-                'relatedProjectIds' => $this->relatedProjectId,
+                ...$this->relatedParameters(),
                 ...$this->customParameters,
             ], fn ($v) => ! is_null($v)),
         );
@@ -96,9 +94,7 @@ class TaskBuilder extends Builder
             OnOfficeResourceType::Task,
             parameters: array_filter([
                 OnOfficeService::DATA => $data,
-                'relatedAddressId' => $this->relatedAddressId,
-                'relatedEstateId' => $this->relatedEstateId,
-                'relatedProjectIds' => $this->relatedProjectId,
+                ...$this->relatedParameters(),
                 ...$this->customParameters,
             ], fn ($v) => ! is_null($v)),
         );
@@ -118,9 +114,7 @@ class TaskBuilder extends Builder
             $id,
             parameters: array_filter([
                 OnOfficeService::DATA => $this->modifies,
-                'relatedAddressId' => $this->relatedAddressId,
-                'relatedEstateId' => $this->relatedEstateId,
-                'relatedProjectIds' => $this->relatedProjectId,
+                ...$this->relatedParameters(),
                 ...$this->customParameters,
             ], fn ($v) => ! is_null($v)),
         );
@@ -128,6 +122,21 @@ class TaskBuilder extends Builder
         $this->requestApi($request);
 
         return true;
+    }
+
+    /**
+     * The relation parameters shared by the task read, create and modify
+     * requests. Null entries are stripped by the caller's array_filter.
+     *
+     * @return array<string, int|null>
+     */
+    private function relatedParameters(): array
+    {
+        return [
+            OnOfficeService::RELATEDADDRESSID => $this->relatedAddressId,
+            OnOfficeService::RELATEDESTATEID => $this->relatedEstateId,
+            OnOfficeService::RELATEDPROJECTIDS => $this->relatedProjectId,
+        ];
     }
 
     public function relatedAddress(int $id): static
