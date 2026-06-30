@@ -12,6 +12,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use JsonException;
 use Throwable;
 
@@ -116,7 +117,7 @@ class BatchBuilder extends Builder
             'status' => $response->json('status'),
             'response' => [
                 'results' => [
-                    $response->json("response.results.$index"),
+                    $response->json(OnOfficeResponsePath::result($index)),
                 ],
             ],
         ];

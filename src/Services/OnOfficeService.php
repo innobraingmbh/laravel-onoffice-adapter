@@ -355,13 +355,13 @@ class OnOfficeService
     {
         $statusCode = $response->json('status.code', 500);
         $statusErrorCode = $response->json('status.errorcode', 0);
-        $responseStatusCode = $response->json("response.results.$index.status.errorcode", 0);
+        $responseStatusCode = $response->json(OnOfficeResponsePath::statusErrorCode($index), 0);
 
         $errorMessage = $response->json('status.message', '');
         if ($errorMessage === '') {
             $errorMessage = "Status code: $statusCode";
         }
-        $responseErrorMessage = $response->json("response.results.$index.status.message", '');
+        $responseErrorMessage = $response->json(OnOfficeResponsePath::statusMessage($index), '');
         if ($responseErrorMessage === '') {
             $responseErrorMessage = "Status code: $responseStatusCode";
         }
