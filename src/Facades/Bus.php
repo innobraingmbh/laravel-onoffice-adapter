@@ -9,6 +9,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Query\BatchBuilder;
 use Innobrain\OnOfficeAdapter\Query\Builder;
+use Innobrain\OnOfficeAdapter\Query\PendingBatch;
 use Innobrain\OnOfficeAdapter\Repositories\BatchRepository as RootRepository;
 
 /**
@@ -28,12 +29,12 @@ class Bus extends BaseRepository
      *
      * @param  array<int, OnOfficeRequest|Builder>  $requests
      */
-    public static function batch(array $requests = []): BatchBuilder
+    public static function batch(array $requests = []): PendingBatch
     {
         /** @var BatchBuilder $builder */
         $builder = static::query();
 
-        return $builder->add(...$requests);
+        return new PendingBatch($builder->add(...$requests));
     }
 
     /**

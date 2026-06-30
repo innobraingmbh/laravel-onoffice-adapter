@@ -10,10 +10,10 @@ use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
 $results = Bus::batch([
     EstateRepository::query()->select('kaufpreis')->limit(10),
     AddressRepository::query()->whereLike('Vorname', 'Max'),
-])->dispatch();
+])->once();
 ```
 
-`dispatch()` executes one API call and returns a collection with one result element per action, in the order they were added:
+`once()` executes one API call and returns a collection with one result element per action, in the order they were added:
 
 ```php
 $estates = data_get($results[0], 'data.records');
@@ -39,16 +39,16 @@ $results = Bus::batch([
         OnOfficeResourceType::Fields,
         parameters: ['modules' => ['estate']],
     ),
-])->dispatch();
+])->once();
 ```
 
-You can also keep adding to the batch fluently before dispatching:
+You can also keep adding to the batch fluently before sending:
 
 ```php
 Bus::batch()
     ->add(EstateRepository::query()->select('kaufpreis'))
     ->add(AddressRepository::query()->whereLike('Vorname', 'Max'))
-    ->dispatch();
+    ->once();
 ```
 
 Builders are converted to their read request via `toRequest()`, which is available on all builders that support `get()` pagination (Estate, Address, Appointment, Task, Activity, User, Last Seen). A batched action is never paginated, so the builder's `limit()`, `pageSize()` and `offset()` are baked into the single request. The API caps each action at 500 records.
@@ -69,7 +69,7 @@ $results = Bus::batch([
         OnOfficeResourceType::Address,
         identifier: 'addresses',
     ),
-])->dispatch();
+])->once();
 
 $estates = data_get($results->firstWhere('identifier', 'estates'), 'data.records');
 ```
@@ -80,7 +80,7 @@ If the batch response or any action inside it fails, an `OnOfficeException` is t
 
 ## Testing
 
-Faking works like with any other repository. Each page of the faked response becomes one action result of the next `dispatch()`:
+Faking works like with any other repository. Each page of the faked response becomes one action result of the next `once()`:
 
 ```php
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
@@ -99,7 +99,7 @@ Bus::fake(Bus::response([
 
 $results = Bus::batch([
     // ...
-])->dispatch();
+])->once();
 ```
 
 Every action of a batch is recorded individually, so `assertSent()` callbacks receive the single `OnOfficeRequest` objects and `assertSentCount()` counts actions, not HTTP calls:

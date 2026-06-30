@@ -16,7 +16,7 @@ use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 
 describe('fake responses', function () {
-    test('dispatch returns one result per action', function () {
+    test('once returns one result per action', function () {
         Bus::fake(Bus::response([
             Bus::page(recordFactories: [
                 EstateFactory::make()->id(1),
@@ -29,7 +29,7 @@ describe('fake responses', function () {
         $results = Bus::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
-        ])->dispatch();
+        ])->once();
 
         expect($results)->toHaveCount(2)
             ->and(data_get($results[0], 'resourcetype'))->toBe('estate')
@@ -51,7 +51,7 @@ describe('fake responses', function () {
         Bus::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
-        ])->dispatch();
+        ])->once();
 
         Bus::assertSentCount(2);
         Bus::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
@@ -68,7 +68,7 @@ describe('fake responses', function () {
 
         $results = Bus::batch([
             EstateRepository::query()->select('kaufpreis')->limit(5),
-        ])->dispatch();
+        ])->once();
 
         expect($results)->toHaveCount(1);
 
@@ -80,10 +80,10 @@ describe('fake responses', function () {
         });
     });
 
-    test('dispatching an empty batch throws', function () {
+    test('sending an empty batch throws', function () {
         Bus::fake(null);
 
-        Bus::batch()->dispatch();
+        Bus::batch()->once();
     })->throws(OnOfficeException::class, 'Cannot send an empty batch');
 
     test('stray requests are prevented', function () {
@@ -91,7 +91,7 @@ describe('fake responses', function () {
 
         Bus::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
-        ])->dispatch();
+        ])->once();
     })->throws(StrayRequestException::class);
 
     test('a failed action throws', function () {
@@ -105,12 +105,12 @@ describe('fake responses', function () {
         Bus::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
-        ])->dispatch();
+        ])->once();
     })->throws(OnOfficeException::class, 'Error');
 });
 
 describe('real responses', function () {
-    test('dispatch posts all actions in one request', function () {
+    test('once posts all actions in one request', function () {
         Http::preventStrayRequests();
         Http::fake([
             'https://api.onoffice.de/api/stable/api.php' => Http::response([
@@ -139,7 +139,7 @@ describe('real responses', function () {
         $results = Bus::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate, identifier: 'estates'),
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address, identifier: 'addresses'),
-        ])->dispatch();
+        ])->once();
 
         expect($results)->toHaveCount(2)
             ->and(data_get($results->firstWhere('identifier', 'addresses'), 'data.records.0.id'))->toBe(2);
@@ -157,7 +157,7 @@ describe('real responses', function () {
         Http::assertSentCount(1);
     });
 
-    test('the signature is generated at dispatch, not when the batch is built', function () {
+    test('the signature is generated on once(), not when the batch is built', function () {
         Http::preventStrayRequests();
         Http::fake([
             'https://api.onoffice.de/api/stable/api.php' => Http::response([
@@ -183,7 +183,7 @@ describe('real responses', function () {
 
         Carbon::setTestNow('2026-01-01 12:30:00');
 
-        $batch->dispatch();
+        $batch->once();
 
         $dispatchedAt = Carbon::parse('2026-01-01 12:30:00')->timestamp;
 
@@ -219,6 +219,6 @@ describe('real responses', function () {
         Bus::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
-        ])->dispatch();
+        ])->once();
     })->throws(OnOfficeException::class, 'Some error');
 });
