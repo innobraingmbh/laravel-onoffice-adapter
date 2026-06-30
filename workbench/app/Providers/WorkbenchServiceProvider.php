@@ -8,6 +8,7 @@ use Dotenv\Dotenv;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Workbench\App\Console\Commands\ProbeAppointmentsCommand;
+use Workbench\App\Console\Commands\ProbeBatchCommand;
 use Workbench\App\Console\Commands\ProbeRegionsCommand;
 
 class WorkbenchServiceProvider extends ServiceProvider
@@ -30,6 +31,7 @@ class WorkbenchServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ProbeAppointmentsCommand::class,
+                ProbeBatchCommand::class,
                 ProbeRegionsCommand::class,
             ]);
         }

@@ -651,6 +651,17 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * Build the request this builder would send, without sending it.
+     * Useful for sending multiple requests in one batch.
+     *
+     * @throws OnOfficeException
+     */
+    public function toRequest(): OnOfficeRequest
+    {
+        throw new OnOfficeException('Not implemented');
+    }
+
+    /**
      * @return Collection<int, array<string, mixed>>
      *
      * @throws OnOfficeException

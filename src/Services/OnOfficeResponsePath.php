@@ -78,16 +78,35 @@ final class OnOfficeResponsePath
     public const META_COUNT_ABSOLUTE = self::FIRST_RESULT.'.data.meta.cntabsolute';
 
     /**
-     * The error code of the first result block's status.
+     * The result block at the given index.
      *
-     * Resolves to `response.results.0.status.errorcode`.
+     * A batch request returns one result block per action, so the index
+     * is not always `0` like the constants above assume.
+     *
+     * Resolves to `response.results.{index}`.
      */
-    public const STATUS_ERROR_CODE = self::FIRST_RESULT.'.status.errorcode';
+    public static function result(int $index): string
+    {
+        return 'response.results.'.$index;
+    }
 
     /**
-     * The message of the first result block's status.
+     * The error code of the given result block's status.
      *
-     * Resolves to `response.results.0.status.message`.
+     * Resolves to `response.results.{index}.status.errorcode`.
      */
-    public const STATUS_MESSAGE = self::FIRST_RESULT.'.status.message';
+    public static function statusErrorCode(int $index): string
+    {
+        return self::result($index).'.status.errorcode';
+    }
+
+    /**
+     * The message of the given result block's status.
+     *
+     * Resolves to `response.results.{index}.status.message`.
+     */
+    public static function statusMessage(int $index): string
+    {
+        return self::result($index).'.status.message';
+    }
 }

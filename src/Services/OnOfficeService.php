@@ -124,23 +124,63 @@ class OnOfficeService
      */
     public function requestApi(OnOfficeRequest $request): Response
     {
+        return $this->post(
+            fn (): array => $request->toRequestArray(),
+            fn (Response $response) => $this->throwIfResponseIsFailed($response),
+        );
+    }
+
+    /**
+     * Makes a single request with multiple actions to the onOffice API.
+     * All actions are sent in one HTTP call and the API returns
+     * one result per action, in the same order.
+     *
+     * Read more: https://apidoc.onoffice.de/onoffice-api-request/aufbau/
+     *
+     * @param  array<int, OnOfficeRequest>  $requests
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    public function requestApiBatch(array $requests): Response
+    {
+        return $this->post(
+            fn (): array => [
+                'token' => $this->getToken(),
+                'request' => [
+                    'actions' => array_map(static fn (OnOfficeRequest $request): array => $request->toActionArray(), $requests),
+                ],
+            ],
+            fn (Response $response) => $this->throwIfBatchResponseIsFailed($response),
+        );
+    }
+
+    /**
+     * Post a freshly built body to the API, retrying on failure.
+     *
+     * The body is rebuilt on every attempt: each request carries a time-based
+     * HMAC, so a retry needs a new timestamp and signature or the API rejects
+     * it. That is why the body is a callable rather than a value.
+     *
+     * @param  callable(): array<string, mixed>  $body
+     * @param  callable(Response): void  $throwIfFailed
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    private function post(callable $body, callable $throwIfFailed): Response
+    {
         $retryOnlyOnConnectionError = static fn ($exception): bool => $exception instanceof ConnectionException;
 
         if (! $this->retryOnlyOnConnectionError()) {
             $retryOnlyOnConnectionError = null;
         }
 
-        /*
-         * All requests have a time-based validation.
-         * If we retry the request, the timestamp will be different.
-         * In this case, the HMAC will be invalid.
-         * To avoid this, we need to retry the request with payload creation until we get a valid response.
-         */
         $response = null;
-        retry($this->getRetryCount(), function () use ($request, &$response) {
-            $response = Http::withHeaders(config('onoffice.headers'))->post(config('onoffice.base_url'), $request->toRequestArray());
+        retry($this->getRetryCount(), function () use ($body, $throwIfFailed, &$response) {
+            $response = Http::withHeaders(config('onoffice.headers'))->post(config('onoffice.base_url'), $body());
 
-            $this->throwIfResponseIsFailed($response);
+            $throwIfFailed($response);
         }, $this->getRetryDelay(), $retryOnlyOnConnectionError);
 
         /** @var Response $response */
@@ -286,15 +326,38 @@ class OnOfficeService
      */
     public function throwIfResponseIsFailed(Response $response): void
     {
+        $this->throwIfResultIsFailed($response, 0);
+    }
+
+    /**
+     * Checks the response status and every result of a
+     * multi-action response for errors.
+     *
+     * @throws OnOfficeException
+     */
+    public function throwIfBatchResponseIsFailed(Response $response): void
+    {
+        $resultCount = max(1, count($response->json('response.results', []) ?? []));
+
+        for ($index = 0; $index < $resultCount; $index++) {
+            $this->throwIfResultIsFailed($response, $index);
+        }
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    protected function throwIfResultIsFailed(Response $response, int $index): void
+    {
         $statusCode = $response->json('status.code', 500);
         $statusErrorCode = $response->json('status.errorcode', 0);
-        $responseStatusCode = $response->json(OnOfficeResponsePath::STATUS_ERROR_CODE, 0);
+        $responseStatusCode = $response->json(OnOfficeResponsePath::statusErrorCode($index), 0);
 
         $errorMessage = $response->json('status.message', '');
         if ($errorMessage === '') {
             $errorMessage = "Status code: $statusCode";
         }
-        $responseErrorMessage = $response->json(OnOfficeResponsePath::STATUS_MESSAGE, '');
+        $responseErrorMessage = $response->json(OnOfficeResponsePath::statusMessage($index), '');
         if ($responseErrorMessage === '') {
             $responseErrorMessage = "Status code: $responseStatusCode";
         }

@@ -35,40 +35,58 @@ readonly class OnOfficeResponsePage
      */
     public function toResponse(): array
     {
+        return [
+            'status' => $this->toStatusArray(),
+            'response' => [
+                'results' => [
+                    $this->toResultArray(),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toStatusArray(): array
+    {
+        return [
+            'code' => $this->status,
+            'errorcode' => $this->errorCode,
+            'message' => $this->message,
+        ];
+    }
+
+    /**
+     * Returns a single result element of the response body.
+     *
+     * @return array<string, mixed>
+     */
+    public function toResultArray(): array
+    {
         $records = $this->recordFactories
             ->map(fn (BaseFactory $recordFactory) => $recordFactory->toArray())
             ->all();
 
         return [
-            'status' => [
-                'code' => $this->status,
-                'errorcode' => $this->errorCode,
-                'message' => $this->message,
-            ],
-            'response' => [
-                'results' => [
-                    [
-                        'actionid' => $this->actionId->value,
-                        'resourceid' => (string) ($this->resourceId instanceof OnOfficeResourceId
-                            ? $this->resourceId->value
-                            : $this->resourceId),
-                        'resourcetype' => (string) ($this->resourceType instanceof OnOfficeResourceType
-                            ? $this->resourceType->value
-                            : $this->resourceType),
-                        'cacheable' => $this->cacheable,
-                        'identifier' => $this->identifier,
-                        'data' => [
-                            'meta' => [
-                                'cntabsolute' => $this->countAbsolute === -1 ? count($records) : $this->countAbsolute,
-                            ],
-                            'records' => $records,
-                        ],
-                        'status' => [
-                            'errorcode' => $this->errorCodeResult,
-                            'message' => $this->messageResult,
-                        ],
-                    ],
+            'actionid' => $this->actionId->value,
+            'resourceid' => (string) ($this->resourceId instanceof OnOfficeResourceId
+                ? $this->resourceId->value
+                : $this->resourceId),
+            'resourcetype' => (string) ($this->resourceType instanceof OnOfficeResourceType
+                ? $this->resourceType->value
+                : $this->resourceType),
+            'cacheable' => $this->cacheable,
+            'identifier' => $this->identifier,
+            'data' => [
+                'meta' => [
+                    'cntabsolute' => $this->countAbsolute === -1 ? count($records) : $this->countAbsolute,
                 ],
+                'records' => $records,
+            ],
+            'status' => [
+                'errorcode' => $this->errorCodeResult,
+                'message' => $this->messageResult,
             ],
         ];
     }

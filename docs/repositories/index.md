@@ -17,11 +17,12 @@ Repositories are the primary entry point for retrieving and modifying data in on
 12. [Log](./log-repository.md)
 13. [Macro](./macro-repository.md)
 14. [Marketplace](./marketplace-repository.md)
-15. [Relation](./relation-repository.md)
-16. [Search Criteria](./search-criteria-repository.md)
-17. [Setting](./setting-repository.md)
-18. [Task](./task-repository.md)
-19. [User](./user-repository.md)
+15. [Query](./query-repository.md)
+16. [Relation](./relation-repository.md)
+17. [Search Criteria](./search-criteria-repository.md)
+18. [Setting](./setting-repository.md)
+19. [Task](./task-repository.md)
+20. [User](./user-repository.md)
 
 ## Usage Example
 
