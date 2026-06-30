@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Workbench\App\Console\Commands\ProbeAppointmentsCommand;
 use Workbench\App\Console\Commands\ProbeBatchCommand;
+use Workbench\App\Console\Commands\ProbeFindCommand;
 use Workbench\App\Console\Commands\ProbeRegionsCommand;
 
 class WorkbenchServiceProvider extends ServiceProvider
@@ -32,6 +33,7 @@ class WorkbenchServiceProvider extends ServiceProvider
             $this->commands([
                 ProbeAppointmentsCommand::class,
                 ProbeBatchCommand::class,
+                ProbeFindCommand::class,
                 ProbeRegionsCommand::class,
             ]);
         }
