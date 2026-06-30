@@ -22,9 +22,11 @@ class LogBuilder extends Builder
     public int $userId = -1;
 
     /**
-     * @throws OnOfficeException
+     * Build the shared request parameters used by every terminal method.
+     *
+     * @return array<string, mixed>
      */
-    public function get(): Collection
+    private function buildParameters(): array
     {
         $parameters = [
             OnOfficeService::MODULE => $this->module,
@@ -38,6 +40,16 @@ class LogBuilder extends Builder
         if ($this->userId > 0) {
             $parameters['user'] = $this->userId;
         }
+
+        return $parameters;
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function get(): Collection
+    {
+        $parameters = $this->buildParameters();
 
         $request = new OnOfficeRequest(
             OnOfficeAction::Read,
@@ -54,18 +66,7 @@ class LogBuilder extends Builder
      */
     public function first(): ?array
     {
-        $parameters = [
-            OnOfficeService::MODULE => $this->module,
-            OnOfficeService::ACTION => $this->action,
-            OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => $this->limit,
-            OnOfficeService::LISTOFFSET => $this->offset,
-            ...$this->customParameters,
-        ];
-
-        if ($this->userId > 0) {
-            $parameters['user'] = $this->userId;
-        }
+        $parameters = $this->buildParameters();
 
         $request = new OnOfficeRequest(
             OnOfficeAction::Read,
@@ -98,18 +99,7 @@ class LogBuilder extends Builder
      */
     public function each(callable $callback): void
     {
-        $parameters = [
-            OnOfficeService::MODULE => $this->module,
-            OnOfficeService::ACTION => $this->action,
-            OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => $this->limit,
-            OnOfficeService::LISTOFFSET => $this->offset,
-            ...$this->customParameters,
-        ];
-
-        if ($this->userId > 0) {
-            $parameters['user'] = $this->userId;
-        }
+        $parameters = $this->buildParameters();
 
         $request = new OnOfficeRequest(
             OnOfficeAction::Read,
@@ -128,18 +118,7 @@ class LogBuilder extends Builder
      */
     public function count(): int
     {
-        $parameters = [
-            OnOfficeService::MODULE => $this->module,
-            OnOfficeService::ACTION => $this->action,
-            OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => $this->limit,
-            OnOfficeService::LISTOFFSET => $this->offset,
-            ...$this->customParameters,
-        ];
-
-        if ($this->userId > 0) {
-            $parameters['user'] = $this->userId;
-        }
+        $parameters = $this->buildParameters();
 
         $request = new OnOfficeRequest(
             OnOfficeAction::Read,
