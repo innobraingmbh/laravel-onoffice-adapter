@@ -29,7 +29,8 @@ class ProbeFindCommand extends Command
             fn () => $this->probePair('Estate', fn () => EstateRepository::query()->select(['Id'])),
             fn () => $this->probePair('Address', fn () => AddressRepository::query()->select(['KdNr'])),
             fn () => $this->probePair('Task', fn () => TaskRepository::query()),
-            fn () => $this->probePair('User', fn () => UserRepository::query()),
+            // The user read returns nothing on an empty data set, so select real columns.
+            fn () => $this->probePair('User', fn () => UserRepository::query()->select(['Vorname', 'Nachname', 'Emailname'])),
             fn () => $this->probeActivity(),
             fn () => $this->probeAppointment(),
             fn () => $this->probeLastSeen(),
