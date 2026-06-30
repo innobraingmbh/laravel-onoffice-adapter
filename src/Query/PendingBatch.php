@@ -7,18 +7,32 @@ namespace Innobrain\OnOfficeAdapter\Query;
 use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Repositories\BatchRepository;
 use Throwable;
 
 /**
  * The pending batch returned by Query::batch(). Collects requests and sends
- * them as a single API call via once(). It wraps a BatchBuilder so the public
- * batch surface stays small (add/once) without inheriting the query builder API.
+ * them as a single API call via once(). The repository does the sending, so
+ * the public batch surface stays small (add/once).
  */
 class PendingBatch
 {
+    /**
+     * The requests that will be sent as one batch.
+     *
+     * @var array<int, OnOfficeRequest>
+     */
+    protected array $requests = [];
+
+    /**
+     * @param  array<int, OnOfficeRequest|Builder>  $requests
+     */
     public function __construct(
-        protected BatchBuilder $builder
-    ) {}
+        protected BatchRepository $repository,
+        array $requests = [],
+    ) {
+        $this->add(...$requests);
+    }
 
     /**
      * Add one or more requests to the batch. A builder can be
@@ -29,7 +43,9 @@ class PendingBatch
      */
     public function add(OnOfficeRequest|Builder ...$requests): static
     {
-        $this->builder->add(...$requests);
+        foreach ($requests as $request) {
+            $this->requests[] = $request instanceof Builder ? $request->toRequest() : $request;
+        }
 
         return $this;
     }
@@ -48,6 +64,6 @@ class PendingBatch
      */
     public function once(): Collection
     {
-        return $this->builder->dispatch();
+        return $this->repository->dispatch($this->requests);
     }
 }

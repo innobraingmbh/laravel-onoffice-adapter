@@ -7,15 +7,12 @@ namespace Innobrain\OnOfficeAdapter\Facades;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
-use Innobrain\OnOfficeAdapter\Query\BatchBuilder;
 use Innobrain\OnOfficeAdapter\Query\Builder;
 use Innobrain\OnOfficeAdapter\Query\PendingBatch;
 use Innobrain\OnOfficeAdapter\Repositories\BatchRepository as RootRepository;
 
 /**
  * @see RootRepository
- *
- * @method static BatchBuilder query()
  */
 class Query extends BaseRepository
 {
@@ -31,10 +28,10 @@ class Query extends BaseRepository
      */
     public static function batch(array $requests = []): PendingBatch
     {
-        /** @var BatchBuilder $builder */
-        $builder = static::query();
+        /** @var RootRepository $repository */
+        $repository = static::getFacadeRoot();
 
-        return new PendingBatch($builder->add(...$requests));
+        return $repository->batch($requests);
     }
 
     /**
