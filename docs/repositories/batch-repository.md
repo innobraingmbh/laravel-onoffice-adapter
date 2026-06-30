@@ -1,42 +1,54 @@
-# Batch Repository
+# Bus
 
-The onOffice API allows sending multiple actions in a single request. Use `BatchRepository` to bundle several requests into one HTTP call, for example to read estates and addresses at the same time.
+The onOffice API allows sending multiple actions in a single request. Use the `Bus` facade to bundle several requests into one HTTP call, for example to read estates and addresses at the same time. It reads like Laravel's `Bus::batch()`:
 
 ```php
-use Innobrain\OnOfficeAdapter\Facades\BatchRepository;
+use Innobrain\OnOfficeAdapter\Facades\Bus;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
 
-$results = BatchRepository::query()
-    ->add(EstateRepository::query()->select('kaufpreis')->limit(10))
-    ->add(AddressRepository::query()->whereLike('Vorname', 'Max'))
-    ->send();
+$results = Bus::batch([
+    EstateRepository::query()->select('kaufpreis')->limit(10),
+    AddressRepository::query()->whereLike('Vorname', 'Max'),
+])->dispatch();
 ```
 
-`send()` executes one API call and returns a collection with one result element per action, in the order they were added:
+`dispatch()` executes one API call and returns a collection with one result element per action, in the order they were added:
 
 ```php
 $estates = data_get($results[0], 'data.records');
 $addresses = data_get($results[1], 'data.records');
 ```
 
+> [!WARNING]
+> A batched action is never paginated — you get the **first page only** (max 500 records per action). The builder's `limit()`, `pageSize()` and `offset()` are baked into that single request. If you need every matching record, query the resource through its own repository with `->get()` instead of batching it.
+
 ## Adding Requests
 
-`add()` accepts query builders and raw `OnOfficeRequest` objects, in any combination:
+`batch()` accepts query builders and raw `OnOfficeRequest` objects, in any combination:
 
 ```php
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 
-$results = BatchRepository::query()
-    ->add(EstateRepository::query()->select('kaufpreis'))
-    ->add(new OnOfficeRequest(
+$results = Bus::batch([
+    EstateRepository::query()->select('kaufpreis'),
+    new OnOfficeRequest(
         OnOfficeAction::Get,
         OnOfficeResourceType::Fields,
         parameters: ['modules' => ['estate']],
-    ))
-    ->send();
+    ),
+])->dispatch();
+```
+
+You can also keep adding to the batch fluently before dispatching:
+
+```php
+Bus::batch()
+    ->add(EstateRepository::query()->select('kaufpreis'))
+    ->add(AddressRepository::query()->whereLike('Vorname', 'Max'))
+    ->dispatch();
 ```
 
 Builders are converted to their read request via `toRequest()`, which is available on all builders that support `get()` pagination (Estate, Address, Appointment, Task, Activity, User, Last Seen). A batched action is never paginated, so the builder's `limit()`, `pageSize()` and `offset()` are baked into the single request. The API caps each action at 500 records.
@@ -46,18 +58,18 @@ Builders are converted to their read request via `toRequest()`, which is availab
 Results are returned in the order the requests were added. For explicit matching, you can give each request an identifier, which the API echoes back in the result:
 
 ```php
-$results = BatchRepository::query()
-    ->add(new OnOfficeRequest(
+$results = Bus::batch([
+    new OnOfficeRequest(
         OnOfficeAction::Read,
         OnOfficeResourceType::Estate,
         identifier: 'estates',
-    ))
-    ->add(new OnOfficeRequest(
+    ),
+    new OnOfficeRequest(
         OnOfficeAction::Read,
         OnOfficeResourceType::Address,
         identifier: 'addresses',
-    ))
-    ->send();
+    ),
+])->dispatch();
 
 $estates = data_get($results->firstWhere('identifier', 'estates'), 'data.records');
 ```
@@ -68,32 +80,31 @@ If the batch response or any action inside it fails, an `OnOfficeException` is t
 
 ## Testing
 
-Faking works like with any other repository. Each page of the faked response becomes one action result of the next `send()`:
+Faking works like with any other repository. Each page of the faked response becomes one action result of the next `dispatch()`:
 
 ```php
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Innobrain\OnOfficeAdapter\Facades\BatchRepository;
+use Innobrain\OnOfficeAdapter\Facades\Bus;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 
-BatchRepository::fake(BatchRepository::response([
-    BatchRepository::page(recordFactories: [
+Bus::fake(Bus::response([
+    Bus::page(recordFactories: [
         EstateFactory::make()->id(1),
     ]),
-    BatchRepository::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
+    Bus::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
         AddressFactory::make()->id(2),
     ]),
 ]));
 
-$results = BatchRepository::query()
-    ->add(...)
-    ->add(...)
-    ->send();
+$results = Bus::batch([
+    // ...
+])->dispatch();
 ```
 
 Every action of a batch is recorded individually, so `assertSent()` callbacks receive the single `OnOfficeRequest` objects and `assertSentCount()` counts actions, not HTTP calls:
 
 ```php
-BatchRepository::assertSentCount(2);
-BatchRepository::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
+Bus::assertSentCount(2);
+Bus::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
 ```

@@ -8,7 +8,7 @@ Repositories are the primary entry point for retrieving and modifying data in on
 3. [Address](./address-repository.md)
 4. [Appointment](./appointment-repository.md)
 5. [Base](./base-repository.md)
-6. [Batch](./batch-repository.md)
+6. [Bus](./batch-repository.md)
 7. [Estate](./estate-repository.md)
 8. [Field](./field-repository.md)
 9. [File](./file-repository.md)

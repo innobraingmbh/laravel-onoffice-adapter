@@ -3,32 +3,33 @@
 declare(strict_types=1);
 
 use Illuminate\Http\Client\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
-use Innobrain\OnOfficeAdapter\Facades\BatchRepository;
+use Innobrain\OnOfficeAdapter\Facades\Bus;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 
 describe('fake responses', function () {
-    test('send returns one result per action', function () {
-        BatchRepository::fake(BatchRepository::response([
-            BatchRepository::page(recordFactories: [
+    test('dispatch returns one result per action', function () {
+        Bus::fake(Bus::response([
+            Bus::page(recordFactories: [
                 EstateFactory::make()->id(1),
             ]),
-            BatchRepository::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
+            Bus::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
                 AddressFactory::make()->id(2),
             ]),
         ]));
 
-        $results = BatchRepository::query()
-            ->add(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate))
-            ->add(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address))
-            ->send();
+        $results = Bus::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
+        ])->dispatch();
 
         expect($results)->toHaveCount(2)
             ->and(data_get($results[0], 'resourcetype'))->toBe('estate')
@@ -38,42 +39,40 @@ describe('fake responses', function () {
     });
 
     test('each action is recorded with its own result', function () {
-        BatchRepository::fake(BatchRepository::response([
-            BatchRepository::page(recordFactories: [
+        Bus::fake(Bus::response([
+            Bus::page(recordFactories: [
                 EstateFactory::make()->id(1),
             ]),
-            BatchRepository::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
+            Bus::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
                 AddressFactory::make()->id(2),
             ]),
         ]));
 
-        BatchRepository::query()
-            ->add(
-                new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
-                new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
-            )
-            ->send();
+        Bus::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
+        ])->dispatch();
 
-        BatchRepository::assertSentCount(2);
-        BatchRepository::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
+        Bus::assertSentCount(2);
+        Bus::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
 
-        expect(data_get(BatchRepository::lastRecordedResponse(), 'response.results.0.data.records.0.id'))->toBe(2);
+        expect(data_get(Bus::lastRecordedResponse(), 'response.results.0.data.records.0.id'))->toBe(2);
     });
 
     test('builders can be added directly', function () {
-        BatchRepository::fake(BatchRepository::response([
-            BatchRepository::page(recordFactories: [
+        Bus::fake(Bus::response([
+            Bus::page(recordFactories: [
                 EstateFactory::make()->id(1),
             ]),
         ]));
 
-        $results = BatchRepository::query()
-            ->add(EstateRepository::query()->select('kaufpreis')->limit(5))
-            ->send();
+        $results = Bus::batch([
+            EstateRepository::query()->select('kaufpreis')->limit(5),
+        ])->dispatch();
 
         expect($results)->toHaveCount(1);
 
-        BatchRepository::assertSent(function (OnOfficeRequest $request) {
+        Bus::assertSent(function (OnOfficeRequest $request) {
             return $request->actionId === OnOfficeAction::Read
                 && $request->resourceType === OnOfficeResourceType::Estate
                 && data_get($request->parameters, 'data') === ['kaufpreis']
@@ -81,39 +80,37 @@ describe('fake responses', function () {
         });
     });
 
-    test('sending an empty batch throws', function () {
-        BatchRepository::fake(null);
+    test('dispatching an empty batch throws', function () {
+        Bus::fake(null);
 
-        BatchRepository::query()->send();
+        Bus::batch()->dispatch();
     })->throws(OnOfficeException::class, 'Cannot send an empty batch');
 
     test('stray requests are prevented', function () {
-        BatchRepository::preventStrayRequests();
+        Bus::preventStrayRequests();
 
-        BatchRepository::query()
-            ->add(new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate))
-            ->send();
+        Bus::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+        ])->dispatch();
     })->throws(StrayRequestException::class);
 
     test('a failed action throws', function () {
-        BatchRepository::fake(BatchRepository::response([
-            BatchRepository::page(recordFactories: [
+        Bus::fake(Bus::response([
+            Bus::page(recordFactories: [
                 EstateFactory::make()->id(1),
             ]),
-            BatchRepository::page(resourceType: OnOfficeResourceType::Address, errorCodeResult: 137, messageResult: 'Error'),
+            Bus::page(resourceType: OnOfficeResourceType::Address, errorCodeResult: 137, messageResult: 'Error'),
         ]));
 
-        BatchRepository::query()
-            ->add(
-                new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
-                new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
-            )
-            ->send();
+        Bus::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
+        ])->dispatch();
     })->throws(OnOfficeException::class, 'Error');
 });
 
 describe('real responses', function () {
-    test('send posts all actions in one request', function () {
+    test('dispatch posts all actions in one request', function () {
         Http::preventStrayRequests();
         Http::fake([
             'https://api.onoffice.de/api/stable/api.php' => Http::response([
@@ -139,12 +136,10 @@ describe('real responses', function () {
             ]),
         ]);
 
-        $results = BatchRepository::query()
-            ->add(
-                new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate, identifier: 'estates'),
-                new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address, identifier: 'addresses'),
-            )
-            ->send();
+        $results = Bus::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate, identifier: 'estates'),
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address, identifier: 'addresses'),
+        ])->dispatch();
 
         expect($results)->toHaveCount(2)
             ->and(data_get($results->firstWhere('identifier', 'addresses'), 'data.records.0.id'))->toBe(2);
@@ -160,6 +155,41 @@ describe('real responses', function () {
         });
 
         Http::assertSentCount(1);
+    });
+
+    test('the signature is generated at dispatch, not when the batch is built', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
+                'status' => ['code' => 200, 'errorcode' => 0, 'message' => 'OK'],
+                'response' => [
+                    'results' => [
+                        [
+                            'actionid' => OnOfficeAction::Read->value,
+                            'resourcetype' => 'estate',
+                            'data' => ['meta' => ['cntabsolute' => 0], 'records' => []],
+                            'status' => ['errorcode' => 0, 'message' => 'OK'],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        Carbon::setTestNow('2026-01-01 12:00:00');
+
+        $batch = Bus::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+        ]);
+
+        Carbon::setTestNow('2026-01-01 12:30:00');
+
+        $batch->dispatch();
+
+        $dispatchedAt = Carbon::parse('2026-01-01 12:30:00')->timestamp;
+
+        Http::assertSent(fn (Request $request): bool => data_get($request->data(), 'request.actions.0.timestamp') === $dispatchedAt);
+
+        Carbon::setTestNow();
     });
 
     test('a failed action throws', function () {
@@ -186,11 +216,9 @@ describe('real responses', function () {
             ]),
         ]);
 
-        BatchRepository::query()
-            ->add(
-                new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
-                new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
-            )
-            ->send();
+        Bus::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
+        ])->dispatch();
     })->throws(OnOfficeException::class, 'Some error');
 });

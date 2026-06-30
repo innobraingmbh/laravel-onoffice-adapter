@@ -55,7 +55,9 @@ trait Paginate
     /**
      * Build the read request this builder would send, without sending it.
      * Useful for sending multiple requests in one batch. Since a batched
-     * request is never paginated, the limit and offset are baked into the request.
+     * request is never paginated, the limit and offset are baked into the
+     * request, and only the first page (max 500 records) is returned. For the
+     * full, paginated result set use get() on the repository instead.
      */
     public function toRequest(): OnOfficeRequest
     {

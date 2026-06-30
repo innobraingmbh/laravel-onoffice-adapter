@@ -28,6 +28,9 @@ class BatchBuilder extends Builder
     /**
      * Add one or more requests to the batch. A builder can be
      * passed directly and will be converted to its read request.
+     *
+     * Each request becomes one batch action and returns a single,
+     * non-paginated page: the first page only, capped at 500 records.
      */
     public function add(OnOfficeRequest|Builder ...$requests): static
     {
@@ -39,15 +42,18 @@ class BatchBuilder extends Builder
     }
 
     /**
-     * Send all added requests in a single API call.
+     * Dispatch all added requests in a single API call.
      * Returns one result element per request, in the same order.
+     *
+     * Each result is a single, non-paginated page: the first page only,
+     * capped at 500 records per action.
      *
      * @return Collection<int, array<string, mixed>>
      *
      * @throws OnOfficeException
      * @throws Throwable
      */
-    public function send(): Collection
+    public function dispatch(): Collection
     {
         throw_if($this->requests === [], OnOfficeException::class, 'Cannot send an empty batch');
 
