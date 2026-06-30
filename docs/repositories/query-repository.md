@@ -53,6 +53,21 @@ Query::batch()
 
 Builders are converted to their read request via `toRequest()`, which is available on all builders that support `get()` pagination (Estate, Address, Appointment, Task, Activity, User, Last Seen).
 
+## Reading a Single Record
+
+Call `withId()` on a builder to read one record by its id instead of a list. It is the batch-friendly counterpart to `find()`:
+
+```php
+$results = Query::batch([
+    EstateRepository::query()->withId(5),
+    AddressRepository::query()->withId(9),
+])->once();
+
+$estate = data_get($results[0], 'data.records.0');
+```
+
+`withId()` is available on the same builders as `toRequest()`. It also applies outside a batch (`->withId(5)->get()` reads just that record), but on its own `find()` is more direct — it returns the record itself, or `null` when it is missing.
+
 ## Identifying Results
 
 Results are returned in the order the requests were added. For explicit matching, you can give each request an identifier, which the API echoes back in the result:

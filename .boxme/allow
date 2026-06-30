@@ -1,0 +1,7 @@
+# boxme network allowlist — hosts package code in this project may reach.
+# Deny-by-default is in effect whenever this file exists (alongside the package
+# registries, which are always allowed). One entry per line:
+#   example.com     a bare domain matches it and every subdomain
+#   =api.example.com  a '=' prefix matches that exact host only
+# '#' comments and blank lines are ignored. Edit freely.
+

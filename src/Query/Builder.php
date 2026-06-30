@@ -15,6 +15,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
@@ -81,6 +82,13 @@ class Builder implements BuilderInterface
      * @var array<string, mixed>
      */
     public array $customParameters = [];
+
+    /**
+     * The resource id to read. When set, the read request targets a single
+     * record instead of a list, which is what lets one record be read inside
+     * a batch via Query::batch().
+     */
+    protected OnOfficeResourceId|int|string $readResourceId = OnOfficeResourceId::None;
 
     /**
      * Whether the resource's read endpoint accepts a listoffset parameter.
@@ -519,6 +527,18 @@ class Builder implements BuilderInterface
     public function offset(int $value): static
     {
         $this->offset = max(0, $value);
+
+        return $this;
+    }
+
+    /**
+     * Target a single record by its id. The read request then returns just that
+     * record. Useful for reading one record inside a batch via Query::batch();
+     * on its own, prefer find().
+     */
+    public function withId(int|string $id): static
+    {
+        $this->readResourceId = $id;
 
         return $this;
     }

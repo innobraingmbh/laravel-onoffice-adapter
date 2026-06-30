@@ -81,6 +81,22 @@ describe('fake responses', function () {
         });
     });
 
+    test('a single record can be read in a batch via withId', function () {
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
+                EstateFactory::make()->id(5),
+            ]),
+        ]));
+
+        $results = Query::batch([
+            EstateRepository::query()->withId(5),
+        ])->once();
+
+        expect(data_get($results[0], 'data.records.0.id'))->toBe(5);
+
+        Query::assertSent(fn (OnOfficeRequest $request) => $request->resourceId === 5);
+    });
+
     test('batching a non-zero offset on a resource without offset support throws', function () {
         Query::batch([
             TaskRepository::query()->offset(50),

@@ -11,6 +11,7 @@ use Illuminate\Pagination\Paginator as PaginatorImpl;
 use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\PaginatedResponse;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
@@ -19,17 +20,33 @@ use Throwable;
 trait Paginate
 {
     /**
-     * Build the base read request for this builder.
-     * Each builder implements this once; all terminal methods call it.
+     * Build the base read request for this builder. Each builder implements this
+     * once. Do not call it from terminals directly: go through readRequest() so a
+     * single record targeted via withId() is applied. This is the hook, not the
+     * entry point.
      */
     abstract protected function buildReadRequest(): OnOfficeRequest;
+
+    /**
+     * The entry point every terminal read must use. Builds the base request and
+     * applies the targeted id, if one was set via withId(), so a single record is
+     * read consistently, including inside a batch via toRequest().
+     */
+    protected function readRequest(): OnOfficeRequest
+    {
+        return tap($this->buildReadRequest(), function (OnOfficeRequest $request): void {
+            if ($this->readResourceId !== OnOfficeResourceId::None) {
+                $request->resourceId = $this->readResourceId;
+            }
+        });
+    }
 
     /**
      * @throws OnOfficeException
      */
     public function get(): Collection
     {
-        return $this->requestAll($this->buildReadRequest());
+        return $this->requestAll($this->readRequest());
     }
 
     /**
@@ -38,7 +55,7 @@ trait Paginate
      */
     public function first(): ?array
     {
-        $request = $this->buildReadRequest();
+        $request = $this->readRequest();
         $this->applyListWindow($request, $this->limit > 0 ? $this->limit : $this->pageSize, $this->offset);
 
         return $this->requestApi($request)->json(OnOfficeResponsePath::FIRST_RECORD);
@@ -49,7 +66,7 @@ trait Paginate
      */
     public function each(callable $callback): void
     {
-        $this->requestAllChunked($this->buildReadRequest(), $callback);
+        $this->requestAllChunked($this->readRequest(), $callback);
     }
 
     /**
@@ -61,7 +78,7 @@ trait Paginate
      */
     public function toRequest(): OnOfficeRequest
     {
-        $request = $this->buildReadRequest();
+        $request = $this->readRequest();
         $this->applyListWindow($request, $this->limit > 0 ? $this->limit : $this->pageSize, $this->offset);
 
         return $request;
@@ -76,7 +93,7 @@ trait Paginate
      */
     public function count(): int
     {
-        $request = $this->buildReadRequest();
+        $request = $this->readRequest();
         data_set($request->parameters, OnOfficeService::DATA, []);
         data_set($request->parameters, OnOfficeService::LISTLIMIT, 1);
 
@@ -190,7 +207,7 @@ trait Paginate
      */
     protected function getPageWithMeta(): PaginatedResponse
     {
-        $request = $this->buildReadRequest();
+        $request = $this->readRequest();
         $this->applyListWindow($request, $this->pageSize, $this->offset);
 
         $response = $this->requestApi($request);
