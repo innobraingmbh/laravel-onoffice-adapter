@@ -51,7 +51,7 @@ Query::batch()
     ->once();
 ```
 
-Builders are converted to their read request via `toRequest()`, which is available on all builders that support `get()` pagination (Estate, Address, Appointment, Task, Activity, User, Last Seen). A batched action is never paginated, so the builder's `limit()`, `pageSize()` and `offset()` are baked into the single request. The API caps each action at 500 records.
+Builders are converted to their read request via `toRequest()`, which is available on all builders that support `get()` pagination (Estate, Address, Appointment, Task, Activity, User, Last Seen).
 
 ## Identifying Results
 
@@ -80,31 +80,36 @@ If the batch response or any action inside it fails, an `OnOfficeException` is t
 
 ## Testing
 
-Faking works like with any other repository. Each page of the faked response becomes one action result of the next `once()`:
+Faking works like with any other repository. Each page of the faked response becomes one action result, returned in the order the requests were added. Every action is recorded individually, so `assertSentCount()` counts actions (not HTTP calls) and `assertSent()` callbacks receive the individual `OnOfficeRequest` objects:
 
 ```php
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\Query;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 
-Query::fake(Query::response([
-    Query::page(recordFactories: [
-        EstateFactory::make()->id(1),
-    ]),
-    Query::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
-        AddressFactory::make()->id(2),
-    ]),
-]));
+test('it reads estates and addresses in one call', function () {
+    Query::fake(Query::response([
+        Query::page(recordFactories: [
+            EstateFactory::make()->id(1),
+        ]),
+        Query::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
+            AddressFactory::make()->id(2),
+        ]),
+    ]));
 
-$results = Query::batch([
-    // ...
-])->once();
-```
+    $results = Query::batch([
+        EstateRepository::query()->select('kaufpreis'),
+        AddressRepository::query()->whereLike('Vorname', 'Max'),
+    ])->once();
 
-Every action of a batch is recorded individually, so `assertSent()` callbacks receive the single `OnOfficeRequest` objects and `assertSentCount()` counts actions, not HTTP calls:
+    expect(data_get($results[0], 'data.records.0.id'))->toBe(1)
+        ->and(data_get($results[1], 'data.records.0.id'))->toBe(2);
 
-```php
-Query::assertSentCount(2);
-Query::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
+    Query::assertSentCount(2);
+    Query::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
+});
 ```
