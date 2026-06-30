@@ -124,27 +124,10 @@ class OnOfficeService
      */
     public function requestApi(OnOfficeRequest $request): Response
     {
-        $retryOnlyOnConnectionError = static fn ($exception): bool => $exception instanceof ConnectionException;
-
-        if (! $this->retryOnlyOnConnectionError()) {
-            $retryOnlyOnConnectionError = null;
-        }
-
-        /*
-         * All requests have a time-based validation.
-         * If we retry the request, the timestamp will be different.
-         * In this case, the HMAC will be invalid.
-         * To avoid this, we need to retry the request with payload creation until we get a valid response.
-         */
-        $response = null;
-        retry($this->getRetryCount(), function () use ($request, &$response) {
-            $response = Http::withHeaders(config('onoffice.headers'))->post(config('onoffice.base_url'), $request->toRequestArray());
-
-            $this->throwIfResponseIsFailed($response);
-        }, $this->getRetryDelay(), $retryOnlyOnConnectionError);
-
-        /** @var Response $response */
-        return $response;
+        return $this->post(
+            fn (): array => $request->toRequestArray(),
+            fn (Response $response) => $this->throwIfResponseIsFailed($response),
+        );
     }
 
     /**
@@ -161,30 +144,43 @@ class OnOfficeService
      */
     public function requestApiBatch(array $requests): Response
     {
+        return $this->post(
+            fn (): array => [
+                'token' => $this->getToken(),
+                'request' => [
+                    'actions' => array_map(static fn (OnOfficeRequest $request): array => $request->toActionArray(), $requests),
+                ],
+            ],
+            fn (Response $response) => $this->throwIfBatchResponseIsFailed($response),
+        );
+    }
+
+    /**
+     * Post a freshly built body to the API, retrying on failure.
+     *
+     * The body is rebuilt on every attempt: each request carries a time-based
+     * HMAC, so a retry needs a new timestamp and signature or the API rejects
+     * it. That is why the body is a callable rather than a value.
+     *
+     * @param  callable(): array<string, mixed>  $body
+     * @param  callable(Response): void  $throwIfFailed
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    private function post(callable $body, callable $throwIfFailed): Response
+    {
         $retryOnlyOnConnectionError = static fn ($exception): bool => $exception instanceof ConnectionException;
 
         if (! $this->retryOnlyOnConnectionError()) {
             $retryOnlyOnConnectionError = null;
         }
 
-        /*
-         * All requests have a time-based validation.
-         * If we retry the request, the timestamp will be different.
-         * In this case, the HMAC will be invalid.
-         * To avoid this, we need to retry the request with payload creation until we get a valid response.
-         */
         $response = null;
-        retry($this->getRetryCount(), function () use ($requests, &$response) {
-            $body = [
-                'token' => $this->getToken(),
-                'request' => [
-                    'actions' => array_map(static fn (OnOfficeRequest $request): array => $request->toActionArray(), $requests),
-                ],
-            ];
+        retry($this->getRetryCount(), function () use ($body, $throwIfFailed, &$response) {
+            $response = Http::withHeaders(config('onoffice.headers'))->post(config('onoffice.base_url'), $body());
 
-            $response = Http::withHeaders(config('onoffice.headers'))->post(config('onoffice.base_url'), $body);
-
-            $this->throwIfBatchResponseIsFailed($response);
+            $throwIfFailed($response);
         }, $this->getRetryDelay(), $retryOnlyOnConnectionError);
 
         /** @var Response $response */
