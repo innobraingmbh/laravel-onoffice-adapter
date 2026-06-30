@@ -19,17 +19,66 @@ use Throwable;
 trait Paginate
 {
     /**
-     * Build the base read request for this builder.
-     * Each builder implements this once; all terminal methods call it.
+     * The id of a single record to read, set via withId(). When present, reads
+     * target that one record instead of a list, which is what lets one record be
+     * read inside a batch via Query::batch().
+     */
+    protected int|string|null $readResourceId = null;
+
+    /**
+     * Build the list read request for this builder.
      */
     abstract protected function buildReadRequest(): OnOfficeRequest;
+
+    /**
+     * Build the request to read a single record by its id. This is the lazy twin
+     * of find(): both go through it, so a record read inside a batch is identical
+     * to one read eagerly.
+     */
+    abstract protected function buildFindRequest(int|string $id): OnOfficeRequest;
+
+    /**
+     * Target a single record by its id. The read then returns just that record,
+     * which is how one record is read inside a batch via Query::batch(). On its
+     * own, prefer find() — it returns the record itself.
+     */
+    public function withId(int|string $id): static
+    {
+        $this->readResourceId = $id;
+
+        return $this;
+    }
+
+    /**
+     * Read a single record by its id, or null when it is missing.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @throws OnOfficeException
+     */
+    public function find(int $id): ?array
+    {
+        return $this->requestApi($this->buildFindRequest($id))
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
+    }
+
+    /**
+     * The entry point every terminal read goes through. Reads a single record
+     * when one was targeted via withId(), otherwise the list.
+     */
+    protected function readRequest(): OnOfficeRequest
+    {
+        return $this->readResourceId === null
+            ? $this->buildReadRequest()
+            : $this->buildFindRequest($this->readResourceId);
+    }
 
     /**
      * @throws OnOfficeException
      */
     public function get(): Collection
     {
-        return $this->requestAll($this->buildReadRequest());
+        return $this->requestAll($this->readRequest());
     }
 
     /**
@@ -38,7 +87,7 @@ trait Paginate
      */
     public function first(): ?array
     {
-        $request = $this->buildReadRequest();
+        $request = $this->readRequest();
         $this->applyListWindow($request, $this->limit > 0 ? $this->limit : $this->pageSize, $this->offset);
 
         return $this->requestApi($request)->json(OnOfficeResponsePath::FIRST_RECORD);
@@ -49,7 +98,7 @@ trait Paginate
      */
     public function each(callable $callback): void
     {
-        $this->requestAllChunked($this->buildReadRequest(), $callback);
+        $this->requestAllChunked($this->readRequest(), $callback);
     }
 
     /**
@@ -61,7 +110,7 @@ trait Paginate
      */
     public function toRequest(): OnOfficeRequest
     {
-        $request = $this->buildReadRequest();
+        $request = $this->readRequest();
         $this->applyListWindow($request, $this->limit > 0 ? $this->limit : $this->pageSize, $this->offset);
 
         return $request;
@@ -76,7 +125,7 @@ trait Paginate
      */
     public function count(): int
     {
-        $request = $this->buildReadRequest();
+        $request = $this->readRequest();
         data_set($request->parameters, OnOfficeService::DATA, []);
         data_set($request->parameters, OnOfficeService::LISTLIMIT, 1);
 
@@ -190,7 +239,7 @@ trait Paginate
      */
     protected function getPageWithMeta(): PaginatedResponse
     {
-        $request = $this->buildReadRequest();
+        $request = $this->readRequest();
         $this->applyListWindow($request, $this->pageSize, $this->offset);
 
         $response = $this->requestApi($request);

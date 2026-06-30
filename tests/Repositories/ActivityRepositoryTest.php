@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Facades\ActivityRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadActivityResponse;
@@ -22,6 +25,24 @@ describe('fake responses', function () {
             ->and($response->first()['id'])->toBe(1);
 
         ActivityRepository::assertSentCount(1);
+    });
+
+    test('withId reads a single activity with the Get action', function () {
+        ActivityRepository::fake(ActivityRepository::response([
+            ActivityRepository::page(recordFactories: [
+                AddressFactory::make()
+                    ->id(7),
+            ]),
+        ]));
+
+        $response = ActivityRepository::query()->withId(7)->get();
+
+        expect($response->first()['id'])->toBe(7);
+
+        ActivityRepository::assertSent(fn (OnOfficeRequest $request) => $request->actionId === OnOfficeAction::Get
+            && $request->resourceType === OnOfficeResourceType::Activity
+            && $request->resourceId === 7
+        );
     });
 });
 

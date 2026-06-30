@@ -690,15 +690,13 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * Build and send a request to read a single record by its id.
-     *
-     * @return array<string, mixed>|null
-     *
-     * @throws OnOfficeException
+     * Build a request to read a single record by its id. This is the one place
+     * single-record requests are constructed, so the eager find() and the
+     * batch-deferred read produce the same request.
      */
-    protected function requestFind(OnOfficeAction $action, OnOfficeResourceType $resourceType, int $id): ?array
+    protected function singleRecordRequest(OnOfficeAction $action, OnOfficeResourceType $resourceType, int|string $id): OnOfficeRequest
     {
-        $request = new OnOfficeRequest(
+        return new OnOfficeRequest(
             $action,
             $resourceType,
             $id,
@@ -707,9 +705,6 @@ class Builder implements BuilderInterface
                 ...$this->customParameters,
             ],
         );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**

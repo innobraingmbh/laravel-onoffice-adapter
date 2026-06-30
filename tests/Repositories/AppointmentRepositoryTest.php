@@ -66,6 +66,24 @@ describe('fake responses', function () {
         );
     });
 
+    test('withId reads a single appointment without a date range', function () {
+        AppointmentRepository::fake(AppointmentRepository::response([
+            AppointmentRepository::page(recordFactories: [
+                AppointmentFactory::make()
+                    ->id(42),
+            ]),
+        ]));
+
+        $response = AppointmentRepository::query()->withId(42)->get();
+
+        expect($response->first()['id'])->toBe(42);
+
+        AppointmentRepository::assertSent(fn (OnOfficeRequest $request) => $request->actionId === OnOfficeAction::Get
+            && $request->resourceType === OnOfficeResourceType::AppointmentList
+            && $request->resourceId === 42
+        );
+    });
+
     test('create', function () {
         AppointmentRepository::fake(AppointmentRepository::response([
             AppointmentRepository::page(recordFactories: [

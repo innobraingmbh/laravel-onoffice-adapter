@@ -10,7 +10,6 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
-use Throwable;
 
 class LastSeenBuilder extends Builder
 {
@@ -39,10 +38,7 @@ class LastSeenBuilder extends Builder
         );
     }
 
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function find(int $id): ?array
+    protected function buildFindRequest(int|string $id): OnOfficeRequest
     {
         throw new OnOfficeException('Find by ID is not supported for LastSeen records.');
     }

@@ -43,6 +43,21 @@ describe('fake responses', function () {
         expect($response)->toBeArray()
             ->and($response['id'])->toBe(1);
     });
+
+    test('withId targets a single record', function () {
+        EstateRepository::fake(EstateRepository::response([
+            EstateRepository::page(recordFactories: [
+                EstateFactory::make()
+                    ->id(5),
+            ]),
+        ]));
+
+        $response = EstateRepository::query()->withId(5)->get();
+
+        expect($response->first()['id'])->toBe(5);
+
+        EstateRepository::assertSent(fn (OnOfficeRequest $request) => $request->resourceId === 5);
+    });
 });
 
 describe('real responses', function () {
