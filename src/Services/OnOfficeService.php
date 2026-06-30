@@ -203,8 +203,8 @@ class OnOfficeService
      */
     public function requestAll(
         callable $request,
-        string $resultPath = 'response.results.0.data.records',
-        string $countPath = 'response.results.0.data.meta.cntabsolute',
+        string $resultPath = OnOfficeResponsePath::RECORDS,
+        string $countPath = OnOfficeResponsePath::META_COUNT_ABSOLUTE,
         int $pageSize = 500,
         int $offset = 0,
         int $limit = -1,
@@ -267,8 +267,8 @@ class OnOfficeService
     public function requestAllChunked(
         callable $request,
         callable $callback,
-        string $resultPath = 'response.results.0.data.records',
-        string $countPath = 'response.results.0.data.meta.cntabsolute',
+        string $resultPath = OnOfficeResponsePath::RECORDS,
+        string $countPath = OnOfficeResponsePath::META_COUNT_ABSOLUTE,
         int $pageSize = 500,
         int $offset = 0,
         int $limit = -1,

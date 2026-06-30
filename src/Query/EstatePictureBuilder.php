@@ -11,6 +11,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 
 class EstatePictureBuilder extends Builder
 {
@@ -64,7 +65,7 @@ class EstatePictureBuilder extends Builder
             OnOfficeResourceType::EstatePictures,
             OnOfficeResourceId::None,
             parameters: [
-                'estateids' => $this->estateIds,
+                OnOfficeService::ESTATEIDS => $this->estateIds,
                 'categories' => $this->categories,
                 ...$this->customParameters,
             ],
@@ -87,7 +88,7 @@ class EstatePictureBuilder extends Builder
             OnOfficeResourceType::EstatePictures,
             OnOfficeResourceId::None,
             parameters: [
-                'estateids' => $this->estateIds,
+                OnOfficeService::ESTATEIDS => $this->estateIds,
                 'categories' => $this->categories,
                 ...$this->customParameters,
             ],

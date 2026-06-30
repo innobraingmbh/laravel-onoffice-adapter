@@ -11,6 +11,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonFilterable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -51,7 +52,7 @@ class ImprintBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**
@@ -59,17 +60,6 @@ class ImprintBuilder extends Builder
      */
     public function find(int $id): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Impressum,
-            resourceId: $id,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+        return $this->requestFind(OnOfficeAction::Read, OnOfficeResourceType::Impressum, $id);
     }
 }

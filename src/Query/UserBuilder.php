@@ -35,17 +35,6 @@ class UserBuilder extends Builder
      */
     public function find(int $id): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::User,
-            $id,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+        return $this->requestFind(OnOfficeAction::Read, OnOfficeResourceType::User, $id);
     }
 }

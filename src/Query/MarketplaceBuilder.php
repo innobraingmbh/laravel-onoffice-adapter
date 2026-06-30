@@ -8,6 +8,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -31,6 +32,6 @@ class MarketplaceBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0.elements.success') === 'success';
+            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_SUCCESS) === 'success';
     }
 }

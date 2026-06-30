@@ -21,6 +21,7 @@ use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
 use Innobrain\OnOfficeAdapter\Facades\BaseRepository as BaseRepositoryFacade;
 use Innobrain\OnOfficeAdapter\Query\Concerns\BuilderInterface;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use JsonException;
 use Symfony\Component\VarDumper\VarDumper;
@@ -80,6 +81,13 @@ class Builder implements BuilderInterface
      * @var array<string, mixed>
      */
     public array $customParameters = [];
+
+    /**
+     * Whether the resource's read endpoint accepts a listoffset parameter.
+     * Most do; a few (e.g. the task endpoint) reject it outright, so their
+     * builders opt out and reads are bounded to a single listlimit page.
+     */
+    protected bool $supportsListOffset = true;
 
     /**
      * The stub callables that will be used to fake the responses.
@@ -295,10 +303,10 @@ class Builder implements BuilderInterface
      * @param  string  $module  The module name to check rights in (e.g. 'estate', 'address').
      * @param  int  $userId  The ID of the user whose rights are being checked.
      * @param  string  $resultPath  The dot-notated path to the records in the response body.
-     *                              Defaults to 'response.results.0.data.records'.
+     *                              Defaults to OnOfficeResponsePath::RECORDS.
      * @return self Returns the current Builder instance for method chaining.
      */
-    public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = 'response.results.0.data.records'): self
+    public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = OnOfficeResponsePath::RECORDS): self
     {
         return $this->after([
             function (Response $response, string $action, string $module, int $userId) use ($resultPath): ?Response {
@@ -306,7 +314,7 @@ class Builder implements BuilderInterface
                     return null;
                 }
 
-                $ids = $response->json('response.results.0.data.records.*.id', []);
+                $ids = $response->json(OnOfficeResponsePath::RECORD_IDS, []);
 
                 if ($ids === []) {
                     $responseBody = $response->json();
@@ -335,7 +343,7 @@ class Builder implements BuilderInterface
                         ],
                     ));
 
-                $allowedIds = $userRightsResponse->json('response.results.0.data.records.0.elements', []);
+                $allowedIds = $userRightsResponse->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS, []);
                 $allowedIds = array_map(static fn (string $element): int => (int) $element, $allowedIds);
 
                 /** @var array<int, array{id: string|int}> $records */
@@ -362,6 +370,30 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * Apply the list window (limit and, where supported, offset) to a read request.
+     *
+     * A resource whose endpoint rejects listoffset omits it and can therefore
+     * only read the first page; requesting a later page (a non-zero offset) is a
+     * hard error rather than a silent first-page result.
+     *
+     * @throws OnOfficeException
+     */
+    protected function applyListWindow(OnOfficeRequest $request, int $listLimit, int $offset): void
+    {
+        data_set($request->parameters, OnOfficeService::LISTLIMIT, $listLimit);
+
+        if ($this->supportsListOffset) {
+            data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
+
+            return;
+        }
+
+        throw_if($offset > 0, new OnOfficeException(
+            'This resource does not support offset pagination; only the first page can be read.'
+        ));
+    }
+
+    /**
      * @return Collection<int, array<string, mixed>>
      *
      * @throws OnOfficeException
@@ -372,8 +404,7 @@ class Builder implements BuilderInterface
          * @throws OnOfficeException
          * @throws Throwable
          */ function (int $pageSize, int $offset) use ($request) {
-            data_set($request->parameters, OnOfficeService::LISTLIMIT, $pageSize);
-            data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
+            $this->applyListWindow($request, $pageSize, $offset);
 
             return $this->requestApi($request);
         }, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit, pageOverwrite: $this->getPageOverwrite());
@@ -402,8 +433,7 @@ class Builder implements BuilderInterface
          * @throws OnOfficeException
          * @throws Throwable
          */ function (int $pageSize, int $offset) use ($request) {
-            data_set($request->parameters, OnOfficeService::LISTLIMIT, $pageSize);
-            data_set($request->parameters, OnOfficeService::LISTOFFSET, $offset);
+            $this->applyListWindow($request, $pageSize, $offset);
 
             return $this->requestApi($request);
         }, $callback, pageSize: $this->pageSize, offset: $this->offset, limit: $this->limit, pageOverwrite: $this->getPageOverwrite());
@@ -657,6 +687,29 @@ class Builder implements BuilderInterface
     public function once(OnOfficeRequest $request): Response
     {
         return $this->requestApi($request);
+    }
+
+    /**
+     * Build and send a request to read a single record by its id.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @throws OnOfficeException
+     */
+    protected function requestFind(OnOfficeAction $action, OnOfficeResourceType $resourceType, int $id): ?array
+    {
+        $request = new OnOfficeRequest(
+            $action,
+            $resourceType,
+            $id,
+            parameters: [
+                OnOfficeService::DATA => $this->columns,
+                ...$this->customParameters,
+            ],
+        );
+
+        return $this->requestApi($request)
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**

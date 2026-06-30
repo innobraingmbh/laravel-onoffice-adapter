@@ -11,6 +11,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -51,18 +52,7 @@ class ActivityBuilder extends Builder
      */
     public function find(int $id): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Activity,
-            $id,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+        return $this->requestFind(OnOfficeAction::Get, OnOfficeResourceType::Activity, $id);
     }
 
     /**
@@ -84,7 +74,7 @@ class ActivityBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**
@@ -92,7 +82,7 @@ class ActivityBuilder extends Builder
      */
     public function estate(): static
     {
-        $this->estateOrAddress = 'estateid';
+        $this->estateOrAddress = OnOfficeService::ESTATEID;
 
         return $this;
     }
@@ -102,7 +92,7 @@ class ActivityBuilder extends Builder
      */
     public function address(): static
     {
-        $this->estateOrAddress = 'addressid';
+        $this->estateOrAddress = OnOfficeService::ADDRESSID;
 
         return $this;
     }
@@ -160,13 +150,13 @@ class ActivityBuilder extends Builder
         }
 
         if (! is_null($this->estateId)) {
-            $parameters['estateid'] = $this->estateId;
+            $parameters[OnOfficeService::ESTATEID] = $this->estateId;
         }
 
         if ($this->addressIds !== []) {
             $key = match ($create) {
-                true => 'addressids',
-                false => 'addressid',
+                true => OnOfficeService::ADDRESSIDS,
+                false => OnOfficeService::ADDRESSID,
             };
 
             $parameters[$key] = $this->addressIds;

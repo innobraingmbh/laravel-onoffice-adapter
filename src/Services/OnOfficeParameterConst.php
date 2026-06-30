@@ -35,6 +35,24 @@ trait OnOfficeParameterConst
 
     public const RECORDID = 'recordId';
 
+    public const ESTATEID = 'estateid';
+
+    public const ESTATEIDS = 'estateids';
+
+    public const ADDRESSID = 'addressid';
+
+    public const ADDRESSIDS = 'addressids';
+
+    public const APPOINTMENTID = 'appointmentid';
+
+    public const RELATEDADDRESSID = 'relatedAddressId';
+
+    public const RELATEDESTATEID = 'relatedEstateId';
+
+    public const RELATEDPROJECTIDS = 'relatedProjectIds';
+
+    public const FILEID = 'fileid';
+
     public const PARAMETERCACHEID = 'parameterCacheId';
 
     public const EXTENDEDCLAIM = 'extendedclaim';

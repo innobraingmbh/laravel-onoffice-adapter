@@ -8,6 +8,8 @@ use Illuminate\Support\Arr;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 
 class MacroBuilder extends Builder
 {
@@ -22,7 +24,7 @@ class MacroBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0.elements.resolvedtext');
+            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_RESOLVED_TEXT);
     }
 
     /**
@@ -48,7 +50,7 @@ class MacroBuilder extends Builder
      */
     public function estateIds(int|array $ids): static
     {
-        return $this->parameter('estateids', Arr::wrap($ids));
+        return $this->parameter(OnOfficeService::ESTATEIDS, Arr::wrap($ids));
     }
 
     /**
@@ -58,7 +60,7 @@ class MacroBuilder extends Builder
      */
     public function addressIds(int|array $ids): static
     {
-        return $this->parameter('addressids', Arr::wrap($ids));
+        return $this->parameter(OnOfficeService::ADDRESSIDS, Arr::wrap($ids));
     }
 
     /**

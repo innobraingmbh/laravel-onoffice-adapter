@@ -4,17 +4,10 @@ declare(strict_types=1);
 
 namespace Innobrain\OnOfficeAdapter\Query;
 
-use Illuminate\Support\Collection;
-use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
-use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
-use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
-use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
-use Throwable;
 
-class AddressFileBuilder extends Builder
+class AddressFileBuilder extends FileBuilder
 {
     public function __construct(
         public int $addressId,
@@ -22,130 +15,23 @@ class AddressFileBuilder extends Builder
         parent::__construct();
     }
 
-    /**
-     * @throws OnOfficeException
-     */
-    public function get(): Collection
+    protected function resourceId(): OnOfficeResourceId
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::File,
-            OnOfficeResourceId::Address,
-            parameters: [
-                'addressid' => $this->addressId,
-                OnOfficeService::LISTLIMIT => $this->limit,
-                OnOfficeService::LISTOFFSET => $this->offset,
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestAll($request);
+        return OnOfficeResourceId::Address;
     }
 
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function first(): ?array
+    protected function parentIdParameter(): string
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::File,
-            OnOfficeResourceId::Address,
-            parameters: [
-                'addressid' => $this->addressId,
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+        return OnOfficeService::ADDRESSID;
     }
 
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function find(int $id): ?array
+    protected function relationType(): string
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::File,
-            OnOfficeResourceId::Address,
-            parameters: [
-                'addressid' => $this->addressId,
-                'fileid' => $id,
-                ...$this->customParameters,
-            ],
-        );
-
-        $response = $this->requestApi($request);
-
-        $result = $response->json('response.results.0.data.records.0');
-
-        throw_unless($result,
-            OnOfficeException::class,
-            OnOfficeError::File_Not_Found->toString(),
-            OnOfficeError::File_Not_Found->value, // @phpstan-ignore argument.type
-            isResponseError: true); // @phpstan-ignore argument.type
-
-        return $result;
+        return 'address';
     }
 
-    /**
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
+    protected function parentId(): int
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::File,
-            OnOfficeResourceId::Address,
-            parameters: [
-                'addressid' => $this->addressId,
-                ...$this->customParameters,
-            ],
-        );
-
-        $this->requestAllChunked($request, $callback);
-    }
-
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function modify(int $id): bool
-    {
-        $parameters = array_replace($this->modifies, [
-            'fileId' => $id,
-            'parentid' => $this->addressId,
-            'relationtype' => 'address',
-        ]);
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Modify,
-            OnOfficeResourceType::FileRelation,
-            parameters: $parameters,
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0.elements.success') === 'success';
-    }
-
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function delete(int $id): bool
-    {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Delete,
-            OnOfficeResourceType::FileRelation,
-            parameters: [
-                'fileId' => $id,
-                'parentid' => $this->addressId,
-                'relationtype' => 'address',
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0.elements.success') === 'success';
+        return $this->addressId;
     }
 }

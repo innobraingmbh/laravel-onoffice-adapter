@@ -9,6 +9,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -31,6 +32,13 @@ class TaskBuilder extends Builder
     public ?int $relatedProjectId = null;
 
     /**
+     * The task endpoint rejects listoffset outright ("Invalid field in input
+     * data: listoffset"), so reads never send it and are bounded to a single
+     * listlimit page (max 500).
+     */
+    protected bool $supportsListOffset = false;
+
+    /**
      * Count matching tasks.
      *
      * Unlike other resources, the task endpoint's `meta.cntabsolute` equals the
@@ -48,7 +56,7 @@ class TaskBuilder extends Builder
         data_set($request->parameters, OnOfficeService::DATA, []);
         data_set($request->parameters, OnOfficeService::LISTLIMIT, self::MAX_LIST_LIMIT);
 
-        return $this->requestApi($request)->json('response.results.0.data.meta.cntabsolute', 0);
+        return $this->requestApi($request)->json(OnOfficeResponsePath::META_COUNT_ABSOLUTE, 0);
     }
 
     protected function buildReadRequest(): OnOfficeRequest
@@ -59,9 +67,7 @@ class TaskBuilder extends Builder
             parameters: array_filter([
                 OnOfficeService::DATA => $this->columns,
                 OnOfficeService::FILTER => $this->getFilters(),
-                'relatedAddressId' => $this->relatedAddressId,
-                'relatedEstateId' => $this->relatedEstateId,
-                'relatedProjectIds' => $this->relatedProjectId,
+                ...$this->relatedParameters(),
                 ...$this->customParameters,
             ], fn ($v) => ! is_null($v)),
         );
@@ -72,18 +78,7 @@ class TaskBuilder extends Builder
      */
     public function find(int $id): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Task,
-            $id,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+        return $this->requestFind(OnOfficeAction::Read, OnOfficeResourceType::Task, $id);
     }
 
     /**
@@ -99,15 +94,13 @@ class TaskBuilder extends Builder
             OnOfficeResourceType::Task,
             parameters: array_filter([
                 OnOfficeService::DATA => $data,
-                'relatedAddressId' => $this->relatedAddressId,
-                'relatedEstateId' => $this->relatedEstateId,
-                'relatedProjectIds' => $this->relatedProjectId,
+                ...$this->relatedParameters(),
                 ...$this->customParameters,
             ], fn ($v) => ! is_null($v)),
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**
@@ -121,9 +114,7 @@ class TaskBuilder extends Builder
             $id,
             parameters: array_filter([
                 OnOfficeService::DATA => $this->modifies,
-                'relatedAddressId' => $this->relatedAddressId,
-                'relatedEstateId' => $this->relatedEstateId,
-                'relatedProjectIds' => $this->relatedProjectId,
+                ...$this->relatedParameters(),
                 ...$this->customParameters,
             ], fn ($v) => ! is_null($v)),
         );
@@ -131,6 +122,21 @@ class TaskBuilder extends Builder
         $this->requestApi($request);
 
         return true;
+    }
+
+    /**
+     * The relation parameters shared by the task read, create and modify
+     * requests. Null entries are stripped by the caller's array_filter.
+     *
+     * @return array<string, int|null>
+     */
+    private function relatedParameters(): array
+    {
+        return [
+            OnOfficeService::RELATEDADDRESSID => $this->relatedAddressId,
+            OnOfficeService::RELATEDESTATEID => $this->relatedEstateId,
+            OnOfficeService::RELATEDPROJECTIDS => $this->relatedProjectId,
+        ];
     }
 
     public function relatedAddress(int $id): static

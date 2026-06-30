@@ -13,6 +13,7 @@ use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Input;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -45,18 +46,7 @@ class AddressBuilder extends Builder
      */
     public function find(int $id): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Address,
-            $id,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+        return $this->requestFind(OnOfficeAction::Read, OnOfficeResourceType::Address, $id);
     }
 
     /**
@@ -91,7 +81,7 @@ class AddressBuilder extends Builder
         );
 
         return $this->requestApi($request)
-            ->json('response.results.0.data.records.0');
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**

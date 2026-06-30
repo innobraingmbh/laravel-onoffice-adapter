@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Facades\SearchCriteriaRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\SearchCriteriaFactory;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\CreateSearchCriteriaResponse;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\GetSearchCriteriaResponse;
 
@@ -25,6 +27,24 @@ describe('fake responses', function () {
         ]);
 
         SearchCriteriaRepository::assertSentCount(1);
+    });
+
+    test('get many reads every requested id in a single request', function () {
+        SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
+            SearchCriteriaRepository::page(recordFactories: [
+                SearchCriteriaFactory::make()->id(7),
+                SearchCriteriaFactory::make()->id(8),
+            ]),
+        ]));
+
+        $response = SearchCriteriaRepository::query()->recordIds([7, 8])->get();
+
+        expect($response)->toHaveCount(2)
+            ->and($response->pluck('id')->all())->toBe([7, 8]);
+
+        SearchCriteriaRepository::assertSentCount(1);
+        SearchCriteriaRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->parameters[OnOfficeService::IDS] === [7, 8]
+            && $request->parameters[OnOfficeService::MODE] === 'internal');
     });
 });
 
