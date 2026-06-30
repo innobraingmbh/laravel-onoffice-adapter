@@ -15,7 +15,6 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
-use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
@@ -82,13 +81,6 @@ class Builder implements BuilderInterface
      * @var array<string, mixed>
      */
     public array $customParameters = [];
-
-    /**
-     * The resource id to read. When set, the read request targets a single
-     * record instead of a list, which is what lets one record be read inside
-     * a batch via Query::batch().
-     */
-    protected OnOfficeResourceId|int|string $readResourceId = OnOfficeResourceId::None;
 
     /**
      * Whether the resource's read endpoint accepts a listoffset parameter.
@@ -532,18 +524,6 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * Target a single record by its id. The read request then returns just that
-     * record. Useful for reading one record inside a batch via Query::batch();
-     * on its own, prefer find().
-     */
-    public function withId(int|string $id): static
-    {
-        $this->readResourceId = $id;
-
-        return $this;
-    }
-
-    /**
      * Be aware that the limit is capped at 500.
      */
     public function limit(int $value): static
@@ -710,15 +690,13 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * Build and send a request to read a single record by its id.
-     *
-     * @return array<string, mixed>|null
-     *
-     * @throws OnOfficeException
+     * Build a request to read a single record by its id. This is the one place
+     * single-record requests are constructed, so the eager find() and the
+     * batch-deferred read produce the same request.
      */
-    protected function requestFind(OnOfficeAction $action, OnOfficeResourceType $resourceType, int $id): ?array
+    protected function singleRecordRequest(OnOfficeAction $action, OnOfficeResourceType $resourceType, int|string $id): OnOfficeRequest
     {
-        $request = new OnOfficeRequest(
+        return new OnOfficeRequest(
             $action,
             $resourceType,
             $id,
@@ -727,9 +705,6 @@ class Builder implements BuilderInterface
                 ...$this->customParameters,
             ],
         );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**

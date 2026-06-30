@@ -7,10 +7,8 @@ namespace Innobrain\OnOfficeAdapter\Query;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
-use Throwable;
 
 class UserBuilder extends Builder
 {
@@ -30,11 +28,8 @@ class UserBuilder extends Builder
         );
     }
 
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function find(int $id): ?array
+    protected function buildFindRequest(int|string $id): OnOfficeRequest
     {
-        return $this->requestFind(OnOfficeAction::Read, OnOfficeResourceType::User, $id);
+        return $this->singleRecordRequest(OnOfficeAction::Read, OnOfficeResourceType::User, $id);
     }
 }

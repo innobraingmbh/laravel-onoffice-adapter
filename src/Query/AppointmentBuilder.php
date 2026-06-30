@@ -102,12 +102,9 @@ class AppointmentBuilder extends Builder
         );
     }
 
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function find(int $id): ?array
+    protected function buildFindRequest(int|string $id): OnOfficeRequest
     {
-        return $this->requestFind(OnOfficeAction::Get, OnOfficeResourceType::AppointmentList, $id);
+        return $this->singleRecordRequest(OnOfficeAction::Get, OnOfficeResourceType::AppointmentList, $id);
     }
 
     /**

@@ -60,6 +60,7 @@ class ImprintBuilder extends Builder
      */
     public function find(int $id): ?array
     {
-        return $this->requestFind(OnOfficeAction::Read, OnOfficeResourceType::Impressum, $id);
+        return $this->requestApi($this->singleRecordRequest(OnOfficeAction::Read, OnOfficeResourceType::Impressum, $id))
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 }

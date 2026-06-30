@@ -41,12 +41,9 @@ class AddressBuilder extends Builder
         );
     }
 
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function find(int $id): ?array
+    protected function buildFindRequest(int|string $id): OnOfficeRequest
     {
-        return $this->requestFind(OnOfficeAction::Read, OnOfficeResourceType::Address, $id);
+        return $this->singleRecordRequest(OnOfficeAction::Read, OnOfficeResourceType::Address, $id);
     }
 
     /**

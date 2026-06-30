@@ -11,7 +11,6 @@ use Illuminate\Pagination\Paginator as PaginatorImpl;
 use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\PaginatedResponse;
-use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
@@ -20,25 +19,58 @@ use Throwable;
 trait Paginate
 {
     /**
-     * Build the base read request for this builder. Each builder implements this
-     * once. Do not call it from terminals directly: go through readRequest() so a
-     * single record targeted via withId() is applied. This is the hook, not the
-     * entry point.
+     * The id of a single record to read, set via withId(). When present, reads
+     * target that one record instead of a list, which is what lets one record be
+     * read inside a batch via Query::batch().
+     */
+    protected int|string|null $readResourceId = null;
+
+    /**
+     * Build the list read request for this builder.
      */
     abstract protected function buildReadRequest(): OnOfficeRequest;
 
     /**
-     * The entry point every terminal read must use. Builds the base request and
-     * applies the targeted id, if one was set via withId(), so a single record is
-     * read consistently, including inside a batch via toRequest().
+     * Build the request to read a single record by its id. This is the lazy twin
+     * of find(): both go through it, so a record read inside a batch is identical
+     * to one read eagerly.
+     */
+    abstract protected function buildFindRequest(int|string $id): OnOfficeRequest;
+
+    /**
+     * Target a single record by its id. The read then returns just that record,
+     * which is how one record is read inside a batch via Query::batch(). On its
+     * own, prefer find() — it returns the record itself.
+     */
+    public function withId(int|string $id): static
+    {
+        $this->readResourceId = $id;
+
+        return $this;
+    }
+
+    /**
+     * Read a single record by its id, or null when it is missing.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @throws OnOfficeException
+     */
+    public function find(int $id): ?array
+    {
+        return $this->requestApi($this->buildFindRequest($id))
+            ->json(OnOfficeResponsePath::FIRST_RECORD);
+    }
+
+    /**
+     * The entry point every terminal read goes through. Reads a single record
+     * when one was targeted via withId(), otherwise the list.
      */
     protected function readRequest(): OnOfficeRequest
     {
-        return tap($this->buildReadRequest(), function (OnOfficeRequest $request): void {
-            if ($this->readResourceId !== OnOfficeResourceId::None) {
-                $request->resourceId = $this->readResourceId;
-            }
-        });
+        return $this->readResourceId === null
+            ? $this->buildReadRequest()
+            : $this->buildFindRequest($this->readResourceId);
     }
 
     /**

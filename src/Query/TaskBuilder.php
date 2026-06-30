@@ -73,12 +73,9 @@ class TaskBuilder extends Builder
         );
     }
 
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function find(int $id): ?array
+    protected function buildFindRequest(int|string $id): OnOfficeRequest
     {
-        return $this->requestFind(OnOfficeAction::Read, OnOfficeResourceType::Task, $id);
+        return $this->singleRecordRequest(OnOfficeAction::Read, OnOfficeResourceType::Task, $id);
     }
 
     /**

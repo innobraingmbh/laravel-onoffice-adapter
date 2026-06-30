@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Facades\LastSeenRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\LastSeenFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadLastSeenResponse;
@@ -23,6 +24,14 @@ describe('fake responses', function () {
 
         LastSeenRepository::assertSentCount(1);
     });
+
+    test('find is not supported', function () {
+        LastSeenRepository::query()->find(1);
+    })->throws(OnOfficeException::class, 'Find by ID is not supported for LastSeen records.');
+
+    test('withId is not supported', function () {
+        LastSeenRepository::query()->withId(1)->get();
+    })->throws(OnOfficeException::class, 'Find by ID is not supported for LastSeen records.');
 });
 
 describe('real responses', function () {
