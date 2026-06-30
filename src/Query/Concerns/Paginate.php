@@ -62,10 +62,7 @@ trait Paginate
     public function toRequest(): OnOfficeRequest
     {
         $request = $this->buildReadRequest();
-        data_set($request->parameters, OnOfficeService::LISTLIMIT, $this->limit > 0 ? $this->limit : $this->pageSize);
-        if ($this->supportsListOffset) {
-            data_set($request->parameters, OnOfficeService::LISTOFFSET, $this->offset);
-        }
+        $this->applyListWindow($request, $this->limit > 0 ? $this->limit : $this->pageSize, $this->offset);
 
         return $request;
     }

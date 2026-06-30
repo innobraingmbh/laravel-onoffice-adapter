@@ -12,6 +12,7 @@ use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\Query;
+use Innobrain\OnOfficeAdapter\Facades\TaskRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 
@@ -79,6 +80,12 @@ describe('fake responses', function () {
                 && data_get($request->parameters, 'listlimit') === 5;
         });
     });
+
+    test('batching a non-zero offset on a resource without offset support throws', function () {
+        Query::batch([
+            TaskRepository::query()->offset(50),
+        ]);
+    })->throws(OnOfficeException::class, 'This resource does not support offset pagination; only the first page can be read.');
 
     test('sending an empty batch throws', function () {
         Query::fake(null);
