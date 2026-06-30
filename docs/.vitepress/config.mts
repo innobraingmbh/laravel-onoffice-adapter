@@ -38,6 +38,7 @@ export default defineConfig({
                     {text: 'Logs', link: '/repositories/log-repository'},
                     {text: 'Macros', link: '/repositories/macro-repository'},
                     {text: 'Marketplace', link: '/repositories/marketplace-repository'},
+                    {text: 'Query', link: '/repositories/query-repository'},
                     {text: 'Relation', link: '/repositories/relation-repository'},
                     {text: 'SearchCriteria', link: '/repositories/search-criteria-repository'},
                     {text: 'Setting', link: '/repositories/setting-repository'},

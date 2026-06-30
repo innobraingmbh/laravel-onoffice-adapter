@@ -17,7 +17,7 @@ use Innobrain\OnOfficeAdapter\Repositories\BatchRepository as RootRepository;
  *
  * @method static BatchBuilder query()
  */
-class Bus extends BaseRepository
+class Query extends BaseRepository
 {
     /**
      * Start a batch of requests that will be sent in a single API call.

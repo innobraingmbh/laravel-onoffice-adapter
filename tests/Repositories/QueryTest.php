@@ -10,23 +10,23 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
-use Innobrain\OnOfficeAdapter\Facades\Bus;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Facades\Query;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 
 describe('fake responses', function () {
     test('once returns one result per action', function () {
-        Bus::fake(Bus::response([
-            Bus::page(recordFactories: [
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
                 EstateFactory::make()->id(1),
             ]),
-            Bus::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
+            Query::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
                 AddressFactory::make()->id(2),
             ]),
         ]));
 
-        $results = Bus::batch([
+        $results = Query::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
         ])->once();
@@ -39,40 +39,40 @@ describe('fake responses', function () {
     });
 
     test('each action is recorded with its own result', function () {
-        Bus::fake(Bus::response([
-            Bus::page(recordFactories: [
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
                 EstateFactory::make()->id(1),
             ]),
-            Bus::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
+            Query::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
                 AddressFactory::make()->id(2),
             ]),
         ]));
 
-        Bus::batch([
+        Query::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
         ])->once();
 
-        Bus::assertSentCount(2);
-        Bus::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
+        Query::assertSentCount(2);
+        Query::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
 
-        expect(data_get(Bus::lastRecordedResponse(), 'response.results.0.data.records.0.id'))->toBe(2);
+        expect(data_get(Query::lastRecordedResponse(), 'response.results.0.data.records.0.id'))->toBe(2);
     });
 
     test('builders can be added directly', function () {
-        Bus::fake(Bus::response([
-            Bus::page(recordFactories: [
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
                 EstateFactory::make()->id(1),
             ]),
         ]));
 
-        $results = Bus::batch([
+        $results = Query::batch([
             EstateRepository::query()->select('kaufpreis')->limit(5),
         ])->once();
 
         expect($results)->toHaveCount(1);
 
-        Bus::assertSent(function (OnOfficeRequest $request) {
+        Query::assertSent(function (OnOfficeRequest $request) {
             return $request->actionId === OnOfficeAction::Read
                 && $request->resourceType === OnOfficeResourceType::Estate
                 && data_get($request->parameters, 'data') === ['kaufpreis']
@@ -81,28 +81,28 @@ describe('fake responses', function () {
     });
 
     test('sending an empty batch throws', function () {
-        Bus::fake(null);
+        Query::fake(null);
 
-        Bus::batch()->once();
+        Query::batch()->once();
     })->throws(OnOfficeException::class, 'Cannot send an empty batch');
 
     test('stray requests are prevented', function () {
-        Bus::preventStrayRequests();
+        Query::preventStrayRequests();
 
-        Bus::batch([
+        Query::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
         ])->once();
     })->throws(StrayRequestException::class);
 
     test('a failed action throws', function () {
-        Bus::fake(Bus::response([
-            Bus::page(recordFactories: [
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
                 EstateFactory::make()->id(1),
             ]),
-            Bus::page(resourceType: OnOfficeResourceType::Address, errorCodeResult: 137, messageResult: 'Error'),
+            Query::page(resourceType: OnOfficeResourceType::Address, errorCodeResult: 137, messageResult: 'Error'),
         ]));
 
-        Bus::batch([
+        Query::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
         ])->once();
@@ -136,7 +136,7 @@ describe('real responses', function () {
             ]),
         ]);
 
-        $results = Bus::batch([
+        $results = Query::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate, identifier: 'estates'),
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address, identifier: 'addresses'),
         ])->once();
@@ -177,7 +177,7 @@ describe('real responses', function () {
 
         Carbon::setTestNow('2026-01-01 12:00:00');
 
-        $batch = Bus::batch([
+        $batch = Query::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
         ]);
 
@@ -216,7 +216,7 @@ describe('real responses', function () {
             ]),
         ]);
 
-        Bus::batch([
+        Query::batch([
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
         ])->once();

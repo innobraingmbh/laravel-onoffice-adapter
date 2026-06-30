@@ -1,13 +1,13 @@
-# Bus
+# Query
 
-The onOffice API allows sending multiple actions in a single request. Use the `Bus` facade to bundle several requests into one HTTP call, for example to read estates and addresses at the same time. It reads like Laravel's `Bus::batch()`:
+The onOffice API allows sending multiple actions in a single request. Use the `Query` facade to bundle several requests into one HTTP call, for example to read estates and addresses at the same time:
 
 ```php
-use Innobrain\OnOfficeAdapter\Facades\Bus;
+use Innobrain\OnOfficeAdapter\Facades\Query;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
 
-$results = Bus::batch([
+$results = Query::batch([
     EstateRepository::query()->select('kaufpreis')->limit(10),
     AddressRepository::query()->whereLike('Vorname', 'Max'),
 ])->once();
@@ -32,7 +32,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 
-$results = Bus::batch([
+$results = Query::batch([
     EstateRepository::query()->select('kaufpreis'),
     new OnOfficeRequest(
         OnOfficeAction::Get,
@@ -45,7 +45,7 @@ $results = Bus::batch([
 You can also keep adding to the batch fluently before sending:
 
 ```php
-Bus::batch()
+Query::batch()
     ->add(EstateRepository::query()->select('kaufpreis'))
     ->add(AddressRepository::query()->whereLike('Vorname', 'Max'))
     ->once();
@@ -58,7 +58,7 @@ Builders are converted to their read request via `toRequest()`, which is availab
 Results are returned in the order the requests were added. For explicit matching, you can give each request an identifier, which the API echoes back in the result:
 
 ```php
-$results = Bus::batch([
+$results = Query::batch([
     new OnOfficeRequest(
         OnOfficeAction::Read,
         OnOfficeResourceType::Estate,
@@ -84,20 +84,20 @@ Faking works like with any other repository. Each page of the faked response bec
 
 ```php
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
-use Innobrain\OnOfficeAdapter\Facades\Bus;
+use Innobrain\OnOfficeAdapter\Facades\Query;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
 
-Bus::fake(Bus::response([
-    Bus::page(recordFactories: [
+Query::fake(Query::response([
+    Query::page(recordFactories: [
         EstateFactory::make()->id(1),
     ]),
-    Bus::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
+    Query::page(resourceType: OnOfficeResourceType::Address, recordFactories: [
         AddressFactory::make()->id(2),
     ]),
 ]));
 
-$results = Bus::batch([
+$results = Query::batch([
     // ...
 ])->once();
 ```
@@ -105,6 +105,6 @@ $results = Bus::batch([
 Every action of a batch is recorded individually, so `assertSent()` callbacks receive the single `OnOfficeRequest` objects and `assertSentCount()` counts actions, not HTTP calls:
 
 ```php
-Bus::assertSentCount(2);
-Bus::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
+Query::assertSentCount(2);
+Query::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
 ```
