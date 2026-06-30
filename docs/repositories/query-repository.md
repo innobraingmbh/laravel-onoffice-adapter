@@ -66,7 +66,14 @@ $results = Query::batch([
 $estate = data_get($results[0], 'data.records.0');
 ```
 
-`withId()` is available on the same builders as `toRequest()`. It also applies outside a batch (`->withId(5)->get()` reads just that record), but on its own `find()` is more direct — it returns the record itself, or `null` when it is missing.
+`withId()` is the lazy form of a single-record read: it sets the target id and waits. `find($id)` is the eager form of `->withId($id)->first()` — it sends straight away and hands you the record itself, or `null` when it is missing. Reach for `withId()` only when you want to defer the read into `Query::batch()`; otherwise `find()` is more direct.
+
+```php
+EstateRepository::query()->find(5);                 // eager — returns the record
+EstateRepository::query()->withId(5);               // lazy — defer into Query::batch()
+```
+
+`withId()` is available on the same builders as `toRequest()`.
 
 ## Identifying Results
 
