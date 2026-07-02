@@ -216,6 +216,26 @@ describe('fake responses', function () {
             AddressRepository::query()->withCredentials('token-b', 'secret-b'),
         ]);
     })->throws(OnOfficeException::class, 'All requests in a batch are sent in one API call and cannot use different credentials.');
+
+    test('batch credentials cannot conflict with builder credentials', function () {
+        Query::batch([
+            EstateRepository::query()->withCredentials('token-a', 'secret-a'),
+        ])->withCredentials('token-b', 'secret-b');
+    })->throws(OnOfficeException::class, 'All requests in a batch are sent in one API call and cannot use different credentials.');
+
+    test('batch credentials equal to builder credentials are accepted', function () {
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
+                EstateFactory::make()->id(1),
+            ]),
+        ]));
+
+        $results = Query::batch([
+            EstateRepository::query()->withCredentials('tenant-token', 'tenant-secret'),
+        ])->withCredentials('tenant-token', 'tenant-secret')->once();
+
+        expect($results)->toHaveCount(1);
+    });
 });
 
 describe('real responses', function () {
@@ -422,5 +442,31 @@ describe('real responses', function () {
             return data_get($actions, '0.parameters.extendedclaim') === 'tenant-claim'
                 && data_get($actions, '1.parameters.extendedclaim') === 'tenant-claim';
         });
+    });
+
+    test('batch credentials sign raw requests', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
+                'status' => ['code' => 200, 'errorcode' => 0, 'message' => 'OK'],
+                'response' => [
+                    'results' => [
+                        [
+                            'actionid' => OnOfficeAction::Read->value,
+                            'resourcetype' => 'estate',
+                            'data' => ['meta' => ['cntabsolute' => 0], 'records' => []],
+                            'status' => ['errorcode' => 0, 'message' => 'OK'],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        Query::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+        ])->withCredentials('tenant-token', 'tenant-secret', 'tenant-claim')->once();
+
+        Http::assertSent(fn (Request $request): bool => data_get($request->data(), 'token') === 'tenant-token'
+            && data_get($request->data(), 'request.actions.0.parameters.extendedclaim') === 'tenant-claim');
     });
 });

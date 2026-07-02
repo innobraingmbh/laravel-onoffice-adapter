@@ -174,6 +174,13 @@ class ProbeBatchCommand extends Command
                 ->withCredentials($realToken, $realSecret)
                 ->get()
                 ->isNotEmpty());
+
+            $this->components->task('batch-level credentials sign raw requests', fn (): bool => Query::batch([
+                new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate, parameters: [
+                    OnOfficeService::DATA => ['Id'],
+                    OnOfficeService::LISTLIMIT => $limit,
+                ]),
+            ])->withCredentials($realToken, $realSecret)->once()->count() === 1);
         } finally {
             config(['onoffice.token' => $realToken, 'onoffice.secret' => $realSecret]);
         }

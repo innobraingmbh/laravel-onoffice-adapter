@@ -55,6 +55,16 @@ Builders are converted to their read request via `toRequest()`, which is availab
 
 A builder's `withCredentials()` apply to the whole batch, since all actions are sent in one API call. Adding builders with different credentials to the same batch throws an `OnOfficeException` — send them as separate batches instead.
 
+Credentials can also be set on the batch itself, which is the only way to send raw `OnOfficeRequest` objects with their own credentials:
+
+```php
+Query::batch([
+    new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+])->withCredentials($token, $secret)->once();
+```
+
+The same conflict rule applies: batch credentials that differ from a builder's credentials throw.
+
 ## Reading a Single Record
 
 Call `withId()` on a builder to read one record by its id instead of a list. It is the batch-friendly counterpart to `find()`:

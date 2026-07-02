@@ -78,6 +78,26 @@ class PendingBatch
     }
 
     /**
+     * Send the whole batch with these credentials instead of the config
+     * fallback. This is the only way to send raw OnOfficeRequest objects
+     * with their own credentials — builders carry theirs into the batch.
+     * The same rule applies as for builder credentials: a conflict with
+     * credentials already set on the batch throws.
+     *
+     * @throws Throwable
+     */
+    public function withCredentials(string|OnOfficeApiCredentials $token, string $secret = '', string $apiClaim = ''): static
+    {
+        if (! $token instanceof OnOfficeApiCredentials) {
+            $token = new OnOfficeApiCredentials(token: $token, secret: $secret, apiClaim: $apiClaim);
+        }
+
+        $this->useCredentials($token);
+
+        return $this;
+    }
+
+    /**
      * @throws Throwable
      */
     protected function useCredentials(?OnOfficeApiCredentials $credentials): void
