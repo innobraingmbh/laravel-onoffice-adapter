@@ -240,6 +240,18 @@ describe('count', function () {
 
         expect($builder->setRepository(new TaskRepository)->count())->toBe(13);
     });
+
+    it('scopes count() to the targeted record when withId() is set', function () {
+        $builder = new TaskBuilder;
+        $builder->setRepository(new TaskRepository)->withId(42)->count();
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $body = json_decode($request->body(), true);
+
+            return data_get($body, 'request.actions.0.resourceid') === 42
+                && ! array_key_exists('listlimit', data_get($body, 'request.actions.0.parameters', []));
+        });
+    });
 });
 
 describe('listoffset', function () {

@@ -58,6 +58,39 @@ describe('fake responses', function () {
 
         EstateRepository::assertSent(fn (OnOfficeRequest $request) => $request->resourceId === 5);
     });
+
+    test('withId and find send the same request', function () {
+        EstateRepository::fake([
+            EstateRepository::response([
+                EstateRepository::page(recordFactories: [
+                    EstateFactory::make()->id(5),
+                ]),
+            ]),
+            EstateRepository::response([
+                EstateRepository::page(recordFactories: [
+                    EstateFactory::make()->id(5),
+                ]),
+            ]),
+        ]);
+
+        EstateRepository::query()->find(5);
+        EstateRepository::query()->withId(5)->first();
+
+        [$findRequest] = EstateRepository::recorded()[0];
+        [$withIdRequest] = EstateRepository::recorded()[1];
+
+        expect($withIdRequest->toArray())->toBe($findRequest->toArray());
+    });
+
+    test('find accepts a string id', function () {
+        EstateRepository::fake(EstateRepository::response([
+            EstateRepository::page(),
+        ]));
+
+        EstateRepository::query()->find('external-1');
+
+        EstateRepository::assertSent(fn (OnOfficeRequest $request) => $request->resourceId === 'external-1');
+    });
 });
 
 describe('real responses', function () {

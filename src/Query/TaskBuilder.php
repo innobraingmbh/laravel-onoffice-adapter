@@ -39,24 +39,15 @@ class TaskBuilder extends Builder
     protected bool $supportsListOffset = false;
 
     /**
-     * Count matching tasks.
-     *
      * Unlike other resources, the task endpoint's `meta.cntabsolute` equals the
      * number of records returned for the given listlimit rather than the real
-     * total, so the inherited count() (which forces listlimit=1) always returns
-     * 1. Requesting the maximum page size makes cntabsolute reflect the true
+     * total, so counting at the inherited listlimit=1 always returns 1.
+     * Requesting the maximum page size makes cntabsolute reflect the true
      * total, capped at MAX_LIST_LIMIT when more tasks exist.
-     *
-     * @throws OnOfficeException
-     * @throws Throwable
      */
-    public function count(): int
+    protected function countListLimit(): int
     {
-        $request = $this->buildReadRequest();
-        data_set($request->parameters, OnOfficeService::DATA, []);
-        data_set($request->parameters, OnOfficeService::LISTLIMIT, self::MAX_LIST_LIMIT);
-
-        return $this->requestApi($request)->json(OnOfficeResponsePath::META_COUNT_ABSOLUTE, 0);
+        return self::MAX_LIST_LIMIT;
     }
 
     protected function buildReadRequest(): OnOfficeRequest

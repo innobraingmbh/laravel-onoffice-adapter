@@ -56,10 +56,26 @@ trait Paginate
      *
      * @throws OnOfficeException
      */
-    public function find(int $id): ?array
+    public function find(int|string $id): ?array
     {
         return $this->requestApi($this->buildFindRequest($id))
             ->json(OnOfficeResponsePath::FIRST_RECORD);
+    }
+
+    /**
+     * An id-scoped read targets exactly one record, so the list window does
+     * not apply. Skipping it keeps a withId() read identical to find() on
+     * the wire.
+     *
+     * @throws OnOfficeException
+     */
+    protected function applyListWindow(OnOfficeRequest $request, int $listLimit, int $offset): void
+    {
+        if ($this->readResourceId !== null) {
+            return;
+        }
+
+        parent::applyListWindow($request, $listLimit, $offset);
     }
 
     /**
@@ -126,10 +142,23 @@ trait Paginate
     public function count(): int
     {
         $request = $this->readRequest();
-        data_set($request->parameters, OnOfficeService::DATA, []);
-        data_set($request->parameters, OnOfficeService::LISTLIMIT, 1);
+
+        if ($this->readResourceId === null) {
+            data_set($request->parameters, OnOfficeService::DATA, []);
+            data_set($request->parameters, OnOfficeService::LISTLIMIT, $this->countListLimit());
+        }
 
         return $this->requestApi($request)->json(OnOfficeResponsePath::META_COUNT_ABSOLUTE, 0);
+    }
+
+    /**
+     * The listlimit a count request is sent with. A count wants no records,
+     * so the smallest page suffices; an endpoint whose cntabsolute misbehaves
+     * at listlimit=1 (the task endpoint) overrides this.
+     */
+    protected function countListLimit(): int
+    {
+        return 1;
     }
 
     /**

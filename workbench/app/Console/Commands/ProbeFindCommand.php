@@ -34,6 +34,7 @@ class ProbeFindCommand extends Command
             fn () => $this->probeActivity(),
             fn () => $this->probeAppointment(),
             fn () => $this->probeLastSeen(),
+            fn () => $this->probeIdScopedShapes(),
         ];
 
         // A live failure in one builder must not hide the others.
@@ -141,6 +142,38 @@ class ProbeFindCommand extends Command
         $this->components->task('LastSeen  find()  rejects  [guard]', fn (): bool => $this->rejects(fn () => LastSeenRepository::query()->find(1)));
 
         $this->components->task('LastSeen  withId()  rejects  [guard]', fn (): bool => $this->rejects(fn () => LastSeenRepository::query()->withId(1)->get()));
+    }
+
+    /**
+     * Every terminal an id-scoped builder can reach. The list window is
+     * skipped for these reads, so verify the API accepts the bare id read
+     * everywhere and reports usable cntabsolute meta for count()/paginate().
+     */
+    private function probeIdScopedShapes(): void
+    {
+        $id = $this->firstId(fn () => EstateRepository::query()->select(['Id'])->limit(1)->get()->first()['id'] ?? 0);
+
+        if ($id === 0) {
+            $this->components->warn('Estate: no records — skipping id-scoped shapes');
+
+            return;
+        }
+
+        $this->components->task("Estate  withId({$id})->first()  [shape]", fn (): bool => (int) (EstateRepository::query()->withId($id)->first()['id'] ?? 0) === $id);
+
+        $this->components->task("Estate  withId({$id})->get()  [shape]", function () use ($id): bool {
+            $records = EstateRepository::query()->withId($id)->get();
+
+            return $records->count() === 1 && (int) $records->first()['id'] === $id;
+        });
+
+        $this->components->task("Estate  withId({$id})->count()  [shape]", fn (): bool => EstateRepository::query()->withId($id)->count() === 1);
+
+        $this->components->task("Estate  withId({$id})->paginate()  [shape]", function () use ($id): bool {
+            $paginator = EstateRepository::query()->withId($id)->paginate();
+
+            return $paginator->total() === 1 && (int) data_get($paginator->items(), '0.id') === $id;
+        });
     }
 
     private function firstId(Closure $list): int

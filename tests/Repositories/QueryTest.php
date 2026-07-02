@@ -95,7 +95,9 @@ describe('fake responses', function () {
 
         expect(data_get($results[0], 'data.records.0.id'))->toBe(5);
 
-        Query::assertSent(fn (OnOfficeRequest $request) => $request->resourceId === 5);
+        Query::assertSent(fn (OnOfficeRequest $request) => $request->resourceId === 5
+            && ! array_key_exists('listlimit', $request->parameters)
+            && ! array_key_exists('listoffset', $request->parameters));
     });
 
     test('batching a non-zero offset on a resource without offset support throws', function () {
