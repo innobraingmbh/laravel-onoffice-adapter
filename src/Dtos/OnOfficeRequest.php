@@ -43,11 +43,8 @@ class OnOfficeRequest
      *
      * @return array<string, mixed>
      */
-    public function toActionArray(): array
+    public function toActionArray(OnOfficeService $onOfficeService): array
     {
-        /** @var OnOfficeService $onOfficeService */
-        $onOfficeService = resolve(OnOfficeService::class);
-
         if (! empty($onOfficeService->getApiClaim())) {
             $this->parameters = array_replace([OnOfficeService::EXTENDEDCLAIM => $onOfficeService->getApiClaim()], $this->parameters);
         }
@@ -73,16 +70,6 @@ class OnOfficeRequest
      */
     public function toRequestArray(): array
     {
-        /** @var OnOfficeService $onOfficeService */
-        $onOfficeService = resolve(OnOfficeService::class);
-
-        return [
-            'token' => $onOfficeService->getToken(),
-            'request' => [
-                'actions' => [
-                    $this->toActionArray(),
-                ],
-            ],
-        ];
+        return resolve(OnOfficeService::class)->requestBody([$this]);
     }
 }

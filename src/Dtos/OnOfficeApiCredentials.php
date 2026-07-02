@@ -11,4 +11,11 @@ readonly class OnOfficeApiCredentials
         public string $secret,
         public string $apiClaim = ''
     ) {}
+
+    public function equals(self $other): bool
+    {
+        return $this->token === $other->token
+            && $this->secret === $other->secret
+            && $this->apiClaim === $other->apiClaim;
+    }
 }

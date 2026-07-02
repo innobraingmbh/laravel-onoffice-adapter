@@ -153,6 +153,20 @@ class Builder implements BuilderInterface
         return $this;
     }
 
+    public function getCredentials(): ?OnOfficeApiCredentials
+    {
+        return $this->credentials;
+    }
+
+    /**
+     * Whether this builder must not hit the live API: its repository
+     * queued fake responses or opted into stray-request prevention.
+     */
+    public function preventsStrayRequests(): bool
+    {
+        return $this->preventStrayRequests || ($this->stubCallables ?? collect())->isNotEmpty();
+    }
+
     protected function getOnOfficeService(): OnOfficeService
     {
         return tap($this->onOfficeService ?? $this->createOnOfficeService(),
@@ -705,6 +719,20 @@ class Builder implements BuilderInterface
                 ...$this->customParameters,
             ],
         );
+    }
+
+    /**
+     * Send the request and return the first record of the response,
+     * or null when there is none.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    protected function requestFirstRecord(OnOfficeRequest $request): ?array
+    {
+        return $this->requestApi($request)->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     /**

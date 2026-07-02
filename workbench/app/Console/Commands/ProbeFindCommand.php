@@ -13,6 +13,7 @@ use Innobrain\OnOfficeAdapter\Facades\AppointmentRepository;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\LastSeenRepository;
 use Innobrain\OnOfficeAdapter\Facades\Query;
+use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 use Innobrain\OnOfficeAdapter\Facades\TaskRepository;
 use Innobrain\OnOfficeAdapter\Facades\UserRepository;
 
@@ -34,6 +35,9 @@ class ProbeFindCommand extends Command
             fn () => $this->probeActivity(),
             fn () => $this->probeAppointment(),
             fn () => $this->probeLastSeen(),
+            fn () => $this->probeIdScopedShapes(),
+            fn () => $this->probeTaskCount(),
+            fn () => $this->probeImprint(),
         ];
 
         // A live failure in one builder must not hide the others.
@@ -141,6 +145,81 @@ class ProbeFindCommand extends Command
         $this->components->task('LastSeen  find()  rejects  [guard]', fn (): bool => $this->rejects(fn () => LastSeenRepository::query()->find(1)));
 
         $this->components->task('LastSeen  withId()  rejects  [guard]', fn (): bool => $this->rejects(fn () => LastSeenRepository::query()->withId(1)->get()));
+    }
+
+    /**
+     * Every terminal an id-scoped builder can reach. The list window is
+     * skipped for these reads, so verify the API accepts the bare id read
+     * everywhere and reports usable cntabsolute meta for count()/paginate().
+     */
+    private function probeIdScopedShapes(): void
+    {
+        $id = $this->firstId(fn () => EstateRepository::query()->select(['Id'])->limit(1)->get()->first()['id'] ?? 0);
+
+        if ($id === 0) {
+            $this->components->warn('Estate: no records — skipping id-scoped shapes');
+
+            return;
+        }
+
+        $this->components->task("Estate  withId({$id})->first()  [shape]", fn (): bool => (int) (EstateRepository::query()->withId($id)->first()['id'] ?? 0) === $id);
+
+        $this->components->task("Estate  withId({$id})->get()  [shape]", function () use ($id): bool {
+            $records = EstateRepository::query()->withId($id)->get();
+
+            return $records->count() === 1 && (int) $records->first()['id'] === $id;
+        });
+
+        $this->components->task("Estate  withId({$id})->count()  [shape]", fn (): bool => EstateRepository::query()->withId($id)->count() === 1);
+
+        $this->components->task("Estate  withId({$id})->paginate()  [shape]", function () use ($id): bool {
+            $paginator = EstateRepository::query()->withId($id)->paginate();
+
+            return $paginator->total() === 1 && (int) data_get($paginator->items(), '0.id') === $id;
+        });
+
+        $this->components->task("Estate  find('{$id}')  [string id]", fn (): bool => (int) (EstateRepository::query()->find((string) $id)['id'] ?? 0) === $id);
+    }
+
+    /**
+     * The task endpoint's count() quirk (cntabsolute mirrors listlimit) and
+     * its id-scoped form both go through readRequest() now — confirm both
+     * still answer sensibly.
+     */
+    private function probeTaskCount(): void
+    {
+        $id = $this->firstId(fn () => TaskRepository::query()->limit(1)->get()->first()['id'] ?? 0);
+
+        if ($id === 0) {
+            $this->components->warn('Task: no records — skipping count shapes');
+
+            return;
+        }
+
+        $this->components->task('Task  count()  [quirk, listlimit=500]', fn (): bool => TaskRepository::query()->count() >= 1);
+
+        $this->components->task("Task  withId({$id})->count()  [shape]", fn (): bool => TaskRepository::query()->withId($id)->count() === 1);
+    }
+
+    /**
+     * The imprint builder is the one non-Paginate consumer of the shared
+     * single-record combinator (requestFirstRecord). The impressum is a
+     * singleton settings record whose id is the string "impressum", so
+     * first() is the accessor and find() is not offered.
+     */
+    private function probeImprint(): void
+    {
+        $record = null;
+
+        $this->components->task('Imprint  first()  [combinator]', function () use (&$record): bool {
+            $record = SettingRepository::imprint()->first();
+
+            return $record !== null;
+        });
+
+        $this->components->task('Imprint  record id is the string "impressum"', fn (): bool => ($record['id'] ?? null) === 'impressum');
+
+        $this->components->task('Imprint  find()  rejects  [guard]', fn (): bool => $this->rejects(fn () => SettingRepository::imprint()->find(1)));
     }
 
     private function firstId(Closure $list): int

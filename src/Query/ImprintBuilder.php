@@ -11,10 +11,14 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonFilterable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
-use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
+/**
+ * The impressum is a singleton settings record (its id is the literal
+ * string "impressum"), so first() is the accessor. There is nothing to
+ * find by id — the API ignores a resource id on this endpoint.
+ */
 class ImprintBuilder extends Builder
 {
     use NonFilterable;
@@ -51,16 +55,6 @@ class ImprintBuilder extends Builder
             ]
         );
 
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
-    }
-
-    /**
-     * @throws Throwable<OnOfficeException>
-     */
-    public function find(int $id): ?array
-    {
-        return $this->requestApi($this->singleRecordRequest(OnOfficeAction::Read, OnOfficeResourceType::Impressum, $id))
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->requestFirstRecord($request);
     }
 }

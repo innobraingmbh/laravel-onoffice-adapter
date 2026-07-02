@@ -125,7 +125,7 @@ class OnOfficeService
     public function requestApi(OnOfficeRequest $request): Response
     {
         return $this->post(
-            fn (): array => $request->toRequestArray(),
+            fn (): array => $this->requestBody([$request]),
             fn (Response $response) => $this->throwIfResponseIsFailed($response),
         );
     }
@@ -145,14 +145,27 @@ class OnOfficeService
     public function requestApiBatch(array $requests): Response
     {
         return $this->post(
-            fn (): array => [
-                'token' => $this->getToken(),
-                'request' => [
-                    'actions' => array_map(static fn (OnOfficeRequest $request): array => $request->toActionArray(), $requests),
-                ],
-            ],
-            fn (Response $response) => $this->throwIfBatchResponseIsFailed($response),
+            fn (): array => $this->requestBody($requests),
+            fn (Response $response) => $this->throwIfBatchResponseIsFailed($response, count($requests)),
         );
+    }
+
+    /**
+     * The request body envelope: the given actions wrapped with the account
+     * token. Single requests and batches share it — a single request is a
+     * batch of one action.
+     *
+     * @param  array<int, OnOfficeRequest>  $requests
+     * @return array<string, mixed>
+     */
+    public function requestBody(array $requests): array
+    {
+        return [
+            'token' => $this->getToken(),
+            'request' => [
+                'actions' => array_map(fn (OnOfficeRequest $request): array => $request->toActionArray($this), $requests),
+            ],
+        ];
     }
 
     /**
@@ -330,18 +343,25 @@ class OnOfficeService
     }
 
     /**
-     * Checks the response status and every result of a
-     * multi-action response for errors.
+     * Checks the response status and every result of a multi-action
+     * response for errors, and that the response contains exactly one
+     * result per action sent.
      *
      * @throws OnOfficeException
      */
-    public function throwIfBatchResponseIsFailed(Response $response): void
+    public function throwIfBatchResponseIsFailed(Response $response, int $expectedResultCount): void
     {
-        $resultCount = max(1, count($response->json('response.results', []) ?? []));
+        $resultCount = count($response->json('response.results', []) ?? []);
 
-        for ($index = 0; $index < $resultCount; $index++) {
+        for ($index = 0; $index < max(1, $resultCount); $index++) {
             $this->throwIfResultIsFailed($response, $index);
         }
+
+        throw_if(
+            $resultCount !== $expectedResultCount,
+            OnOfficeException::class,
+            "Batch response result count ($resultCount) does not match the number of actions sent ($expectedResultCount).",
+        );
     }
 
     /**

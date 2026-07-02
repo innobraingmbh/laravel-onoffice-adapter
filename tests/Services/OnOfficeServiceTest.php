@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeApiCredentials;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
@@ -55,6 +56,48 @@ describe('credentials', function () {
         expect($onOfficeService->getToken())->toBe($token)
             ->and($onOfficeService->getSecret())->toBe($secret)
             ->and($onOfficeService->getApiClaim())->toBe($apiClaim);
+    });
+});
+
+describe('request body', function () {
+    it('wraps every action with the token and injects the credential api claim', function () {
+        $onOfficeService = resolve(OnOfficeService::class)->setCredentials(
+            new OnOfficeApiCredentials('tenant-token', 'tenant-secret', 'tenant-claim'),
+        );
+
+        $body = $onOfficeService->requestBody([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
+        ]);
+
+        expect($body['token'])->toBe('tenant-token')
+            ->and(data_get($body, 'request.actions.0.parameters.extendedclaim'))->toBe('tenant-claim')
+            ->and(data_get($body, 'request.actions.1.parameters.extendedclaim'))->toBe('tenant-claim')
+            ->and(data_get($body, 'request.actions.0.hmac'))->not->toBeEmpty();
+    });
+
+    it('injects the api claim from the config when no credentials are set', function () {
+        Config::set([
+            'onoffice.token' => 'config-token',
+            'onoffice.api_claim' => 'config-claim',
+        ]);
+
+        $body = resolve(OnOfficeService::class)->requestBody([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+        ]);
+
+        expect($body['token'])->toBe('config-token')
+            ->and(data_get($body, 'request.actions.0.parameters.extendedclaim'))->toBe('config-claim');
+    });
+
+    it('omits the claim when none is configured', function () {
+        Config::set(['onoffice.api_claim' => '']);
+
+        $body = resolve(OnOfficeService::class)->requestBody([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+        ]);
+
+        expect(data_get($body, 'request.actions.0.parameters'))->not->toHaveKey('extendedclaim');
     });
 });
 

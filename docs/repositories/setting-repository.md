@@ -30,10 +30,11 @@ SettingRepository::regions()->each(function (array $regions) {
 
 ## Imprint
 
+The imprint is a single settings record, so `first()` is the way to read it:
+
 ```php
 $imprint = SettingRepository::imprint()->get();
 $imprint = SettingRepository::imprint()->first();
-$imprint = SettingRepository::imprint()->find(1);
 ```
 
 ## Actions
@@ -52,5 +53,5 @@ $actions = SettingRepository::actions()->get();
 |---------|-------|---------|--------|--------|---------|-----------|
 | `users()` | Yes | Yes | Yes | Yes | Yes | Yes |
 | `regions()` | Yes | Yes | No | Yes | No | No |
-| `imprint()` | Yes | Yes | Yes | No | No | No |
+| `imprint()` | Yes | Yes | No | No | No | No |
 | `actions()` | Yes | No | No | No | No | No |
