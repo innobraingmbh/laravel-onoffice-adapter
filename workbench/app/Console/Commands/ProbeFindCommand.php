@@ -203,10 +203,9 @@ class ProbeFindCommand extends Command
 
     /**
      * The imprint builder is the one non-Paginate consumer of the shared
-     * single-record combinator (requestFirstRecord), so its first()/find()
-     * need their own live check. The impressum is a singleton settings
-     * record whose id is the string "impressum" — there is nothing to find
-     * by numeric id, so this also records what the API does with one.
+     * single-record combinator (requestFirstRecord). The impressum is a
+     * singleton settings record whose id is the string "impressum", so
+     * first() is the accessor and find() is not offered.
      */
     private function probeImprint(): void
     {
@@ -220,7 +219,7 @@ class ProbeFindCommand extends Command
 
         $this->components->task('Imprint  record id is the string "impressum"', fn (): bool => ($record['id'] ?? null) === 'impressum');
 
-        $this->components->task('Imprint  find(1)  [API ignores the id, returns the singleton]', fn (): bool => (SettingRepository::imprint()->find(1)['id'] ?? null) === 'impressum');
+        $this->components->task('Imprint  find()  rejects  [guard]', fn (): bool => $this->rejects(fn () => SettingRepository::imprint()->find(1)));
     }
 
     private function firstId(Closure $list): int
