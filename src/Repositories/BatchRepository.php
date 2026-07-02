@@ -59,8 +59,10 @@ class BatchRepository extends BaseRepository
             $service->throwIfBatchResponseIsFailed($response, count($requests));
         }
 
-        foreach ($requests as $index => $request) {
-            $this->recordRequestResponsePair($request, $this->actionResponse($response, $index));
+        if ($this->recording) {
+            foreach ($requests as $index => $request) {
+                $this->recordRequestResponsePair($request, $this->actionResponse($response, $index));
+            }
         }
 
         /** @var array<int, array<string, mixed>> $results */
