@@ -153,3 +153,5 @@ test('it reads estates and addresses in one call', function () {
 ```
 
 Batches are faked through `Query::fake()` only — a per-repository fake like `EstateRepository::fake()` is never consumed by a batch. To prevent a mistake here from silently hitting the live API, a batch that contains a builder from a faked (or stray-preventing) repository throws a `StrayRequestException` when the batch itself is not faked. Fake exactly one page per action; a count mismatch throws an `OnOfficeException`.
+
+To fake a failing action, set `errorCodeResult`/`messageResult` on its page. The top-level `status`/`errorCode`/`message` fields describe the whole response and are taken from the first page only — setting a failing one on a later page throws instead of being silently dropped.

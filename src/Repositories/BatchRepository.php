@@ -81,6 +81,7 @@ class BatchRepository extends BaseRepository
      * Each page of the faked response becomes one result of the batch.
      *
      * @throws JsonException
+     * @throws Throwable
      */
     protected function stubResponse(): ?Response
     {
@@ -94,6 +95,16 @@ class BatchRepository extends BaseRepository
         $pages = [];
         while (! $stub->isEmpty()) {
             $pages[] = $stub->shift();
+        }
+
+        foreach (array_slice($pages, 1) as $page) {
+            $status = $page->toStatusArray();
+
+            throw_if(
+                $status['code'] >= 300 || $status['errorcode'] > 0,
+                OnOfficeException::class,
+                'A batch response has a single top-level status, taken from the first faked page. Fail a single action with errorCodeResult/messageResult instead.',
+            );
         }
 
         $body = [

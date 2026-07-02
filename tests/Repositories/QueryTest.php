@@ -134,6 +134,20 @@ describe('fake responses', function () {
         ])->once();
     })->throws(OnOfficeException::class, 'Error');
 
+    test('a failing status on a non-first faked page throws', function () {
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
+                EstateFactory::make()->id(1),
+            ]),
+            Query::page(resourceType: OnOfficeResourceType::Address, status: 500, errorCode: 137, message: 'Error'),
+        ]));
+
+        Query::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
+        ])->once();
+    })->throws(OnOfficeException::class, 'A batch response has a single top-level status, taken from the first faked page. Fail a single action with errorCodeResult/messageResult instead.');
+
     test('faking fewer pages than batch actions throws', function () {
         Query::fake(Query::response([
             Query::page(recordFactories: [
