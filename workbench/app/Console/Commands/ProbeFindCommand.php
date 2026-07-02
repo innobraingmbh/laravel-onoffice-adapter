@@ -13,6 +13,7 @@ use Innobrain\OnOfficeAdapter\Facades\AppointmentRepository;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\LastSeenRepository;
 use Innobrain\OnOfficeAdapter\Facades\Query;
+use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 use Innobrain\OnOfficeAdapter\Facades\TaskRepository;
 use Innobrain\OnOfficeAdapter\Facades\UserRepository;
 
@@ -36,6 +37,7 @@ class ProbeFindCommand extends Command
             fn () => $this->probeLastSeen(),
             fn () => $this->probeIdScopedShapes(),
             fn () => $this->probeTaskCount(),
+            fn () => $this->probeImprint(),
         ];
 
         // A live failure in one builder must not hide the others.
@@ -197,6 +199,32 @@ class ProbeFindCommand extends Command
         $this->components->task('Task  count()  [quirk, listlimit=500]', fn (): bool => TaskRepository::query()->count() >= 1);
 
         $this->components->task("Task  withId({$id})->count()  [shape]", fn (): bool => TaskRepository::query()->withId($id)->count() === 1);
+    }
+
+    /**
+     * The imprint builder is the one non-Paginate consumer of the shared
+     * single-record combinator (requestFirstRecord), so its first()/find()
+     * need their own live check.
+     */
+    private function probeImprint(): void
+    {
+        $record = null;
+
+        $this->components->task('Imprint  first()  [combinator]', function () use (&$record): bool {
+            $record = SettingRepository::imprint()->first();
+
+            return $record !== null;
+        });
+
+        $id = (int) ($record['id'] ?? 0);
+
+        if ($id === 0) {
+            $this->components->warn('Imprint: record has no id — skipping find()');
+
+            return;
+        }
+
+        $this->components->task("Imprint  find({$id})  [combinator]", fn (): bool => SettingRepository::imprint()->find($id) !== null);
     }
 
     private function firstId(Closure $list): int
