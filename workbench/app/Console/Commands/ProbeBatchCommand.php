@@ -129,6 +129,71 @@ class ProbeBatchCommand extends Command
             }
         });
 
+        $this->probeCredentials($limit);
+
         return self::SUCCESS;
+    }
+
+    /**
+     * A batch is one API call, so a builder's credentials must sign all of
+     * it. Corrupting the config fallback leaves builder-supplied credentials
+     * as the only way a request can succeed — a pass proves they were used.
+     */
+    private function probeCredentials(int $limit): void
+    {
+        $realToken = (string) config('onoffice.token');
+        $realSecret = (string) config('onoffice.secret');
+
+        config(['onoffice.token' => 'wrong', 'onoffice.secret' => 'wrong']);
+
+        try {
+            $this->components->task('corrupted config fallback fails a batch (control)', function () use ($limit): bool {
+                try {
+                    Query::batch([EstateRepository::query()->select(['Id'])->limit($limit)])->once();
+
+                    return false;
+                } catch (OnOfficeException) {
+                    return true;
+                }
+            });
+
+            $this->components->task('builder credentials sign the whole batch', function () use ($limit, $realToken, $realSecret): bool {
+                $results = Query::batch([
+                    EstateRepository::query()->select(['Id'])->limit($limit)->withCredentials($realToken, $realSecret),
+                    AddressRepository::query()->select(['Name'])->limit($limit),
+                ])->once();
+
+                return $results->count() === 2
+                    && data_get($results[0], 'resourcetype') === 'estate'
+                    && data_get($results[1], 'resourcetype') === 'address';
+            });
+
+            $this->components->task('single eager request signs with builder credentials', fn (): bool => EstateRepository::query()
+                ->select(['Id'])
+                ->limit($limit)
+                ->withCredentials($realToken, $realSecret)
+                ->get()
+                ->isNotEmpty());
+        } finally {
+            config(['onoffice.token' => $realToken, 'onoffice.secret' => $realSecret]);
+        }
+
+        $this->components->task('a later batch without credentials falls back to config again', fn (): bool => Query::batch([
+            EstateRepository::query()->select(['Id'])->limit($limit),
+        ])->once()->count() === 1);
+
+        // Guard: mixed builder credentials throw before any HTTP is sent.
+        $this->components->task('different builder credentials cannot be batched', function (): bool {
+            try {
+                Query::batch([
+                    EstateRepository::query()->withCredentials('token-a', 'secret-a'),
+                    AddressRepository::query()->withCredentials('token-b', 'secret-b'),
+                ]);
+
+                return false;
+            } catch (OnOfficeException) {
+                return true;
+            }
+        });
     }
 }

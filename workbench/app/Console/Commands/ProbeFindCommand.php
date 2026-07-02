@@ -35,6 +35,7 @@ class ProbeFindCommand extends Command
             fn () => $this->probeAppointment(),
             fn () => $this->probeLastSeen(),
             fn () => $this->probeIdScopedShapes(),
+            fn () => $this->probeTaskCount(),
         ];
 
         // A live failure in one builder must not hide the others.
@@ -174,6 +175,28 @@ class ProbeFindCommand extends Command
 
             return $paginator->total() === 1 && (int) data_get($paginator->items(), '0.id') === $id;
         });
+
+        $this->components->task("Estate  find('{$id}')  [string id]", fn (): bool => (int) (EstateRepository::query()->find((string) $id)['id'] ?? 0) === $id);
+    }
+
+    /**
+     * The task endpoint's count() quirk (cntabsolute mirrors listlimit) and
+     * its id-scoped form both go through readRequest() now — confirm both
+     * still answer sensibly.
+     */
+    private function probeTaskCount(): void
+    {
+        $id = $this->firstId(fn () => TaskRepository::query()->limit(1)->get()->first()['id'] ?? 0);
+
+        if ($id === 0) {
+            $this->components->warn('Task: no records — skipping count shapes');
+
+            return;
+        }
+
+        $this->components->task('Task  count()  [quirk, listlimit=500]', fn (): bool => TaskRepository::query()->count() >= 1);
+
+        $this->components->task("Task  withId({$id})->count()  [shape]", fn (): bool => TaskRepository::query()->withId($id)->count() === 1);
     }
 
     private function firstId(Closure $list): int
