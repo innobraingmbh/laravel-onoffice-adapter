@@ -58,8 +58,7 @@ trait Paginate
      */
     public function find(int|string $id): ?array
     {
-        return $this->requestApi($this->buildFindRequest($id))
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->requestFirstRecord($this->buildFindRequest($id));
     }
 
     /**
@@ -106,7 +105,7 @@ trait Paginate
         $request = $this->readRequest();
         $this->applyListWindow($request, $this->limit > 0 ? $this->limit : $this->pageSize, $this->offset);
 
-        return $this->requestApi($request)->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->requestFirstRecord($request);
     }
 
     /**

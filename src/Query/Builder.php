@@ -722,6 +722,20 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * Send the request and return the first record of the response,
+     * or null when there is none.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @throws OnOfficeException
+     * @throws Throwable
+     */
+    protected function requestFirstRecord(OnOfficeRequest $request): ?array
+    {
+        return $this->requestApi($request)->json(OnOfficeResponsePath::FIRST_RECORD);
+    }
+
+    /**
      * @return array<string, mixed>|null
      *
      * @throws OnOfficeException
