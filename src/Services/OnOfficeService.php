@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Innobrain\OnOfficeAdapter\Services;
 
-use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeApiCredentials;
@@ -91,7 +89,7 @@ class OnOfficeService
      *
      * Read more: https://apidoc.onoffice.de/onoffice-api-request/request-elemente/action/#hmac
      */
-    public function getHmac(OnOfficeAction $actionId, OnOfficeResourceType|string $resourceType): string
+    public function getHmac(OnOfficeAction $actionId, OnOfficeResourceType|string $resourceType, int $timestamp): string
     {
         return base64_encode(
             hash_hmac(
@@ -99,7 +97,7 @@ class OnOfficeService
                 implode(
                     '',
                     [
-                        'timestamp' => Date::now()->timestamp,
+                        'timestamp' => $timestamp,
                         'token' => $this->getToken(),
                         'resourcetype' => $resourceType instanceof OnOfficeResourceType
                             ? $resourceType->value

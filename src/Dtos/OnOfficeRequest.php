@@ -49,6 +49,8 @@ class OnOfficeRequest
             $this->parameters = array_replace([OnOfficeService::EXTENDEDCLAIM => $onOfficeService->getApiClaim()], $this->parameters);
         }
 
+        $timestamp = Date::now()->getTimestamp();
+
         return [
             'actionid' => $this->actionId->value,
             'resourceid' => $this->resourceId instanceof OnOfficeResourceId
@@ -58,8 +60,8 @@ class OnOfficeRequest
                 ? $this->resourceType->value
                 : $this->resourceType,
             'identifier' => $this->identifier,
-            'timestamp' => Date::now()->timestamp,
-            'hmac' => $onOfficeService->getHmac($this->actionId, $this->resourceType),
+            'timestamp' => $timestamp,
+            'hmac' => $onOfficeService->getHmac($this->actionId, $this->resourceType, $timestamp),
             'hmac_version' => 2,
             'parameters' => $this->parameters,
         ];
