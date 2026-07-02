@@ -192,6 +192,24 @@ describe('fake responses', function () {
             ->and(data_get($results[0], 'data.records.0.id'))->toBe(1);
     });
 
+    test('builders with equal credentials can be batched', function () {
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
+                EstateFactory::make()->id(1),
+            ]),
+            Query::page(recordFactories: [
+                EstateFactory::make()->id(2),
+            ]),
+        ]));
+
+        $results = Query::batch([
+            EstateRepository::query()->withCredentials('tenant-token', 'tenant-secret'),
+            EstateRepository::query()->withCredentials('tenant-token', 'tenant-secret'),
+        ])->once();
+
+        expect($results)->toHaveCount(2);
+    });
+
     test('builders with different credentials cannot be batched', function () {
         Query::batch([
             EstateRepository::query()->withCredentials('token-a', 'secret-a'),
@@ -367,5 +385,42 @@ describe('real responses', function () {
         ])->once();
 
         Http::assertSent(fn (Request $request): bool => data_get($request->data(), 'token') === 'tenant-token');
+    });
+
+    test('the api claim is sent with every batch action', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
+                'status' => ['code' => 200, 'errorcode' => 0, 'message' => 'OK'],
+                'response' => [
+                    'results' => [
+                        [
+                            'actionid' => OnOfficeAction::Read->value,
+                            'resourcetype' => 'estate',
+                            'data' => ['meta' => ['cntabsolute' => 0], 'records' => []],
+                            'status' => ['errorcode' => 0, 'message' => 'OK'],
+                        ],
+                        [
+                            'actionid' => OnOfficeAction::Read->value,
+                            'resourcetype' => 'address',
+                            'data' => ['meta' => ['cntabsolute' => 0], 'records' => []],
+                            'status' => ['errorcode' => 0, 'message' => 'OK'],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        Query::batch([
+            EstateRepository::query()->withCredentials('tenant-token', 'tenant-secret', 'tenant-claim'),
+            AddressRepository::query(),
+        ])->once();
+
+        Http::assertSent(function (Request $request): bool {
+            $actions = data_get($request->data(), 'request.actions');
+
+            return data_get($actions, '0.parameters.extendedclaim') === 'tenant-claim'
+                && data_get($actions, '1.parameters.extendedclaim') === 'tenant-claim';
+        });
     });
 });
