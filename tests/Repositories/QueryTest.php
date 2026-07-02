@@ -10,6 +10,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
+use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\Query;
 use Innobrain\OnOfficeAdapter\Facades\TaskRepository;
@@ -130,6 +131,71 @@ describe('fake responses', function () {
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
         ])->once();
     })->throws(OnOfficeException::class, 'Error');
+
+    test('faking fewer pages than batch actions throws', function () {
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
+                EstateFactory::make()->id(1),
+            ]),
+        ]));
+
+        Query::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
+        ])->once();
+    })->throws(OnOfficeException::class, 'Batch response result count (1) does not match the number of actions sent (2).');
+
+    test('faking more pages than batch actions throws', function () {
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
+                EstateFactory::make()->id(1),
+            ]),
+            Query::page(resourceType: OnOfficeResourceType::Address),
+        ]));
+
+        Query::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+        ])->once();
+    })->throws(OnOfficeException::class, 'Batch response result count (2) does not match the number of actions sent (1).');
+
+    test('a builder from a faked repository does not hit the live API', function () {
+        EstateRepository::fake(EstateRepository::response());
+
+        Query::batch([
+            EstateRepository::query()->select('kaufpreis'),
+        ])->once();
+    })->throws(StrayRequestException::class);
+
+    test('a builder from a stray-preventing repository does not hit the live API', function () {
+        EstateRepository::preventStrayRequests();
+
+        Query::batch([
+            EstateRepository::query()->select('kaufpreis'),
+        ])->once();
+    })->throws(StrayRequestException::class);
+
+    test('a builder from a faked repository can be batched when the batch itself is faked', function () {
+        EstateRepository::fake(EstateRepository::response());
+        Query::fake(Query::response([
+            Query::page(recordFactories: [
+                EstateFactory::make()->id(1),
+            ]),
+        ]));
+
+        $results = Query::batch([
+            EstateRepository::query()->select('kaufpreis'),
+        ])->once();
+
+        expect($results)->toHaveCount(1)
+            ->and(data_get($results[0], 'data.records.0.id'))->toBe(1);
+    });
+
+    test('builders with different credentials cannot be batched', function () {
+        Query::batch([
+            EstateRepository::query()->withCredentials('token-a', 'secret-a'),
+            AddressRepository::query()->withCredentials('token-b', 'secret-b'),
+        ]);
+    })->throws(OnOfficeException::class, 'All requests in a batch are sent in one API call and cannot use different credentials.');
 });
 
 describe('real responses', function () {
@@ -244,4 +310,60 @@ describe('real responses', function () {
             new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
         ])->once();
     })->throws(OnOfficeException::class, 'Some error');
+
+    test('a response with fewer results than actions throws', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
+                'status' => ['code' => 200, 'errorcode' => 0, 'message' => 'OK'],
+                'response' => [
+                    'results' => [
+                        [
+                            'actionid' => OnOfficeAction::Read->value,
+                            'resourcetype' => 'estate',
+                            'data' => ['meta' => ['cntabsolute' => 0], 'records' => []],
+                            'status' => ['errorcode' => 0, 'message' => 'OK'],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        Query::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Address),
+        ])->once();
+    })->throws(OnOfficeException::class, 'Batch response result count (1) does not match the number of actions sent (2).');
+
+    test('builder credentials are used for the whole batch', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
+                'status' => ['code' => 200, 'errorcode' => 0, 'message' => 'OK'],
+                'response' => [
+                    'results' => [
+                        [
+                            'actionid' => OnOfficeAction::Read->value,
+                            'resourcetype' => 'estate',
+                            'data' => ['meta' => ['cntabsolute' => 0], 'records' => []],
+                            'status' => ['errorcode' => 0, 'message' => 'OK'],
+                        ],
+                        [
+                            'actionid' => OnOfficeAction::Read->value,
+                            'resourcetype' => 'address',
+                            'data' => ['meta' => ['cntabsolute' => 0], 'records' => []],
+                            'status' => ['errorcode' => 0, 'message' => 'OK'],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        Query::batch([
+            EstateRepository::query()->withCredentials('tenant-token', 'tenant-secret'),
+            AddressRepository::query()->withCredentials('tenant-token', 'tenant-secret'),
+        ])->once();
+
+        Http::assertSent(fn (Request $request): bool => data_get($request->data(), 'token') === 'tenant-token');
+    });
 });

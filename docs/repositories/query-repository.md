@@ -53,6 +53,8 @@ Query::batch()
 
 Builders are converted to their read request via `toRequest()`, which is available on all builders that support `get()` pagination (Estate, Address, Appointment, Task, Activity, User, Last Seen).
 
+A builder's `withCredentials()` apply to the whole batch, since all actions are sent in one API call. Adding builders with different credentials to the same batch throws an `OnOfficeException` — send them as separate batches instead.
+
 ## Reading a Single Record
 
 Call `withId()` on a builder to read one record by its id instead of a list. It is the batch-friendly counterpart to `find()`:
@@ -100,6 +102,8 @@ $estates = data_get($results->firstWhere('identifier', 'estates'), 'data.records
 
 If the batch response or any action inside it fails, an `OnOfficeException` is thrown — the same behavior as single requests. Note that the API may have executed the other actions of the batch regardless. The full response is available via `$exception->getOriginalResponse()` if you need to inspect partial results.
 
+A response that does not contain exactly one result per action also throws an `OnOfficeException`, so a truncated response can never be silently misaligned with the request order.
+
 ## Testing
 
 Faking works like with any other repository. Each page of the faked response becomes one action result, returned in the order the requests were added. Every action is recorded individually, so `assertSentCount()` counts actions (not HTTP calls) and `assertSent()` callbacks receive the individual `OnOfficeRequest` objects:
@@ -135,3 +139,5 @@ test('it reads estates and addresses in one call', function () {
     Query::assertSent(fn (OnOfficeRequest $request) => $request->resourceType === OnOfficeResourceType::Address);
 });
 ```
+
+Batches are faked through `Query::fake()` only — a per-repository fake like `EstateRepository::fake()` is never consumed by a batch. To prevent a mistake here from silently hitting the live API, a batch that contains a builder from a faked (or stray-preventing) repository throws a `StrayRequestException` when the batch itself is not faked. Fake exactly one page per action; a count mismatch throws an `OnOfficeException`.

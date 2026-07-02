@@ -7,6 +7,7 @@ namespace Innobrain\OnOfficeAdapter\Repositories;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeApiCredentials;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
@@ -42,18 +43,20 @@ class BatchRepository extends BaseRepository
      * @throws OnOfficeException
      * @throws Throwable
      */
-    public function dispatch(array $requests): Collection
+    public function dispatch(array $requests, ?OnOfficeApiCredentials $credentials = null, bool $preventStrayRequests = false): Collection
     {
         throw_if($requests === [], OnOfficeException::class, 'Cannot send an empty batch');
+
+        $service = $this->onOfficeService($credentials);
 
         $response = $this->stubResponse();
 
         if (is_null($response)) {
-            throw_if($this->preventStrayRequests, StrayRequestException::class, request: $requests[0]);
+            throw_if($this->preventStrayRequests || $preventStrayRequests, StrayRequestException::class, request: $requests[0]);
 
-            $response = $this->onOfficeService()->requestApiBatch($requests);
+            $response = $service->requestApiBatch($requests);
         } else {
-            $this->onOfficeService()->throwIfBatchResponseIsFailed($response);
+            $service->throwIfBatchResponseIsFailed($response, count($requests));
         }
 
         foreach ($requests as $index => $request) {
@@ -66,9 +69,9 @@ class BatchRepository extends BaseRepository
         return collect($results);
     }
 
-    protected function onOfficeService(): OnOfficeService
+    protected function onOfficeService(?OnOfficeApiCredentials $credentials): OnOfficeService
     {
-        return resolve(OnOfficeService::class);
+        return resolve(OnOfficeService::class)->setCredentials($credentials);
     }
 
     /**

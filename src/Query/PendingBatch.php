@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Innobrain\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Collection;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeApiCredentials;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Repositories\BatchRepository;
@@ -25,6 +26,19 @@ class PendingBatch
     protected array $requests = [];
 
     /**
+     * The credentials the batch will be sent with, taken from the
+     * builders that were added. A batch is one API call, so all
+     * requests share them.
+     */
+    protected ?OnOfficeApiCredentials $credentials = null;
+
+    /**
+     * Whether the batch must not hit the live API because a builder
+     * came from a faking or stray-preventing repository.
+     */
+    protected bool $preventStrayRequests = false;
+
+    /**
      * @param  array<int, OnOfficeRequest|Builder>  $requests
      */
     public function __construct(
@@ -40,14 +54,45 @@ class PendingBatch
      *
      * Each request becomes one batch action and returns a single,
      * non-paginated page: the first page only, capped at 500 records.
+     *
+     * A builder's credentials apply to the whole batch, since all
+     * requests are sent in one API call. Builders with different
+     * credentials cannot be batched together.
+     *
+     * @throws Throwable
      */
     public function add(OnOfficeRequest|Builder ...$requests): static
     {
         foreach ($requests as $request) {
-            $this->requests[] = $request instanceof Builder ? $request->toRequest() : $request;
+            if ($request instanceof Builder) {
+                $this->useCredentials($request->getCredentials());
+                $this->preventStrayRequests = $this->preventStrayRequests || $request->preventsStrayRequests();
+
+                $request = $request->toRequest();
+            }
+
+            $this->requests[] = $request;
         }
 
         return $this;
+    }
+
+    /**
+     * @throws Throwable
+     */
+    protected function useCredentials(?OnOfficeApiCredentials $credentials): void
+    {
+        if (is_null($credentials)) {
+            return;
+        }
+
+        throw_if(
+            $this->credentials && ! $this->credentials->equals($credentials),
+            OnOfficeException::class,
+            'All requests in a batch are sent in one API call and cannot use different credentials.',
+        );
+
+        $this->credentials = $credentials;
     }
 
     /**
@@ -64,6 +109,6 @@ class PendingBatch
      */
     public function once(): Collection
     {
-        return $this->repository->dispatch($this->requests);
+        return $this->repository->dispatch($this->requests, $this->credentials, $this->preventStrayRequests);
     }
 }

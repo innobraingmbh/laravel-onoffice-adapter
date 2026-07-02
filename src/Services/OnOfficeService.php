@@ -151,7 +151,7 @@ class OnOfficeService
                     'actions' => array_map(static fn (OnOfficeRequest $request): array => $request->toActionArray(), $requests),
                 ],
             ],
-            fn (Response $response) => $this->throwIfBatchResponseIsFailed($response),
+            fn (Response $response) => $this->throwIfBatchResponseIsFailed($response, count($requests)),
         );
     }
 
@@ -330,18 +330,25 @@ class OnOfficeService
     }
 
     /**
-     * Checks the response status and every result of a
-     * multi-action response for errors.
+     * Checks the response status and every result of a multi-action
+     * response for errors, and that the response contains exactly one
+     * result per action sent.
      *
      * @throws OnOfficeException
      */
-    public function throwIfBatchResponseIsFailed(Response $response): void
+    public function throwIfBatchResponseIsFailed(Response $response, int $expectedResultCount): void
     {
-        $resultCount = max(1, count($response->json('response.results', []) ?? []));
+        $resultCount = count($response->json('response.results', []) ?? []);
 
-        for ($index = 0; $index < $resultCount; $index++) {
+        for ($index = 0; $index < max(1, $resultCount); $index++) {
             $this->throwIfResultIsFailed($response, $index);
         }
+
+        throw_if(
+            $resultCount !== $expectedResultCount,
+            OnOfficeException::class,
+            "Batch response result count ($resultCount) does not match the number of actions sent ($expectedResultCount).",
+        );
     }
 
     /**
