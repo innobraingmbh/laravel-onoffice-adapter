@@ -1,8 +1,22 @@
 # Changelog
 
 ## main
-- feat: add `SearchCriteriaBuilder::get()` to read multiple search criteria by id in a single request (`recordIds([...])->get()`); `find()` still returns only the first record
 - TODO: Remove old activity repository code in next major release
+
+## v1.20.0
+
+- feat: batches can carry credentials — a builder's `withCredentials()` applies to the whole batch, and `Query::batch([...])->withCredentials(...)` credentials raw `OnOfficeRequest` objects; builders with conflicting credentials in one batch throw
+- feat: `withId()` reads send exactly the request `find()` sends (no `listlimit`/`listoffset`), and `find()` accepts string ids to match `withId()`
+- fix: a batch response must contain exactly one result per action — a short or long response throws instead of silently misaligning results
+- fix: a batch containing a builder from a faked or stray-preventing repository throws a `StrayRequestException` instead of silently hitting the live API; batches are faked through `Query::fake()` only
+- fix: `TaskRepository::query()->withId($id)->count()` counts the targeted record instead of all tasks
+- fix: a failing top-level status on a non-first faked batch page throws instead of being silently dropped — fail a single action with `errorCodeResult`/`messageResult`
+- breaking: `OnOfficeRequest::toActionArray()` now requires the `OnOfficeService` it is signed with; `toRequestArray()` is unchanged
+- breaking: `ImprintBuilder::find()` removed — the impressum is a singleton record whose id the API ignores; use `first()`
+
+## v1.17.0
+
+- feat: add `SearchCriteriaBuilder::get()` to read multiple search criteria by id in a single request (`recordIds([...])->get()`); `find()` still returns only the first record
 
 ## v1.8.2
 
