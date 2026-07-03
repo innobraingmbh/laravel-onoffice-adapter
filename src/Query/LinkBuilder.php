@@ -27,23 +27,7 @@ class LinkBuilder extends Builder
      */
     public function get(): Collection
     {
-        $parameters = [
-            OnOfficeService::RECORDID => $this->recordId,
-            ...$this->customParameters,
-        ];
-
-        if ($this->resourceId === OnOfficeResourceId::AgentsLog) {
-            $parameters['type'] = $this->type->value;
-        }
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::GetLink,
-            $this->resourceId,
-            parameters: $parameters,
-        );
-
-        return $this->requestAll($request);
+        return $this->requestAll($this->toRequest());
     }
 
     /**
@@ -52,23 +36,7 @@ class LinkBuilder extends Builder
      */
     public function first(): ?array
     {
-        $parameters = [
-            OnOfficeService::RECORDID => $this->recordId,
-            ...$this->customParameters,
-        ];
-
-        if ($this->resourceId === OnOfficeResourceId::AgentsLog) {
-            $parameters['type'] = $this->type->value;
-        }
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::GetLink,
-            $this->resourceId,
-            parameters: $parameters,
-        );
-
-        return $this->requestApi($request)
+        return $this->requestApi($this->toRequest())
             ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
@@ -78,8 +46,17 @@ class LinkBuilder extends Builder
      */
     public function find(int $id): ?array
     {
+        return $this->recordId($id)->first();
+    }
+
+    /**
+     * Build the get-link request this builder would send, without sending it.
+     * Useful for fetching links for many records in one batched API call.
+     */
+    public function toRequest(): OnOfficeRequest
+    {
         $parameters = [
-            OnOfficeService::RECORDID => $id,
+            OnOfficeService::RECORDID => $this->recordId,
             ...$this->customParameters,
         ];
 
@@ -87,15 +64,12 @@ class LinkBuilder extends Builder
             $parameters['type'] = $this->type->value;
         }
 
-        $request = new OnOfficeRequest(
+        return new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::GetLink,
             $this->resourceId,
             parameters: $parameters,
         );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
     public function withResourceId(OnOfficeResourceId $resourceId): self
