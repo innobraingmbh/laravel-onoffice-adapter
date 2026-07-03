@@ -34,7 +34,26 @@ class RelationBuilder extends Builder
     #[Override]
     public function get(): Collection
     {
-        $request = new OnOfficeRequest(
+        $records = $this->requestAll($this->toRequest());
+
+        // $records is always an array containing a single element
+        /** @var array<string, mixed> $elements */
+        $elements = data_get($records->first(), 'elements', []);
+
+        /** @var Collection<int, array<string, mixed>> */
+        return collect($elements);
+    }
+
+    /**
+     * Build the ids-from-relation request this builder would send, without
+     * sending it. Useful for resolving several relation lookups in one batched
+     * API call. Unlike get(), a batch result keeps the raw record shape: the
+     * parent ID => child ID map sits at data.records.0.elements.
+     */
+    #[Override]
+    public function toRequest(): OnOfficeRequest
+    {
+        return new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::IdsFromRelation,
             parameters: [
@@ -44,15 +63,6 @@ class RelationBuilder extends Builder
                 ...$this->customParameters,
             ],
         );
-
-        $records = $this->requestAll($request);
-
-        // $records is always an array containing a single element
-        /** @var array<string, mixed> $elements */
-        $elements = data_get($records->first(), 'elements', []);
-
-        /** @var Collection<int, array<string, mixed>> */
-        return collect($elements);
     }
 
     /**
