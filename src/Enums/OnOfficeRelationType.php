@@ -19,4 +19,8 @@ enum OnOfficeRelationType: string
     case EstateOffer = 'urn:onoffice-de-ns:smart:2.5:relationTypes:address:estate:offerByAgentsLog';
     case ComplexEstateUnits = 'urn:onoffice-de-ns:smart:2.5:relationTypes:complex:estate:units';
     case AddressHierarchy = 'urn:onoffice-de-ns:smart:2.5:relationTypes:address:contact:address';
+    case CalendarEstate = 'urn:onoffice-de-ns:smart:2.5:relationTypes:calendar:estate';
+    case CalendarAddress = 'urn:onoffice-de-ns:smart:2.5:relationTypes:calendar:address';
+    case TaskEstate = 'urn:onoffice-de-ns:smart:2.5:relationTypes:task:estate';
+    case TaskAddress = 'urn:onoffice-de-ns:smart:2.5:relationTypes:task:address';
 }
