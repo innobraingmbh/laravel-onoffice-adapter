@@ -6,6 +6,10 @@ Manage calendar appointments in onOffice. Uses the `appointmentList` resource fo
 
 Both `dateRange()` and `select()` are required for listing appointments — the API rejects requests without fields.
 
+::: warning
+The API ignores all pagination parameters for appointment listings and caps a window at 500 records — query smaller date ranges when a window can exceed that.
+:::
+
 ```php
 use Innobrain\OnOfficeAdapter\Facades\AppointmentRepository;
 
@@ -42,6 +46,8 @@ $appointments = AppointmentRepository::query()
 The `appointmentList` returns structured objects for fields like `type`, `status`, `date`, and `location` instead of flat values.
 :::
 
+Two more read quirks: recurring appointments are returned anchored on the series start date — even when that date lies outside the queried window — so in-window occurrences must be computed from the `recurrence` element. And dates come back as timezone-qualified UTC (`2026-08-03T06:00:00+00:00`) while writes take local wall time (`'start_dt' => '2026-08-03 08:00:00'`).
+
 ## Filtering
 
 Filter by users, groups, and appointment state:
@@ -56,6 +62,12 @@ $appointments = AppointmentRepository::query()
     ->recurrent(true)
     ->get();
 ```
+
+`cancelled()`, `done()` and `recurrent()` filter strictly by their boolean — to include both states, don't call the method at all.
+
+::: warning
+Appointments cannot be filtered by linked estate or contact: the API silently ignores every such filter key and returns the full window. Resolve linked appointments via the [Relation Repository](./relation-repository.md) (`CalendarEstate` / `CalendarAddress`, with the estate or address ID as `childIds()`), then fetch them by ID.
+:::
 
 Standard `where()` filters work for `notes`, `subject`, `type`, and `createdBy`:
 
@@ -74,6 +86,8 @@ Uses the `appointmentList` Get endpoint with a resource id:
 ```php
 $appointment = AppointmentRepository::query()->find(42);
 ```
+
+A nonexistent ID is not an error — the API answers with zero records, so `find()` returns `null`.
 
 ## Creating Appointments
 
@@ -102,6 +116,8 @@ $appointment = AppointmentRepository::query()->create([
     'reminderTypes' => ['email', 'popup'],
 ]);
 ```
+
+The response contains only the new appointment's ID — no fields are echoed back.
 
 ### Create Data Fields
 
@@ -151,6 +167,10 @@ AppointmentRepository::query()
     ->modify(42);
 ```
 
+::: warning
+`relatedAddressIds` on modify is additive — existing links are kept. Replace them by also passing `->parameter('replaceAddressIds', true)`; unlink the estate with the literal `->parameter('relatedEstateId', 0)`.
+:::
+
 ## Deleting Appointments
 
 ```php
@@ -198,6 +218,8 @@ $conflicts = AppointmentRepository::query()->conflicts([
 
 Returns arrays of `conflictedUsers`, `conflictedResources`, `conflictedAddresses`, and `conflictedEstates`.
 
+`transitTimePre` and `transitTimePost` are mandatory even with `'allowTransitTime' => false` — omitting them fails with error 305, which masks any other problem in the payload.
+
 ## Calendar Resources
 
 Query available rooms, vehicles, and other bookable resources:
@@ -216,6 +238,8 @@ $result = AppointmentRepository::query()->sendConfirmation(
     useDefaultMailAccount: false,
 );
 ```
+
+The call returns success unconditionally — even when the appointment has no linked contact, the contact has no email address, or the appointment does not exist. No delivery status is available.
 
 ## Recurring Appointments
 
@@ -247,3 +271,9 @@ AppointmentRepository::query()->create([
     'subscribers' => ['users' => [14, 21]],
 ]);
 ```
+
+::: danger
+When making an existing appointment recurring via `modify`, resend `start_dt` — without it the series is anchored on `0000-00-00` and the appointment disappears from every date-window listing while staying readable by ID.
+:::
+
+Open-ended series (`'rp_ende_status' => 2`, no `rp_ende_datum`) are stored and read back correctly but never rendered in the onOffice calendar UI — send a far-future `rp_ende_datum` instead.

@@ -74,9 +74,34 @@ $address = AddressRepository::query()
     ]);
 
 AddressRepository::query()
-    ->addModify(['Vorname' => 'Hans', 'Status' => 1])
+    ->addModify(['Vorname' => 'Hans'])
     ->modify(10505);
 ```
+
+::: warning
+`checkDuplicate` is a silent upsert: when an email in the payload matches any stored email entry of an existing record — including non-default secondary entries — that record's fields are overwritten with the payload and its ID is returned, indistinguishable from a fresh create.
+:::
+
+::: warning
+`Status` accepts writes but never applies them. Archive or activate an address via `Status2Adr` with the select key (`status2adr_active` / `status2adr_archive`) — raw integers are rejected. `Status2Adr` cascades into `Status`.
+:::
+
+### Modifying Contact Details
+
+Contact fields take flat values on `create`, but `modify` rejects them as unknown fields. Use the action-object form:
+
+```php
+AddressRepository::query()
+    ->addModify('email', [
+        'action' => 'modify', // add, modify, or delete
+        'oldvalue' => 'old@example.de',
+        'newvalue' => 'new@example.de',
+        'default' => true,
+    ])
+    ->modify(10505);
+```
+
+Reads only expose the default entry — an entry added without `'default' => true` is invisible to every subsequent read.
 
 ### Contact Parameters
 
@@ -112,9 +137,10 @@ AddressRepository::query()->each(fn ($addresses) => /* process */);
 
 | Field | Description |
 |-------|-------------|
-| `Status` | 1 = Active, 0 = Archive |
+| `Status` | 1 = Active, 0 = Archive — read-only, write `Status2Adr` |
+| `Status2Adr` | `status2adr_active` / `status2adr_archive` — the writable status |
 | `Anrede` | Salutation |
 | `Vorname` / `Name` | First/last name |
 | `Strasse` / `Plz` / `Ort` / `Land` | Address |
-| `Benutzer` | Support user |
+| `Benutzer` | Support user — takes the login name, not the numeric user ID |
 | `newsletter_aktiv` | 0=No, 1=Yes, 2=Cancelled, 3=DOI pending, 4=Unspecified, 5=Undeliverable |

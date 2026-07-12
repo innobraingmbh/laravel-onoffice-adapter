@@ -46,6 +46,8 @@ $count = EstateRepository::query()->count();
 
 `get()` returns a Laravel `Collection` of records, where each record is an array with `id`, `type`, and `elements` keys. `find()` and `first()` return a single record array (or `null`); `count()` returns an `int`.
 
+Element values come back as strings: booleans are `"0"`/`"1"` (empty: `""`) and empty dates are the literal `"0000-00-00"`. Datetimes carry no timezone marker and mix zones per field — creation-style fields (`erstellt_am`, `Eintragsdatum`) are Europe/Berlin wall time while modification-style fields (`modified`, `Letzte_Aktion`) are UTC. Only appointment listings return timezone-qualified UTC.
+
 ## Building Queries
 
 Chain methods to filter, sort, and limit results:

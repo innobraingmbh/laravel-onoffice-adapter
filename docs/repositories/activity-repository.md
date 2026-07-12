@@ -46,6 +46,10 @@ ActivityRepository::query()
     ]);
 ```
 
+::: warning
+`Datum` cannot be set on create — the server discards the supplied value and stamps the current time, without an error.
+:::
+
 ## Advisory Levels
 
 | Level | Description |

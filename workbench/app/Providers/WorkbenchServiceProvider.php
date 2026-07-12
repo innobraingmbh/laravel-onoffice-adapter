@@ -10,6 +10,7 @@ use Illuminate\Support\ServiceProvider;
 use Workbench\App\Console\Commands\ProbeAppointmentsCommand;
 use Workbench\App\Console\Commands\ProbeBatchCommand;
 use Workbench\App\Console\Commands\ProbeDocsVerify2Command;
+use Workbench\App\Console\Commands\ProbeDocsVerify3Command;
 use Workbench\App\Console\Commands\ProbeDocsVerifyCommand;
 use Workbench\App\Console\Commands\ProbeFindCommand;
 use Workbench\App\Console\Commands\ProbeRegionsCommand;
@@ -37,6 +38,7 @@ class WorkbenchServiceProvider extends ServiceProvider
                 ProbeBatchCommand::class,
                 ProbeDocsVerifyCommand::class,
                 ProbeDocsVerify2Command::class,
+                ProbeDocsVerify3Command::class,
                 ProbeFindCommand::class,
                 ProbeRegionsCommand::class,
             ]);
