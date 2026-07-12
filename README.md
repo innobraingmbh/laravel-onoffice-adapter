@@ -35,7 +35,7 @@ ON_OFFICE_SECRET=your-secret
 For advanced configuration (retry settings, custom headers), publish the config file:
 
 ```bash
-php artisan vendor:publish --tag="laravel-onoffice-adapter-config"
+php artisan vendor:publish --tag="onoffice-adapter-config"
 ```
 
 ## Usage
@@ -106,6 +106,10 @@ EstateRepository::query()
 | `EstateRepository` | Real estate properties |
 | `AddressRepository` | Contacts and addresses |
 | `ActivityRepository` | Activity logs |
+| `ActionRepository` | Action kind types |
+| `AppointmentRepository` | Calendar appointments |
+| `TaskRepository` | Tasks |
+| `UserRepository` | onOffice users |
 | `SearchCriteriaRepository` | Buyer search profiles |
 | `FieldRepository` | Field metadata |
 | `FileRepository` | File uploads and downloads |
@@ -179,7 +183,7 @@ BaseRepository::query()->dump()->call(/* ... */);
 // Record requests and responses
 BaseRepository::record();
 BaseRepository::query()->call(/* ... */);
-$lastPair = BaseRepository::lastRecorded(); // [OnOfficeRequest, OnOfficeResponse]
+$lastPair = BaseRepository::lastRecorded(); // [OnOfficeRequest, array]
 ```
 
 ## Helpers
@@ -194,7 +198,7 @@ $estates = EstateRepository::query()
     ->get();
 
 // Remove fields with empty values ("", "0.00", [], null)
-$estates = clean_elements($estates);
+$estates = $estates->map(fn (array $estate) => clear_elements($estate));
 ```
 
 ## Testing

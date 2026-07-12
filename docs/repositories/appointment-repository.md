@@ -4,17 +4,19 @@ Manage calendar appointments in onOffice. Uses the `appointmentList` resource fo
 
 ## Listing Appointments
 
-The `dateRange()` method is required for listing appointments.
+Both `dateRange()` and `select()` are required for listing appointments — the API rejects requests without fields.
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\AppointmentRepository;
 
 $appointments = AppointmentRepository::query()
     ->dateRange('2025-01-01', '2025-12-31')
+    ->select(['subject', 'type', 'status', 'date'])
     ->get();
 
 $appointment = AppointmentRepository::query()
     ->dateRange('2025-01-01', '2025-01-31')
+    ->select(['subject', 'type', 'status', 'date'])
     ->first();
 ```
 

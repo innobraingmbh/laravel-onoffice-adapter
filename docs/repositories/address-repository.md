@@ -62,14 +62,16 @@ $address = AddressRepository::query()
         'Name' => 'Mustermann',
         'email' => 'm.mustermann@example.de',
         'phone' => '0241 12345',
-        'default_phone' => '0241 12345',
         'Land' => 'DEU',
     ]);
 
-// With duplicate check
+// With duplicate check — pass the flag in the data array;
+// parameters() has no effect on create() for addresses
 $address = AddressRepository::query()
-    ->parameters(['checkDuplicate' => true])
-    ->create([...]);
+    ->create([
+        'checkDuplicate' => true,
+        // ...
+    ]);
 
 AddressRepository::query()
     ->addModify(['Vorname' => 'Hans', 'Status' => 1])
@@ -80,11 +82,11 @@ AddressRepository::query()
 
 | Parameter | Description |
 |-----------|-------------|
-| `phone` / `phone_private` / `phone_business` | Phone entries |
+| `phone` | Phone entries |
 | `mobile` | Mobile phone |
-| `fax` / `fax_private` / `fax_business` | Fax entries |
-| `email` / `email_private` / `email_business` | Email entries |
-| `default_phone` / `default_email` | Set main number/email |
+| `fax` | Fax entries |
+| `email` | Email entries |
+| `defaultphone` / `defaultemail` | Main number/email |
 
 ## Files, Count & Chunked
 
@@ -115,4 +117,4 @@ AddressRepository::query()->each(fn ($addresses) => /* process */);
 | `Vorname` / `Name` | First/last name |
 | `Strasse` / `Plz` / `Ort` / `Land` | Address |
 | `Benutzer` | Support user |
-| `newsletter_aktiv` | 0=No, 1=Yes, 2=Cancelled, 3=DOI pending |
+| `newsletter_aktiv` | 0=No, 1=Yes, 2=Cancelled, 3=DOI pending, 4=Unspecified, 5=Undeliverable |

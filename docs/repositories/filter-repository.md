@@ -32,8 +32,13 @@ $estates = EstateRepository::query()
 
 ## Response
 
+Each record has the shape `{id, type, elements}`:
+
 | Field | Description |
 |-------|-------------|
 | `id` | Filter ID for `parameters(['filterid' => id])` |
-| `name` | Filter name |
-| `scope` | Visibility |
+| `type` | Always `filter` |
+| `elements.name` | Filter name |
+| `elements.scope` | Visibility |
+| `elements.userId` | Owning user ID, or `null` |
+| `elements.groupId` | Group ID |

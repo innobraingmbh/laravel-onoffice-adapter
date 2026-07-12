@@ -61,7 +61,7 @@ $factory->data([
     'kaufpreis' => 275000,
 ]);
 
-// Magic setter (converts setFieldName to field_name)
+// Magic setter (setFieldName sets fieldName — only the first letter is lowercased)
 $factory->setKaufpreis(275000);
 
 // Create multiple factory instances
@@ -123,7 +123,7 @@ EstateRepository::fake(EstateRepository::response([
 ]));
 
 $estates = EstateRepository::query()
-    ->select('objekttitel', 'kaufpreis', 'wohnflaeche')
+    ->select(['objekttitel', 'kaufpreis', 'wohnflaeche'])
     ->get();
 
 expect($estates)->toHaveCount(2);
@@ -162,7 +162,7 @@ AddressRepository::fake(AddressRepository::response([
 ]));
 
 $addresses = AddressRepository::query()
-    ->select('Vorname', 'Name', 'Email')
+    ->select(['Vorname', 'Name', 'Email'])
     ->get();
 ```
 
@@ -491,7 +491,7 @@ it('fetches active estates for sale', function () {
 
     // Act
     $estates = EstateRepository::query()
-        ->select('objekttitel', 'kaufpreis')
+        ->select(['objekttitel', 'kaufpreis'])
         ->where('status', 1)
         ->where('verkauft', 0)
         ->orderBy('kaufpreis', 'DESC')
@@ -518,20 +518,20 @@ it('fetches active estates for sale', function () {
 | `ActivityFactory` | `agentslog` | Activity log entries |
 | `AppointmentFactory` | `calendar` | Calendar appointments |
 | `SearchCriteriaFactory` | - | Buyer search profiles |
-| `RelationFactory` | - | Links between records |
+| `RelationFactory` | `idsfromrelation` | Links between records |
 | `EstatePictureFactory` | `estatepictures` | Estate images (includes defaults) |
 | `FileFactory` | `file` | File uploads (has `ok()`/`error()`) |
 | `FileUploadFactory` | - | Upload responses |
-| `FilterFactory` | - | Saved filters |
+| `FilterFactory` | `filter` | Saved filters |
 | `FieldFactory` | - | Field configurations |
-| `UserFactory` | - | User records |
-| `RegionFactory` | - | Geographic regions |
+| `UserFactory` | `user` | User records |
+| `RegionFactory` | `user` | Geographic regions |
 | `ImprintFactory` | - | Imprint data |
-| `LogFactory` | - | Log entries |
+| `LogFactory` | `Log` | Log entries |
 | `LinkFactory` | - | URL links |
-| `LastSeenFactory` | - | Recently viewed records |
+| `LastSeenFactory` | `lastSeen` | Recently viewed records |
 | `MarketPlaceUnlockProviderFactory` | - | Marketplace data |
-| `ActionFactory` | - | Action types |
+| `ActionFactory` | `actionkind` | Action types |
 | `TaskFactory` | `task` | Task records |
 
 ## Tips

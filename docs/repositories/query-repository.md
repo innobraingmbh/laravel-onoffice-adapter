@@ -51,7 +51,7 @@ Query::batch()
     ->once();
 ```
 
-Builders are converted to their read request via `toRequest()`, which is available on all builders that support `get()` pagination (Estate, Address, Appointment, Task, Activity, User, Last Seen).
+Builders are converted to their read request via `toRequest()`, which is available on the Estate, Address, Appointment, Task, Activity, User, Last Seen, Relation, and Link builders.
 
 A builder's `withCredentials()` apply to the whole batch, since all actions are sent in one API call. Adding builders with different credentials to the same batch throws an `OnOfficeException` — send them as separate batches instead.
 
@@ -87,7 +87,7 @@ EstateRepository::query()->find(5);                 // eager — returns the rec
 EstateRepository::query()->withId(5);               // lazy — defer into Query::batch()
 ```
 
-`withId()` is available on the same builders as `toRequest()`.
+`withId()` is available on the paginating builders (Estate, Address, Appointment, Task, Activity, User, Last Seen). Relation and Link builders support `toRequest()` but not `withId()`.
 
 ## Identifying Results
 

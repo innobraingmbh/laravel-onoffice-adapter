@@ -1,6 +1,6 @@
 # Action Repository
 
-Read the action types configured in onOffice (used for activities / agents log entries). The resource type is `actiontypes`.
+Read the action types configured in onOffice (used for activities / agents log entries). The resource type is `actionkindtypes`.
 
 ## Querying Action Types
 
