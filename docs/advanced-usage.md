@@ -8,6 +8,8 @@ Middlewares let you inject custom logic before each request is sent:
 ```php
 use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 
 BaseRepository::query()
     ->before(function (OnOfficeRequest $request) {
@@ -16,7 +18,8 @@ BaseRepository::query()
     })
     ->call(
         new OnOfficeRequest(
-            // For example: read an estate
+            OnOfficeAction::Read,
+            OnOfficeResourceType::Estate,
         )
     );
 ```
@@ -47,7 +50,7 @@ In addition to `dd()` (dump and die), the adapter supports:
 // Dump the request without stopping execution
 BaseRepository::query()->dump()->call(...);
 
-// Dump the raw request payload
+// Dump the raw request payload, then exit — like dd()
 BaseRepository::query()->raw()->call(...);
 
 // Record requests and responses
@@ -56,7 +59,7 @@ BaseRepository::query()->call(...);
 $lastPair = BaseRepository::lastRecorded();
 ```
 
-Combine them to tailor debugging to your needs.
+Note that `raw()` and `dd()` call `exit(1)` after dumping — only `dump()` lets the request complete.
 
 ## Large Dataset Handling
 To handle large datasets without memory issues, use chunked processing with `each()`:

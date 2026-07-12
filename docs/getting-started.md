@@ -22,7 +22,7 @@ ON_OFFICE_SECRET=your-secret
 ::: tip
 For advanced configuration (retry settings, custom headers), publish the config file:
 ```bash
-php artisan vendor:publish --tag="laravel-onoffice-adapter-config"
+php artisan vendor:publish --tag="onoffice-adapter-config"
 ```
 :::
 
@@ -44,7 +44,9 @@ $estate = EstateRepository::query()->first();
 $count = EstateRepository::query()->count();
 ```
 
-All queries return a Laravel `Collection` of arrays, where each array represents a record with `id`, `type`, and `elements` keys.
+`get()` returns a Laravel `Collection` of records, where each record is an array with `id`, `type`, and `elements` keys. `find()` and `first()` return a single record array (or `null`); `count()` returns an `int`.
+
+Element values come back as strings: booleans are `"0"`/`"1"` (empty: `""`) and empty dates are the literal `"0000-00-00"`. Datetimes carry no timezone marker and mix zones per field — creation-style fields (`erstellt_am`, `Eintragsdatum`) are Europe/Berlin wall time while modification-style fields (`modified`, `Letzte_Aktion`) are UTC. Only appointment listings return timezone-qualified UTC.
 
 ## Building Queries
 

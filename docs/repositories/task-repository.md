@@ -53,6 +53,15 @@ TaskRepository::query()
     ->modify(99);
 ```
 
+## Field Gotchas
+
+- `Art` is mandatory on create, but the field metadata reports no permitted values for it — read an existing task to find a valid key.
+- `Status` is written with numeric keys but read back as German labels (`In Bearbeitung`).
+- `Status` and `erledigt` are stored independently; the API does not sync them, so complete a task by setting both.
+- `Deadline` is stored but stays inactive unless `Deadline_strikt` is also set.
+- `Verantwortung` and `Bearbeiter` accept any string verbatim — a typo produces a task with no functional assignee, without an error.
+- The endpoint rejects `sortby`, so results cannot be ordered server-side; `orderBy()` has no effect.
+
 ## Count & Chunked
 
 ```php

@@ -23,14 +23,20 @@ $estates = RelationRepository::query()
 
 `addParentIds()` and `addChildIds()` append to the already set ids instead of replacing them.
 
-## Chunked Processing
+`get()` returns a Collection keyed by parent ID => array of related child IDs, not full records. The ID arrays can contain duplicates — dedupe before fetching the related records.
+
+## Processing All Results
+
+Unlike other builders, the relation builder's `each()` does not chunk: it fetches all results and invokes the callback once with the full Collection.
 
 ```php
+use Illuminate\Support\Collection;
+
 RelationRepository::query()
     ->relationType(OnOfficeRelationType::ContactPersonAll)
     ->parentIds([48])
-    ->each(function (array $relations) {
-        // Process chunk
+    ->each(function (Collection $relations) {
+        // All relations at once
     });
 ```
 
@@ -61,9 +67,13 @@ RelationRepository::query()
 | `EstateOffer` | Estate offers from agents log |
 | `ComplexEstateUnits` | Complex units |
 | `AddressHierarchy` | Contact address hierarchy |
+| `CalendarEstate` | Calendar entry linked to estate |
+| `CalendarAddress` | Calendar entry linked to address |
+| `TaskEstate` | Task linked to estate |
+| `TaskAddress` | Task linked to address |
 
 Custom URN: `'urn:onoffice-de-ns:smart:2.5:relationTypes:estate:address:buyer'`
 
 ::: warning
-Don't swap `parentIds` and `childIds` - the relation type determines which is which.
+Don't swap `parentIds` and `childIds` — the relation type determines which is which, and the wrong direction is not an error: the API returns empty lists with a success status, indistinguishable from "no links". For `CalendarEstate`, `CalendarAddress`, `TaskEstate`, and `TaskAddress`, the estate or address is the child.
 :::

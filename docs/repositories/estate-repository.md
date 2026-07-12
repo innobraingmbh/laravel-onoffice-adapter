@@ -80,9 +80,17 @@ $estate = EstateRepository::query()
     ]);
 
 EstateRepository::query()
-    ->addModify(['kaufpreis' => 180000, 'status' => 1])
+    ->addModify(['kaufpreis' => 180000, 'status2' => 'status2obj_aktiv'])
     ->modify(100);
 ```
+
+::: warning
+`status` cannot be written: an integer is rejected as a type error, a string returns success without being applied, and on create it is silently ignored. Write `status2` instead (`status2obj_aktiv`, `status2obj_archiviert`) — it cascades into `status`.
+:::
+
+::: warning
+Modifying `benutzer` (Betreuer) only works while the record still belongs to the API user, and the value is never validated — even a nonexistent ID is stored. Once `benutzer` is anyone else, every further `benutzer` modify returns success and changes nothing.
+:::
 
 ## Estate Files
 
@@ -115,6 +123,8 @@ EstateRepository::pictures([100, 101])->each(function (array $pictures) {
 ```
 
 Categories: `Titelbild`, `Foto`, `Foto_gross`, `Grundriss`, `Lageplan`, `Epass_Skala`, `Panorama`, `Link`, `Film-Link`, `Ogulo-Link`, `Objekt-Link`, `Expose`
+
+These are the built-in categories. Customers can define their own, and the API offers no way to enumerate them — custom category names have to be known up front.
 
 ## Custom Parameters
 
@@ -171,7 +181,8 @@ $estates = EstateRepository::query()
 
 | Field | Description |
 |-------|-------------|
-| `status` | 1 = Active, 2 = Pending, 0 = Archive |
+| `status` | 1 = Active, 2 = Pending, 0 = Archive — read-only, write `status2` |
+| `status2` | `status2obj_aktiv` / `status2obj_archiviert` — the writable status |
 | `objektart` | Property type (haus, wohnung, grundstueck) |
 | `nutzungsart` | Type of use (wohnen, gewerbe) |
 | `vermarktungsart` | Marketing type (kauf, miete) |

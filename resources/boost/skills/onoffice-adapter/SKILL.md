@@ -13,7 +13,7 @@ Use this skill when working with the `innobrain/laravel-onoffice-adapter` packag
 
 - Every resource has a **Facade repository** in `Innobrain\OnOfficeAdapter\Facades\*` (e.g. `EstateRepository`, `AddressRepository`, `ActivityRepository`, `RelationRepository`, `FileRepository`, `SearchCriteriaRepository`, `FieldRepository`, `AppointmentRepository`, `TaskRepository`, `UserRepository`).
 - `Repository::query()` returns an Eloquent-like builder: `select()`, `where()`, `whereIn()`, `whereLike()`, `whereBetween()`, `orderBy()`, `orderByDesc()`, `limit()`, `offset()`, `when()`.
-- Terminal methods: `get()` (auto-paginates all pages), `first()`, `find($id)`, `count()`, `each(fn)` (chunked processing), `create()`, `modify()`.
+- Terminal methods: `get()` (auto-paginates all pages), `first()`, `find($id)`, `count()`, `each(fn)` (chunked processing), `create()`, `modify()`. Special-purpose builders (relations, files, fields) support only a subset — e.g. the relation builder has no `select()`/`where()`/`orderBy()`/`find()`/`count()`.
 - Always `select()` only the fields you need to minimize API payload.
 - For endpoints without a repository, use `BaseRepository::query()->call(new OnOfficeRequest(...))`.
 
@@ -58,13 +58,14 @@ EstateRepository::query()
     ->modify(123);
 
 // Log an activity
-ActivityRepository::query()->create([
-    'addressids' => [34],
-    'estateid' => 41,
-    'actionkind' => 'Email',
-    'actiontype' => 'Ausgang',
-    'note' => 'Contract sent',
-]);
+ActivityRepository::query()
+    ->estateId(41)
+    ->addressIds([34])
+    ->create([
+        'actionkind' => 'Email',
+        'actiontype' => 'Ausgang',
+        'note' => 'Contract sent',
+    ]);
 ```
 
 ## Relations
@@ -76,6 +77,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeRelationType;
 use Innobrain\OnOfficeAdapter\Facades\RelationRepository;
 
 // Get contact persons for an estate
+// Returns a Collection keyed by parent ID => array of child IDs, not full records
 $contacts = RelationRepository::query()
     ->relationType(OnOfficeRelationType::ContactPersonAll)
     ->parentIds([48])
@@ -111,7 +113,7 @@ $pictures = EstateRepository::pictures(123)
 
 ## Batching multiple actions in one HTTP call
 
-Use the `Query` facade to bundle builders (or raw `OnOfficeRequest` objects) into a single API call. Batched actions are **never paginated** — you get the first page only (max 500 records per action):
+Use the `Query` facade to bundle builders (or raw `OnOfficeRequest` objects) into a single API call. Batched actions are **never paginated** — you get the first page only (max 500 records per action). Only builders implementing `toRequest()` are batchable: estate, address, activity, appointment, task, user, last-seen, relation, and link builders. Others (files, fields, search criteria, ...) throw.
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\Query;
@@ -167,6 +169,7 @@ EstateRepository::query()
 // Request middleware / debugging
 EstateRepository::query()
     ->before(fn ($request) => Log::info('Sending', ['request' => $request->toArray()]))
+    ->after(fn ($response) => Log::info('Received', ['status' => $response->status()]))
     ->get();
 
 EstateRepository::query()->dump()->get(); // dump request without stopping

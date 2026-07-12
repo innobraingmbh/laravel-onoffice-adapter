@@ -1,6 +1,6 @@
 # Search Criteria Repository
 
-Manage search criteria. The resource type is `searchcriterias`.
+Manage search criteria. Reads (`find()`, `get()`) use resource type `searchcriterias`; `create()` uses `searchcriteria`.
 
 ## Modes
 

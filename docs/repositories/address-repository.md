@@ -62,29 +62,56 @@ $address = AddressRepository::query()
         'Name' => 'Mustermann',
         'email' => 'm.mustermann@example.de',
         'phone' => '0241 12345',
-        'default_phone' => '0241 12345',
         'Land' => 'DEU',
     ]);
 
-// With duplicate check
+// With duplicate check — pass the flag in the data array;
+// parameters() has no effect on create() for addresses
 $address = AddressRepository::query()
-    ->parameters(['checkDuplicate' => true])
-    ->create([...]);
+    ->create([
+        'checkDuplicate' => true,
+        // ...
+    ]);
 
 AddressRepository::query()
-    ->addModify(['Vorname' => 'Hans', 'Status' => 1])
+    ->addModify(['Vorname' => 'Hans'])
     ->modify(10505);
 ```
+
+::: warning
+`checkDuplicate` is a silent upsert: when an email in the payload matches any stored email entry of an existing record — including non-default secondary entries — that record's fields are overwritten with the payload and its ID is returned, indistinguishable from a fresh create.
+:::
+
+::: warning
+`Status` accepts writes but never applies them. Archive or activate an address via `Status2Adr` with the select key (`status2adr_active` / `status2adr_archive`) — raw integers are rejected. `Status2Adr` cascades into `Status`.
+:::
+
+### Modifying Contact Details
+
+Contact fields take flat values on `create`, but `modify` rejects them as unknown fields. Use the action-object form:
+
+```php
+AddressRepository::query()
+    ->addModify('email', [
+        'action' => 'modify', // add, modify, or delete
+        'oldvalue' => 'old@example.de',
+        'newvalue' => 'new@example.de',
+        'default' => true,
+    ])
+    ->modify(10505);
+```
+
+Reads only expose the default entry — an entry added without `'default' => true` is invisible to every subsequent read.
 
 ### Contact Parameters
 
 | Parameter | Description |
 |-----------|-------------|
-| `phone` / `phone_private` / `phone_business` | Phone entries |
+| `phone` | Phone entries |
 | `mobile` | Mobile phone |
-| `fax` / `fax_private` / `fax_business` | Fax entries |
-| `email` / `email_private` / `email_business` | Email entries |
-| `default_phone` / `default_email` | Set main number/email |
+| `fax` | Fax entries |
+| `email` | Email entries |
+| `defaultphone` / `defaultemail` | Main number/email |
 
 ## Files, Count & Chunked
 
@@ -110,9 +137,10 @@ AddressRepository::query()->each(fn ($addresses) => /* process */);
 
 | Field | Description |
 |-------|-------------|
-| `Status` | 1 = Active, 0 = Archive |
+| `Status` | 1 = Active, 0 = Archive — read-only, write `Status2Adr` |
+| `Status2Adr` | `status2adr_active` / `status2adr_archive` — the writable status |
 | `Anrede` | Salutation |
 | `Vorname` / `Name` | First/last name |
 | `Strasse` / `Plz` / `Ort` / `Land` | Address |
-| `Benutzer` | Support user |
-| `newsletter_aktiv` | 0=No, 1=Yes, 2=Cancelled, 3=DOI pending |
+| `Benutzer` | Support user — takes the login name, not the numeric user ID |
+| `newsletter_aktiv` | 0=No, 1=Yes, 2=Cancelled, 3=DOI pending, 4=Unspecified, 5=Undeliverable |
