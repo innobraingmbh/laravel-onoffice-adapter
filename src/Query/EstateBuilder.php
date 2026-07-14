@@ -29,7 +29,7 @@ class EstateBuilder extends Builder
             parameters: [
                 OnOfficeService::DATA => $this->columns,
                 OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::SORTBY => $this->getOrderBy(),
+                ...$this->getSortByParameter(),
                 ...$this->customParameters,
             ]
         );
@@ -94,8 +94,7 @@ class EstateBuilder extends Builder
             OnOfficeResourceId::Estate,
             parameters: [
                 OnOfficeService::INPUT => $this->input,
-                OnOfficeService::SORTBY => data_get(array_keys($this->orderBy), 0),
-                OnOfficeService::SORTORDER => data_get($this->orderBy, 0),
+                ...$this->getSortByParameter(),
                 OnOfficeService::FILTER => $this->getFilters(),
                 ...$this->customParameters,
             ],

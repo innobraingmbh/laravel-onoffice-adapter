@@ -22,7 +22,7 @@ class UserBuilder extends Builder
             parameters: [
                 OnOfficeService::DATA => $this->columns,
                 OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::SORTBY => $this->getOrderBy(),
+                ...$this->getSortByParameter(),
                 ...$this->customParameters,
             ],
         );

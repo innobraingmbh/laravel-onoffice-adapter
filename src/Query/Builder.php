@@ -637,6 +637,23 @@ class Builder implements BuilderInterface
         })->all();
     }
 
+    /**
+     * The sort parameter for a read or search request.
+     *
+     * onOffice expects `sortby` as a `{column: direction}` map, which also
+     * preserves multi-column ordering. Centralising the encoding here keeps
+     * every builder consistent instead of each one hand-rolling
+     * `sortby`/`sortorder` from the raw order-by state.
+     *
+     * @return array<string, array<string, string>>
+     */
+    protected function getSortByParameter(): array
+    {
+        return [
+            OnOfficeService::SORTBY => $this->getOrderBy(),
+        ];
+    }
+
     public function parameter(string $key, mixed $value): static
     {
         $this->customParameters[$key] = $value;
