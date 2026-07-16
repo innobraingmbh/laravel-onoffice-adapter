@@ -13,6 +13,7 @@ use Workbench\App\Console\Commands\ProbeDocsVerify2Command;
 use Workbench\App\Console\Commands\ProbeDocsVerify3Command;
 use Workbench\App\Console\Commands\ProbeDocsVerifyCommand;
 use Workbench\App\Console\Commands\ProbeFindCommand;
+use Workbench\App\Console\Commands\ProbeOrderByCommand;
 use Workbench\App\Console\Commands\ProbeRegionsCommand;
 
 class WorkbenchServiceProvider extends ServiceProvider
@@ -40,6 +41,7 @@ class WorkbenchServiceProvider extends ServiceProvider
                 ProbeDocsVerify2Command::class,
                 ProbeDocsVerify3Command::class,
                 ProbeFindCommand::class,
+                ProbeOrderByCommand::class,
                 ProbeRegionsCommand::class,
             ]);
         }

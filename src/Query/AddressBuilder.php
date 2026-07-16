@@ -32,7 +32,7 @@ class AddressBuilder extends Builder
                 OnOfficeService::RECORDIDS => $this->recordIds,
                 OnOfficeService::DATA => $this->columns,
                 OnOfficeService::FILTER => $this->getFilters(),
-                ...$this->getSortByParameter(),
+                ...$this->getSplitSortParameters(),
                 ...$this->customParameters,
             ],
         );
@@ -91,7 +91,7 @@ class AddressBuilder extends Builder
             OnOfficeResourceId::Address,
             parameters: [
                 OnOfficeService::INPUT => $this->input,
-                ...$this->getSortByParameter(),
+                ...$this->getSplitSortParameters(),
                 OnOfficeService::FILTER => $this->getFilters(),
                 ...$this->customParameters,
             ],

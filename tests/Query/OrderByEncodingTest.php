@@ -9,10 +9,13 @@ use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\UserRepository;
 
 /**
- * Every builder must encode orderBy() the same way: onOffice expects `sortby`
- * as a `{column: direction}` map. Previously Address/Activity reads dropped the
- * direction (sortorder was always null) and the search() methods emitted an
- * integer sortby, so the caller's sort direction was silently lost.
+ * onOffice's sort encoding differs per endpoint (verified against the live
+ * API): estate, user and activity reads take `sortby` as a `{column: direction}`
+ * map, while the address read silently ignores that map and the search
+ * endpoints reject it outright — those need `sortby` as a column name with the
+ * direction in a separate `sortorder`. Previously Address/Activity reads
+ * dropped the direction and the search() methods emitted an integer sortby,
+ * so the caller's sort direction was silently lost.
  */
 describe('orderBy sortby encoding', function () {
     it('sends the direction as a sortby map for estate reads', function () {
@@ -28,28 +31,15 @@ describe('orderBy sortby encoding', function () {
         });
     });
 
-    it('sends the direction as a sortby map for address reads', function () {
-        AddressRepository::fake(AddressRepository::response([
-            AddressRepository::page(),
-        ]));
-
-        AddressRepository::query()->orderByDesc('kaufpreis')->get();
-
-        AddressRepository::assertSent(function (OnOfficeRequest $request) {
-            return $request->parameters['sortby'] === ['kaufpreis' => 'DESC']
-                && ! array_key_exists('sortorder', $request->parameters);
-        });
-    });
-
     it('sends the direction as a sortby map for activity reads', function () {
         ActivityRepository::fake(ActivityRepository::response([
             ActivityRepository::page(),
         ]));
 
-        ActivityRepository::query()->orderByDesc('date')->get();
+        ActivityRepository::query()->orderByDesc('Datum')->get();
 
         ActivityRepository::assertSent(function (OnOfficeRequest $request) {
-            return $request->parameters['sortby'] === ['date' => 'DESC']
+            return $request->parameters['sortby'] === ['Datum' => 'DESC']
                 && ! array_key_exists('sortorder', $request->parameters);
         });
     });
@@ -67,7 +57,20 @@ describe('orderBy sortby encoding', function () {
         });
     });
 
-    it('sends the direction as a sortby map for estate search', function () {
+    it('sends the column and direction separately for address reads', function () {
+        AddressRepository::fake(AddressRepository::response([
+            AddressRepository::page(),
+        ]));
+
+        AddressRepository::query()->orderByDesc('KdNr')->get();
+
+        AddressRepository::assertSent(function (OnOfficeRequest $request) {
+            return $request->parameters['sortby'] === 'KdNr'
+                && $request->parameters['sortorder'] === 'DESC';
+        });
+    });
+
+    it('sends the column and direction separately for estate search', function () {
         EstateRepository::fake(EstateRepository::response([
             EstateRepository::page(),
         ]));
@@ -75,21 +78,34 @@ describe('orderBy sortby encoding', function () {
         EstateRepository::query()->setInput('foo')->orderByDesc('kaufpreis')->search();
 
         EstateRepository::assertSent(function (OnOfficeRequest $request) {
-            return $request->parameters['sortby'] === ['kaufpreis' => 'DESC']
-                && ! array_key_exists('sortorder', $request->parameters);
+            return $request->parameters['sortby'] === 'kaufpreis'
+                && $request->parameters['sortorder'] === 'DESC';
         });
     });
 
-    it('sends the direction as a sortby map for address search', function () {
+    it('sends the column and direction separately for address search', function () {
         AddressRepository::fake(AddressRepository::response([
             AddressRepository::page(),
         ]));
 
-        AddressRepository::query()->setInput('foo')->orderByDesc('kaufpreis')->search();
+        AddressRepository::query()->setInput('foo')->orderByDesc('KdNr')->search();
 
         AddressRepository::assertSent(function (OnOfficeRequest $request) {
-            return $request->parameters['sortby'] === ['kaufpreis' => 'DESC']
-                && ! array_key_exists('sortorder', $request->parameters);
+            return $request->parameters['sortby'] === 'KdNr'
+                && $request->parameters['sortorder'] === 'DESC';
+        });
+    });
+
+    it('sends null sort parameters for an unordered address read', function () {
+        AddressRepository::fake(AddressRepository::response([
+            AddressRepository::page(),
+        ]));
+
+        AddressRepository::query()->get();
+
+        AddressRepository::assertSent(function (OnOfficeRequest $request) {
+            return $request->parameters['sortby'] === null
+                && $request->parameters['sortorder'] === null;
         });
     });
 

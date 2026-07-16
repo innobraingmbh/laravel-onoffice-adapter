@@ -94,7 +94,7 @@ class EstateBuilder extends Builder
             OnOfficeResourceId::Estate,
             parameters: [
                 OnOfficeService::INPUT => $this->input,
-                ...$this->getSortByParameter(),
+                ...$this->getSplitSortParameters(),
                 OnOfficeService::FILTER => $this->getFilters(),
                 ...$this->customParameters,
             ],
