@@ -54,7 +54,7 @@ describe('toRequest', function () {
             ->type(OnOfficeResourceId::Address)
             ->toRequest();
 
-        expect($request->parameters)->toBe([OnOfficeService::RECORDID => 7, 'type' => 'address']);
+        expect($request->parameters)->toBe([OnOfficeService::RECORDID => 7, OnOfficeService::TYPE => 'address']);
     });
 
     test('link builders can be batched', function () {
