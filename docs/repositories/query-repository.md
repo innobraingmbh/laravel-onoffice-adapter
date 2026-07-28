@@ -51,7 +51,7 @@ Query::batch()
     ->once();
 ```
 
-Builders are converted to their read request via `toRequest()`, which is available on the Estate, Address, Appointment, Task, Activity, User, Last Seen, Relation, and Link builders.
+Builders are converted to their read request via `toRequest()`, which is available on the Estate, Estate Language, Address, Appointment, Task, Activity, User, Last Seen, Relation, and Link builders.
 
 A builder's `withCredentials()` apply to the whole batch, since all actions are sent in one API call. Adding builders with different credentials to the same batch throws an `OnOfficeException` — send them as separate batches instead.
 
