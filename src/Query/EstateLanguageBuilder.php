@@ -52,8 +52,7 @@ class EstateLanguageBuilder extends Builder
      */
     public function first(): ?array
     {
-        return $this->requestApi($this->toRequest())
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->requestFirstRecord($this->toRequest());
     }
 
     /**
