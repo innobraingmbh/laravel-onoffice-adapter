@@ -6,6 +6,7 @@ namespace Innobrain\OnOfficeAdapter\Repositories;
 
 use Innobrain\OnOfficeAdapter\Query\EstateBuilder;
 use Innobrain\OnOfficeAdapter\Query\EstateFileBuilder;
+use Innobrain\OnOfficeAdapter\Query\EstateLanguageBuilder;
 use Innobrain\OnOfficeAdapter\Query\EstatePictureBuilder;
 
 class EstateRepository extends BaseRepository
@@ -33,5 +34,14 @@ class EstateRepository extends BaseRepository
     {
         /** @var EstatePictureBuilder */
         return $this->createBuilderFromClass(EstatePictureBuilder::class, $estateId);
+    }
+
+    /**
+     * Returns a new estate language builder instance.
+     */
+    public function languages(int $estateId): EstateLanguageBuilder
+    {
+        /** @var EstateLanguageBuilder */
+        return $this->createBuilderFromClass(EstateLanguageBuilder::class, $estateId);
     }
 }
