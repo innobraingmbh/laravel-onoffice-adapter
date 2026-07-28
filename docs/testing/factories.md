@@ -306,6 +306,22 @@ EstateRepository::fake(EstateRepository::response([
 $pictures = EstateRepository::pictures(3729)->get();
 ```
 
+### Estate Languages
+
+```php
+use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
+use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateLanguageFactory;
+
+EstateRepository::fake(EstateRepository::response([
+    EstateRepository::page(recordFactories: [
+        EstateLanguageFactory::make()->id(100)->language('DEU')->isMain(true)->mainLangId(100),
+        EstateLanguageFactory::make()->id(101)->language('ENG')->isMain(false)->mainLangId(100),
+    ]),
+]));
+
+$languages = EstateRepository::languages(100)->get();
+```
+
 ### Files
 
 Fake the response to an upload. `save()` returns the `tmpUploadId` from the faked response:
@@ -520,6 +536,7 @@ it('fetches active estates for sale', function () {
 | `SearchCriteriaFactory` | - | Buyer search profiles |
 | `RelationFactory` | `idsfromrelation` | Links between records |
 | `EstatePictureFactory` | `estatepictures` | Estate images (includes defaults) |
+| `EstateLanguageFactory` | `estateLanguage` | Estate language variants (includes defaults) |
 | `FileFactory` | `file` | File uploads (has `ok()`/`error()`) |
 | `FileUploadFactory` | - | Upload responses |
 | `FilterFactory` | `filter` | Saved filters |

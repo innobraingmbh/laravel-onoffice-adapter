@@ -1,6 +1,7 @@
 # Changelog
 
 ## main
+- feat: add `EstateRepository::languages()` to read an estate's language variants (`EstateRepository::languages(31)->get()`)
 - TODO: Remove old activity repository code in next major release
 
 ## v1.20.0

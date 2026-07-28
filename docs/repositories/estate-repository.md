@@ -126,6 +126,37 @@ Categories: `Titelbild`, `Foto`, `Foto_gross`, `Grundriss`, `Lageplan`, `Epass_S
 
 These are the built-in categories. Customers can define their own, and the API offers no way to enumerate them — custom category names have to be known up front.
 
+## Estate Languages
+
+Read the language variants of a multilingual estate (multi-language module). The resource type is `estateLanguage`.
+
+```php
+$languages = EstateRepository::languages(100)->get();
+$language = EstateRepository::languages(100)->first();
+```
+
+Each variant is its own estate record: `id` is the variant's estate id, `language` is a 3-letter ISO code, and `mainLangId` points to the main variant's id.
+
+```php
+[
+    ['id' => 100, 'type' => 'estateLanguage', 'elements' => ['language' => 'DEU', 'isMain' => true, 'mainLangId' => 100]],
+    ['id' => 101, 'type' => 'estateLanguage', 'elements' => ['language' => 'ENG', 'isMain' => false, 'mainLangId' => 100]],
+]
+```
+
+An estate has a handful of variants at most, so `get()` reads them in a single request — there is no pagination and no `each()`. To read the variants of many estates in one API call, defer the builders into [`Query::batch()`](./query-repository.md):
+
+```php
+use Innobrain\OnOfficeAdapter\Facades\Query;
+
+$results = Query::batch([
+    EstateRepository::languages(100),
+    EstateRepository::languages(200),
+])->once();
+```
+
+To read the translated field contents of a specific variant, query the estate with the `estatelanguage` parameter (see [Custom Parameters](#custom-parameters) below).
+
 ## Custom Parameters
 
 ```php

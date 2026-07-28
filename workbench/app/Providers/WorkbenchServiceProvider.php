@@ -12,6 +12,7 @@ use Workbench\App\Console\Commands\ProbeBatchCommand;
 use Workbench\App\Console\Commands\ProbeDocsVerify2Command;
 use Workbench\App\Console\Commands\ProbeDocsVerify3Command;
 use Workbench\App\Console\Commands\ProbeDocsVerifyCommand;
+use Workbench\App\Console\Commands\ProbeEstateLanguagesCommand;
 use Workbench\App\Console\Commands\ProbeFindCommand;
 use Workbench\App\Console\Commands\ProbeRegionsCommand;
 
@@ -39,6 +40,7 @@ class WorkbenchServiceProvider extends ServiceProvider
                 ProbeDocsVerifyCommand::class,
                 ProbeDocsVerify2Command::class,
                 ProbeDocsVerify3Command::class,
+                ProbeEstateLanguagesCommand::class,
                 ProbeFindCommand::class,
                 ProbeRegionsCommand::class,
             ]);
