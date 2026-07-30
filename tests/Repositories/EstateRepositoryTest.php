@@ -153,4 +153,23 @@ describe('search', function () {
             && $request->resourceType === OnOfficeResourceType::Search
             && $request->parameters['input'] === 'testInput');
     });
+
+    it('should send the first order by as sortby and sortorder', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
+                ReadEstateResponse::make(),
+            ]),
+        ]);
+
+        EstateRepository::record();
+
+        EstateRepository::query()
+            ->setInput('testInput')
+            ->orderByDesc('kaufpreis')
+            ->search();
+
+        EstateRepository::assertSent(fn (OnOfficeRequest $request) => $request->parameters['sortby'] === 'kaufpreis'
+            && $request->parameters['sortorder'] === 'DESC');
+    });
 });

@@ -83,3 +83,19 @@ describe('real responses', function () {
         ActivityRepository::assertSentCount(1);
     });
 });
+
+describe('order by', function () {
+    test('get sends the first order by as sortby and sortorder', function () {
+        ActivityRepository::fake(ActivityRepository::response([
+            ActivityRepository::page(),
+        ]));
+
+        ActivityRepository::query()
+            ->orderByDesc('Datum')
+            ->orderBy('Art')
+            ->get();
+
+        ActivityRepository::assertSent(fn (OnOfficeRequest $request) => $request->parameters['sortby'] === 'Datum'
+            && $request->parameters['sortorder'] === 'DESC');
+    });
+});

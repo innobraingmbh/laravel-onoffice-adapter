@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadAddressResponse;
@@ -60,5 +61,34 @@ describe('real responses', function () {
         expect($response)->toBe(1500);
 
         AddressRepository::assertSentCount(1);
+    });
+});
+
+describe('order by', function () {
+    test('get sends the first order by as sortby and sortorder', function () {
+        AddressRepository::fake(AddressRepository::response([
+            AddressRepository::page(),
+        ]));
+
+        AddressRepository::query()
+            ->orderByDesc('KdNr')
+            ->get();
+
+        AddressRepository::assertSent(fn (OnOfficeRequest $request) => $request->parameters['sortby'] === 'KdNr'
+            && $request->parameters['sortorder'] === 'DESC');
+    });
+
+    test('search sends the first order by as sortby and sortorder', function () {
+        AddressRepository::fake(AddressRepository::response([
+            AddressRepository::page(),
+        ]));
+
+        AddressRepository::query()
+            ->setInput('test')
+            ->orderBy('KdNr')
+            ->search();
+
+        AddressRepository::assertSent(fn (OnOfficeRequest $request) => $request->parameters['sortby'] === 'KdNr'
+            && $request->parameters['sortorder'] === 'ASC');
     });
 });
