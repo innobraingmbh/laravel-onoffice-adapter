@@ -94,8 +94,8 @@ class EstateBuilder extends Builder
             OnOfficeResourceId::Estate,
             parameters: [
                 OnOfficeService::INPUT => $this->input,
-                OnOfficeService::SORTBY => data_get(array_keys($this->orderBy), 0),
-                OnOfficeService::SORTORDER => data_get($this->orderBy, 0),
+                OnOfficeService::SORTBY => $this->getSortBy(),
+                OnOfficeService::SORTORDER => $this->getSortOrder(),
                 OnOfficeService::FILTER => $this->getFilters(),
                 ...$this->customParameters,
             ],

@@ -637,6 +637,23 @@ class Builder implements BuilderInterface
         })->all();
     }
 
+    /**
+     * The column of the first orderBy entry, for endpoints that expect
+     * a string sortby with a separate sortorder parameter.
+     */
+    protected function getSortBy(): ?string
+    {
+        return data_get($this->orderBy, '0.0');
+    }
+
+    /**
+     * The direction of the first orderBy entry.
+     */
+    protected function getSortOrder(): ?string
+    {
+        return data_get($this->orderBy, '0.1');
+    }
+
     public function parameter(string $key, mixed $value): static
     {
         $this->customParameters[$key] = $value;
