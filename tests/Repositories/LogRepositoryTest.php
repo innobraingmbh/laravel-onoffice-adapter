@@ -26,6 +26,90 @@ describe('fake responses', function () {
 
         LogRepository::assertSentCount(1);
     });
+
+    test('first', function () {
+        LogRepository::fake(LogRepository::response([
+            LogRepository::page(recordFactories: [
+                LogFactory::make()->id(7),
+                LogFactory::make()->id(8),
+            ]),
+        ]));
+
+        $record = LogRepository::query()->first();
+
+        expect($record['id'])->toBe(7);
+
+        LogRepository::assertSentCount(1);
+    });
+
+    test('each', function () {
+        LogRepository::fake(LogRepository::response([
+            LogRepository::page(recordFactories: [
+                LogFactory::make()->id(1),
+                LogFactory::make()->id(2),
+            ]),
+        ]));
+
+        $ids = [];
+        LogRepository::query()->each(function (array $records) use (&$ids) {
+            foreach ($records as $record) {
+                $ids[] = $record['id'];
+            }
+        });
+
+        expect($ids)->toBe([1, 2]);
+
+        LogRepository::assertSentCount(1);
+    });
+
+    test('find', function () {
+        LogRepository::fake(LogRepository::response([
+            LogRepository::page(recordFactories: [
+                LogFactory::make()->id(13),
+            ]),
+        ]));
+
+        $record = LogRepository::query()->find(13);
+
+        expect($record['id'])->toBe(13);
+
+        LogRepository::assertSentCount(1);
+    });
+
+    test('read request carries module, action, user and filters', function () {
+        LogRepository::fake(LogRepository::response([
+            LogRepository::page(recordFactories: [
+                LogFactory::make()->id(1),
+            ]),
+        ]));
+
+        LogRepository::query()
+            ->withModule('estate')
+            ->withAction('edit')
+            ->withUserId(42)
+            ->where('actionId', 'create')
+            ->get();
+
+        LogRepository::assertSentCount(1);
+        LogRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->actionId === OnOfficeAction::Read
+            && $request->resourceType === OnOfficeResourceType::Log
+            && $request->parameters['module'] === 'estate'
+            && $request->parameters['action'] === 'edit'
+            && $request->parameters['user'] === 42
+            && array_key_exists('actionId', $request->parameters['filter']));
+    });
+
+    test('read request omits user when no user id is set', function () {
+        LogRepository::fake(LogRepository::response([
+            LogRepository::page(recordFactories: [
+                LogFactory::make()->id(1),
+            ]),
+        ]));
+
+        LogRepository::query()->get();
+
+        LogRepository::assertSent(fn (OnOfficeRequest $request): bool => ! array_key_exists('user', $request->parameters));
+    });
 });
 
 describe('real responses', function () {
