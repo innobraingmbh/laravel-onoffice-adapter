@@ -16,6 +16,10 @@ use Throwable;
 
 class FilterBuilder extends Builder
 {
+    public const MODULE_ESTATE = 'estate';
+
+    public const MODULE_ADDRESS = 'address';
+
     public string $module;
 
     /**
@@ -24,17 +28,7 @@ class FilterBuilder extends Builder
      */
     public function get(): Collection
     {
-        throw_unless(isset($this->module), OnOfficeQueryException::class, 'Filter Builder module is not set');
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Filters,
-            parameters: [
-                OnOfficeService::MODULE => $this->module,
-            ]
-        );
-
-        return $this->requestAll($request);
+        return $this->requestAll($this->buildRequest());
     }
 
     /**
@@ -43,19 +37,8 @@ class FilterBuilder extends Builder
      */
     public function first(): ?array
     {
-        throw_unless(isset($this->module), OnOfficeQueryException::class, 'Filter Builder module is not set');
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Filters,
-            parameters: [
-                'module' => $this->module,
-            ]
-        );
-
-        return $this->requestApi($request)
+        return $this->requestApi($this->buildRequest())
             ->json(OnOfficeResponsePath::FIRST_RECORD);
-
     }
 
     /**
@@ -64,30 +47,36 @@ class FilterBuilder extends Builder
      */
     public function each(callable $callback): void
     {
-        throw_unless(isset($this->module), OnOfficeQueryException::class, 'Filter Builder module is not set');
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Filters,
-            parameters: [
-                OnOfficeService::MODULE => $this->module,
-            ],
-        );
-
-        $this->requestAllChunked($request, $callback);
+        $this->requestAllChunked($this->buildRequest(), $callback);
     }
 
     public function estate(): static
     {
-        $this->module = 'estate';
+        $this->module = self::MODULE_ESTATE;
 
         return $this;
     }
 
     public function address(): static
     {
-        $this->module = 'address';
+        $this->module = self::MODULE_ADDRESS;
 
         return $this;
+    }
+
+    /**
+     * @throws Throwable<OnOfficeQueryException>
+     */
+    private function buildRequest(): OnOfficeRequest
+    {
+        throw_unless(isset($this->module), OnOfficeQueryException::class, 'Filter Builder module is not set');
+
+        return new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Filters,
+            parameters: [
+                OnOfficeService::MODULE => $this->module,
+            ],
+        );
     }
 }
