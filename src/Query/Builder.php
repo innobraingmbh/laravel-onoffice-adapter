@@ -18,8 +18,8 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
-use Innobrain\OnOfficeAdapter\Facades\BaseRepository as BaseRepositoryFacade;
 use Innobrain\OnOfficeAdapter\Query\Concerns\BuilderInterface;
+use Innobrain\OnOfficeAdapter\Query\Concerns\ChecksUserRecordsRight;
 use Innobrain\OnOfficeAdapter\Repositories\BaseRepository;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
@@ -29,6 +29,7 @@ use Throwable;
 
 class Builder implements BuilderInterface
 {
+    use ChecksUserRecordsRight;
     use Conditionable;
 
     /**
@@ -304,83 +305,6 @@ class Builder implements BuilderInterface
                 }
             });
         });
-    }
-
-    /**
-     * Will check for each record in the response if the user has the right to access it.
-     * Will remove every record that the user does not have access to from the response.
-     * Checks for each record in the response if the user has the right to access it.
-     * Removes every record that the user does not have access to from the response,
-     * but does not change anything else in the response (e.g. count_absolute).
-     *
-     * @param  string  $action  The action to check rights for (e.g. 'get', 'edit').
-     * @param  string  $module  The module name to check rights in (e.g. 'estate', 'address').
-     * @param  int  $userId  The ID of the user whose rights are being checked.
-     * @param  string  $resultPath  The dot-notated path to the records in the response body.
-     *                              Defaults to OnOfficeResponsePath::RECORDS.
-     * @return self Returns the current Builder instance for method chaining.
-     */
-    public function checkUserRecordsRight(string $action, string $module, int $userId, string $resultPath = OnOfficeResponsePath::RECORDS): self
-    {
-        return $this->after([
-            function (Response $response, string $action, string $module, int $userId) use ($resultPath): ?Response {
-                if ($response->failed()) {
-                    return null;
-                }
-
-                $ids = $response->json(OnOfficeResponsePath::RECORD_IDS, []);
-
-                if ($ids === []) {
-                    $responseBody = $response->json();
-                    data_set($responseBody, $resultPath, []);
-                    $psrResponse = $response->toPsrResponse();
-
-                    return new Response(new Psr7Response(
-                        $psrResponse->getStatusCode(),
-                        $psrResponse->getHeaders(),
-                        json_encode($responseBody, JSON_THROW_ON_ERROR),
-                        $psrResponse->getProtocolVersion(),
-                        $psrResponse->getReasonPhrase(),
-                    ));
-                }
-
-                $userRightsResponse = BaseRepositoryFacade::query()
-                    ->when($this->credentials, fn (Builder $query, OnOfficeApiCredentials $credentials) => $query->withCredentials($credentials))
-                    ->requestApi(new OnOfficeRequest(
-                        actionId: OnOfficeAction::Get,
-                        resourceType: OnOfficeResourceType::CheckUserRecordsRight,
-                        parameters: [
-                            'action' => $action,
-                            'module' => $module,
-                            'userid' => $userId,
-                            'recordIds' => $ids,
-                        ],
-                    ));
-
-                $allowedIds = $userRightsResponse->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS, []);
-                $allowedIds = array_map(static fn (string $element): int => (int) $element, $allowedIds);
-
-                /** @var array<int, array{id: string|int}> $records */
-                $records = $response->json($resultPath, []);
-
-                $records = array_filter($records, static fn (array $record): bool => in_array((int) $record['id'], $allowedIds, true));
-
-                $responseBody = $response->json();
-                data_set($responseBody, $resultPath, array_values($records));
-                $psrResponse = $response->toPsrResponse();
-
-                return new Response(new Psr7Response(
-                    $psrResponse->getStatusCode(),
-                    $psrResponse->getHeaders(),
-                    json_encode($responseBody, JSON_THROW_ON_ERROR),
-                    $psrResponse->getProtocolVersion(),
-                    $psrResponse->getReasonPhrase(),
-                ));
-            },
-            $action,
-            $module,
-            $userId,
-        ]);
     }
 
     /**
