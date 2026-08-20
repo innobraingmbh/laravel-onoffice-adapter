@@ -26,26 +26,7 @@ class LogBuilder extends Builder
      */
     public function get(): Collection
     {
-        $parameters = [
-            OnOfficeService::MODULE => $this->module,
-            OnOfficeService::ACTION => $this->action,
-            OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => $this->limit,
-            OnOfficeService::LISTOFFSET => $this->offset,
-            ...$this->customParameters,
-        ];
-
-        if ($this->userId > 0) {
-            $parameters['user'] = $this->userId;
-        }
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Log,
-            parameters: $parameters,
-        );
-
-        return $this->requestAll($request);
+        return $this->requestAll($this->buildReadRequest());
     }
 
     /**
@@ -54,26 +35,7 @@ class LogBuilder extends Builder
      */
     public function first(): ?array
     {
-        $parameters = [
-            OnOfficeService::MODULE => $this->module,
-            OnOfficeService::ACTION => $this->action,
-            OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => $this->limit,
-            OnOfficeService::LISTOFFSET => $this->offset,
-            ...$this->customParameters,
-        ];
-
-        if ($this->userId > 0) {
-            $parameters['user'] = $this->userId;
-        }
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Log,
-            parameters: $parameters,
-        );
-
-        return $this->requestApi($request)
+        return $this->requestApi($this->buildReadRequest())
             ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
@@ -98,26 +60,7 @@ class LogBuilder extends Builder
      */
     public function each(callable $callback): void
     {
-        $parameters = [
-            OnOfficeService::MODULE => $this->module,
-            OnOfficeService::ACTION => $this->action,
-            OnOfficeService::FILTER => $this->getFilters(),
-            OnOfficeService::LISTLIMIT => $this->limit,
-            OnOfficeService::LISTOFFSET => $this->offset,
-            ...$this->customParameters,
-        ];
-
-        if ($this->userId > 0) {
-            $parameters['user'] = $this->userId;
-        }
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Log,
-            parameters: $parameters,
-        );
-
-        $this->requestAllChunked($request, $callback);
+        $this->requestAllChunked($this->buildReadRequest(), $callback);
     }
 
     /**
@@ -127,6 +70,15 @@ class LogBuilder extends Builder
      * @throws Throwable<OnOfficeException>
      */
     public function count(): int
+    {
+        return $this->requestApi($this->buildReadRequest())
+            ->json(OnOfficeResponsePath::META_COUNT_ABSOLUTE, 0);
+    }
+
+    /**
+     * Build the list read request shared by get(), first(), each() and count().
+     */
+    protected function buildReadRequest(): OnOfficeRequest
     {
         $parameters = [
             OnOfficeService::MODULE => $this->module,
@@ -138,17 +90,14 @@ class LogBuilder extends Builder
         ];
 
         if ($this->userId > 0) {
-            $parameters['user'] = $this->userId;
+            $parameters[OnOfficeService::USER] = $this->userId;
         }
 
-        $request = new OnOfficeRequest(
+        return new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Log,
-            parameters: $parameters
+            parameters: $parameters,
         );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::META_COUNT_ABSOLUTE, 0);
     }
 
     public function withModule(string $module): static
