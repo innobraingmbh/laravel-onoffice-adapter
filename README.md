@@ -99,7 +99,7 @@ EstateRepository::query()
     });
 ```
 
-If any page fails, `get()` and `each()` throw an `OnOfficeException` rather than returning a partial result. Chunks already handed to the `each()` callback are not rolled back.
+A failed page throws `OnOfficeException`. No partial results. Chunks already passed to the callback are not rolled back.
 
 ### Available Repositories
 

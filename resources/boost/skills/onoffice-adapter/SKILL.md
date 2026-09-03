@@ -42,7 +42,7 @@ EstateRepository::query()->each(function (array $estates) {
 });
 ```
 
-A failing page throws `OnOfficeException` from `get()` and `each()`; results are never partial. Pages already handed to the `each()` callback are not rolled back.
+A failed page throws `OnOfficeException`. No partial results. Chunks already passed to the `each()` callback are not rolled back.
 
 ## Writing data
 
