@@ -31,5 +31,5 @@ UserRepository::query()->each(function (array $users) {
 ```
 
 ::: tip
-`SettingRepository::users()` returns the same builder — both entry points are equivalent.
+`SettingRepository::users()` returns the same builder.
 :::

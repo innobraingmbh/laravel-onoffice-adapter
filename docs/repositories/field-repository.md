@@ -32,7 +32,7 @@ $fields = FieldRepository::query()
     ->get();
 ```
 
-All of these are opt-in and default to off — a default response gives no hint that richer output exists. Without `realDataTypes`, real field types are flattened to `text` (e.g. a `user` field reports as `text`).
+All options default to off. Without `realDataTypes`, field types are flattened to `text`; a `user` field reports as `text`.
 
 ## Response Fields
 
@@ -52,5 +52,5 @@ The metadata is not always complete: mandatory select fields can report empty `p
 :::
 
 ::: tip
-Cache field responses - they can take several seconds.
+Cache field responses. They can take several seconds.
 :::

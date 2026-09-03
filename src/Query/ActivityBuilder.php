@@ -10,7 +10,6 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
-use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
@@ -18,9 +17,6 @@ use Throwable;
 class ActivityBuilder extends Builder
 {
     use Paginate;
-    use RecordIds;
-
-    public string $estateOrAddress = 'estate';
 
     public ?int $estateId = null;
 
@@ -71,46 +67,6 @@ class ActivityBuilder extends Builder
             ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
-    /**
-     * @deprecated Use estateId() instead
-     */
-    public function estate(): static
-    {
-        $this->estateOrAddress = OnOfficeService::ESTATEID;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated Use addressIds() instead
-     */
-    public function address(): static
-    {
-        $this->estateOrAddress = OnOfficeService::ADDRESSID;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated Use estateId() instead
-     */
-    public function recordIdsAsEstate(): static
-    {
-        $this->estate();
-
-        return $this;
-    }
-
-    /**
-     * @deprecated Use addressIds() instead
-     */
-    public function recordIdsAsAddress(): static
-    {
-        $this->address();
-
-        return $this;
-    }
-
     public function estateId(int $estateId): static
     {
         $this->estateId = $estateId;
@@ -129,19 +85,11 @@ class ActivityBuilder extends Builder
     }
 
     /**
-     * Function is used to deprecate the usage of recordIdsAsEstate() and recordIdsAsAddress()
-     * without breaking changes.
-     *
      * @return array<string, mixed>
      */
     private function prepareEstateOrAddressParameters(bool $create = false): array
     {
-        $parameters = [$this->estateOrAddress => $this->recordIds];
-
-        // If the estateOrAddress is set to estate, we know the user has not used the old methods.
-        if ($this->estateOrAddress === 'estate') {
-            $parameters = [];
-        }
+        $parameters = [];
 
         if (! is_null($this->estateId)) {
             $parameters[OnOfficeService::ESTATEID] = $this->estateId;

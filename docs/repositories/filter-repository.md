@@ -17,7 +17,7 @@ FilterRepository::query()->estate()->each(function (array $filters) {
 ```
 
 ::: warning
-Must specify module (`estate()` or `address()`) before `get()`, `first()`, or `each()`.
+Call `estate()` or `address()` before `get()`, `first()`, or `each()`.
 :::
 
 ## Using Filters

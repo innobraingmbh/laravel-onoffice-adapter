@@ -8,6 +8,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Query\EstateBuilder;
 use Innobrain\OnOfficeAdapter\Query\EstateFileBuilder;
+use Innobrain\OnOfficeAdapter\Query\EstateLanguageBuilder;
 use Innobrain\OnOfficeAdapter\Query\EstatePictureBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\EstateRepository as RootRepository;
 
@@ -17,6 +18,7 @@ use Innobrain\OnOfficeAdapter\Repositories\EstateRepository as RootRepository;
  * @method static EstateBuilder query()
  * @method static EstateFileBuilder files(int $estateId)
  * @method static EstatePictureBuilder pictures(int|array<int, int> $estateId)
+ * @method static EstateLanguageBuilder languages(int $estateId)
  */
 class EstateRepository extends BaseRepository
 {
