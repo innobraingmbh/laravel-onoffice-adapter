@@ -8,6 +8,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Facades\LogRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\LogFactory;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadLogResponse;
 
 describe('fake responses', function () {
@@ -64,5 +65,42 @@ describe('real responses', function () {
         LogRepository::assertSent(fn (OnOfficeRequest $request) => $request->actionId === OnOfficeAction::Read
             && $request->resourceType === OnOfficeResourceType::Log
         );
+    });
+});
+
+describe('read request shape', function () {
+    test('get, first, each and count all build the same Read request', function () {
+        LogRepository::fake([
+            LogRepository::response(),
+            LogRepository::response(),
+            LogRepository::response(),
+            LogRepository::response(),
+        ]);
+
+        LogRepository::query()->withModule('estate')->withAction('edit')->get();
+        LogRepository::query()->withModule('estate')->withAction('edit')->first();
+        LogRepository::query()->withModule('estate')->withAction('edit')->each(fn () => null);
+        LogRepository::query()->withModule('estate')->withAction('edit')->count();
+
+        LogRepository::assertSentCount(4);
+        LogRepository::assertSent(fn (OnOfficeRequest $request) => $request->actionId === OnOfficeAction::Read
+            && $request->resourceType === OnOfficeResourceType::Log
+            && $request->parameters[OnOfficeService::MODULE] === 'estate'
+            && $request->parameters[OnOfficeService::ACTION] === 'edit'
+            && ! array_key_exists(OnOfficeService::USER, $request->parameters)
+        );
+    });
+
+    test('withUserId adds the user parameter, and its default omits it', function () {
+        LogRepository::fake([
+            LogRepository::response(),
+            LogRepository::response(),
+        ]);
+
+        LogRepository::query()->withUserId(42)->get();
+        LogRepository::query()->get();
+
+        LogRepository::assertSent(fn (OnOfficeRequest $request) => ($request->parameters[OnOfficeService::USER] ?? null) === 42);
+        LogRepository::assertSent(fn (OnOfficeRequest $request) => ! array_key_exists(OnOfficeService::USER, $request->parameters));
     });
 });

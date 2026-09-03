@@ -70,4 +70,6 @@ trait OnOfficeParameterConst
     public const ACTION = 'action';
 
     public const TYPE = 'type';
+
+    public const USER = 'user';
 }
