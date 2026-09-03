@@ -61,7 +61,7 @@ class LinkBuilder extends Builder
         ];
 
         if ($this->resourceId === OnOfficeResourceId::AgentsLog) {
-            $parameters['type'] = $this->type->value;
+            $parameters[OnOfficeService::TYPE] = $this->type->value;
         }
 
         return new OnOfficeRequest(
