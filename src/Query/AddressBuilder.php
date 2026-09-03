@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Innobrain\OnOfficeAdapter\Query;
 
-use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
@@ -13,6 +12,7 @@ use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Input;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
+use Innobrain\OnOfficeAdapter\Query\Concerns\Searchable;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
@@ -22,6 +22,7 @@ class AddressBuilder extends Builder
     use Input;
     use Paginate;
     use RecordIds;
+    use Searchable;
 
     protected function buildReadRequest(): OnOfficeRequest
     {
@@ -81,27 +82,9 @@ class AddressBuilder extends Builder
             ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
-    /**
-     * @return Collection<int, array<string, mixed>>
-     *
-     * @throws OnOfficeException
-     */
-    public function search(): Collection
+    protected function searchResourceId(): OnOfficeResourceId
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Search,
-            OnOfficeResourceId::Address,
-            parameters: [
-                OnOfficeService::INPUT => $this->input,
-                OnOfficeService::SORTBY => data_get(array_keys($this->orderBy), 0),
-                OnOfficeService::SORTORDER => data_get($this->orderBy, 0),
-                OnOfficeService::FILTER => $this->getFilters(),
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestAll($request);
+        return OnOfficeResourceId::Address;
     }
 
     public function addCountryIsoCodeType(string $countryIsoCodeType): static

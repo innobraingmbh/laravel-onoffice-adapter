@@ -49,7 +49,7 @@ Files already attached to a record are managed through the record's own reposito
 
 ## Upload Links
 
-Links (e.g. `Ogulo-Link`) have no file content, so there is nothing to upload first. Use `linkUrl()`:
+Link types such as `Ogulo-Link` have no file content. Use `linkUrl()`:
 
 ```php
 FileRepository::upload()->linkUrl('https://example.com/tour', [

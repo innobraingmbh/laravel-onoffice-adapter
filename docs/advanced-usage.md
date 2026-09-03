@@ -1,9 +1,7 @@
 # Advanced Usage
 
-When interacting with the **onOffice Adapter for Laravel** in more sophisticated ways, you can leverage middlewares, advanced debugging, concurrency, and custom repository extensions.
-
 ## Middlewares
-Middlewares let you inject custom logic before each request is sent:
+`before()` runs a callback before each request:
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
@@ -25,11 +23,11 @@ BaseRepository::query()
 ```
 
 ::: tip
-Use multiple `before` calls to chain any number of middlewares.
+Multiple `before()` calls run in order.
 :::
 
 ## Custom Endpoints with BaseRepository
-When an endpoint or feature is not covered by the existing repositories, you can directly interact with onOffice using `BaseRepository`:
+`BaseRepository` sends any request:
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
@@ -39,18 +37,17 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 $results = BaseRepository::query()
     ->call(new OnOfficeRequest(
         OnOfficeAction::Read,
-        'customResource' // If not defined in OnOfficeResourceType
+        'customResource' // string resource types are accepted
     ));
 ```
 
-## Advanced Debugging
-In addition to `dd()` (dump and die), the adapter supports:
+## Debugging
 
 ```php
 // Dump the request without stopping execution
 BaseRepository::query()->dump()->call(...);
 
-// Dump the raw request payload, then exit — like dd()
+// Dump the raw request payload, then exit
 BaseRepository::query()->raw()->call(...);
 
 // Record requests and responses
@@ -59,10 +56,10 @@ BaseRepository::query()->call(...);
 $lastPair = BaseRepository::lastRecorded();
 ```
 
-Note that `raw()` and `dd()` call `exit(1)` after dumping — only `dump()` lets the request complete.
+`raw()` and `dd()` call `exit(1)` after dumping. `dump()` lets the request complete.
 
-## Large Dataset Handling
-To handle large datasets without memory issues, use chunked processing with `each()`:
+## Chunked Reads
+`each()` processes one page per callback:
 
 ```php
 EstateRepository::query()
@@ -74,11 +71,11 @@ EstateRepository::query()
 ```
 
 ::: warning
-Each chunk requests the next page automatically.
+Each chunk requests the next page automatically. A failed page throws `OnOfficeException`. Chunks already passed to the callback are not rolled back.
 :::
 
 ## Extending the Adapter
-If you frequently call a particular endpoint, you can extend `BaseRepository` and implement your own custom builder for specialized logic:
+Extend `Builder` and `BaseRepository` for a custom endpoint:
 
 ```php
 use Illuminate\Support\Collection;
@@ -102,4 +99,4 @@ class MySpecialRepository extends BaseRepository
 }
 ```
 
-This leverages the same stubbing, chunking, and debugging features as default repositories.
+Custom repositories get faking, chunking, and debugging from the base classes.

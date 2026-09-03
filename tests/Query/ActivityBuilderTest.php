@@ -8,56 +8,6 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Query\ActivityBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\ActivityRepository;
 
-describe('deprecated estate/address methods', function () {
-    it('sets estate parameter correctly', function () {
-        $builder = new ActivityBuilder;
-
-        $builder->estate();
-        $builder->recordIds([1, 2, 3]);
-
-        $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $parameters = $m->invoke($builder);
-
-        expect($parameters)->toBe(['estateid' => [1, 2, 3]]);
-    });
-
-    it('sets address parameter correctly', function () {
-        $builder = new ActivityBuilder;
-
-        $builder->address();
-        $builder->recordIds([1, 2, 3]);
-
-        $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $parameters = $m->invoke($builder);
-
-        expect($parameters)->toBe(['addressid' => [1, 2, 3]]);
-    });
-
-    it('sets estate parameter via recordIdsAsEstate', function () {
-        $builder = new ActivityBuilder;
-
-        $builder->recordIdsAsEstate();
-        $builder->recordIds([1, 2, 3]);
-
-        $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $parameters = $m->invoke($builder);
-
-        expect($parameters)->toBe(['estateid' => [1, 2, 3]]);
-    });
-
-    it('sets address parameter via recordIdsAsAddress', function () {
-        $builder = new ActivityBuilder;
-
-        $builder->recordIdsAsAddress();
-        $builder->recordIds([1, 2, 3]);
-
-        $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
-        $parameters = $m->invoke($builder);
-
-        expect($parameters)->toBe(['addressid' => [1, 2, 3]]);
-    });
-});
-
 describe('new estate/address methods', function () {
     it('sets estateId parameter correctly', function () {
         $builder = new ActivityBuilder;

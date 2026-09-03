@@ -4,10 +4,10 @@ Manage calendar appointments in onOffice. Uses the `appointmentList` resource fo
 
 ## Listing Appointments
 
-Both `dateRange()` and `select()` are required for listing appointments — the API rejects requests without fields.
+`dateRange()` and `select()` are required. The API rejects requests without fields.
 
 ::: warning
-The API ignores all pagination parameters for appointment listings and caps a window at 500 records — query smaller date ranges when a window can exceed that.
+The API ignores all pagination parameters for appointment listings and caps a window at 500 records. Use smaller date ranges when a window can exceed that.
 :::
 
 ```php
@@ -46,7 +46,7 @@ $appointments = AppointmentRepository::query()
 The `appointmentList` returns structured objects for fields like `type`, `status`, `date`, and `location` instead of flat values.
 :::
 
-Two more read quirks: recurring appointments are returned anchored on the series start date — even when that date lies outside the queried window — so in-window occurrences must be computed from the `recurrence` element. And dates come back as timezone-qualified UTC (`2026-08-03T06:00:00+00:00`) while writes take local wall time (`'start_dt' => '2026-08-03 08:00:00'`).
+Recurring appointments are returned anchored on the series start date, even when that date lies outside the queried window. In-window occurrences must be computed from the `recurrence` element. Dates are read as timezone-qualified UTC (`2026-08-03T06:00:00+00:00`) and written as local wall time (`'start_dt' => '2026-08-03 08:00:00'`).
 
 ## Filtering
 
@@ -63,7 +63,7 @@ $appointments = AppointmentRepository::query()
     ->get();
 ```
 
-`cancelled()`, `done()` and `recurrent()` filter strictly by their boolean — to include both states, don't call the method at all.
+`cancelled()`, `done()` and `recurrent()` filter by their boolean. To include both states, omit the call.
 
 ::: warning
 Appointments cannot be filtered by linked estate or contact: the API silently ignores every such filter key and returns the full window. Resolve linked appointments via the [Relation Repository](./relation-repository.md) (`CalendarEstate` / `CalendarAddress`, with the estate or address ID as `childIds()`), then fetch them by ID.
@@ -87,7 +87,7 @@ Uses the `appointmentList` Get endpoint with a resource id:
 $appointment = AppointmentRepository::query()->find(42);
 ```
 
-A nonexistent ID is not an error — the API answers with zero records, so `find()` returns `null`.
+A nonexistent ID is not an error. The API returns zero records and `find()` returns `null`.
 
 ## Creating Appointments
 
@@ -117,7 +117,7 @@ $appointment = AppointmentRepository::query()->create([
 ]);
 ```
 
-The response contains only the new appointment's ID — no fields are echoed back.
+The response contains only the new appointment's ID.
 
 ### Create Data Fields
 
@@ -168,7 +168,7 @@ AppointmentRepository::query()
 ```
 
 ::: warning
-`relatedAddressIds` on modify is additive — existing links are kept. Replace them by also passing `->parameter('replaceAddressIds', true)`; unlink the estate with the literal `->parameter('relatedEstateId', 0)`.
+`relatedAddressIds` on modify is additive. Existing links are kept. To replace them, also pass `->parameter('replaceAddressIds', true)`. To unlink the estate, pass `->parameter('relatedEstateId', 0)`.
 :::
 
 ## Deleting Appointments
@@ -195,7 +195,7 @@ $files = AppointmentRepository::files(42)->get();
 
 ## Appointment Conflicts
 
-Check for scheduling conflicts before creating an appointment:
+Check for scheduling conflicts:
 
 ```php
 $conflicts = AppointmentRepository::query()->conflicts([
@@ -218,11 +218,11 @@ $conflicts = AppointmentRepository::query()->conflicts([
 
 Returns arrays of `conflictedUsers`, `conflictedResources`, `conflictedAddresses`, and `conflictedEstates`.
 
-`transitTimePre` and `transitTimePost` are mandatory even with `'allowTransitTime' => false` — omitting them fails with error 305, which masks any other problem in the payload.
+`transitTimePre` and `transitTimePost` are mandatory even with `'allowTransitTime' => false`. Omitting them fails with error 305, which masks any other problem in the payload.
 
 ## Calendar Resources
 
-Query available rooms, vehicles, and other bookable resources:
+List bookable resources such as rooms and vehicles:
 
 ```php
 $resources = AppointmentRepository::query()->resources();
@@ -230,7 +230,7 @@ $resources = AppointmentRepository::query()->resources();
 
 ## Send Appointment Confirmation
 
-Trigger confirmation emails to appointment participants:
+Send confirmation emails to participants:
 
 ```php
 $result = AppointmentRepository::query()->sendConfirmation(
@@ -239,7 +239,7 @@ $result = AppointmentRepository::query()->sendConfirmation(
 );
 ```
 
-The call returns success unconditionally — even when the appointment has no linked contact, the contact has no email address, or the appointment does not exist. No delivery status is available.
+The call always returns success, even when the appointment has no linked contact, the contact has no email address, or the appointment does not exist. No delivery status is available.
 
 ## Recurring Appointments
 
@@ -273,7 +273,7 @@ AppointmentRepository::query()->create([
 ```
 
 ::: danger
-When making an existing appointment recurring via `modify`, resend `start_dt` — without it the series is anchored on `0000-00-00` and the appointment disappears from every date-window listing while staying readable by ID.
+When making an existing appointment recurring via `modify`, resend `start_dt`. Without it the series is anchored on `0000-00-00`. The appointment then disappears from every date-window listing but stays readable by ID.
 :::
 
-Open-ended series (`'rp_ende_status' => 2`, no `rp_ende_datum`) are stored and read back correctly but never rendered in the onOffice calendar UI — send a far-future `rp_ende_datum` instead.
+Open-ended series (`'rp_ende_status' => 2`, no `rp_ende_datum`) are stored and read back correctly but never rendered in the onOffice calendar UI. Send a far-future `rp_ende_datum` instead.

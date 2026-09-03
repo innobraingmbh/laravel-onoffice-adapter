@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: "onOffice Adapter for Laravel"
-  text: "Query onOffice like it's an ORM"
-  tagline: "Make your onOffice queries feel like Eloquent."
+  text: "A query builder for the onOffice API"
+  tagline: "Eloquent-style builders for onOffice resources."
   actions:
     - theme: brand
       text: Repository Examples
@@ -14,17 +14,17 @@ hero:
       link: /getting-started
 
 features:
-  - title: Easy ORM-like Querying
-    details: Leverage familiar Laravel Eloquent-style methods for onOffice queries, streamlining your codebase.
-  - title: Comprehensive Repositories
-    details: Access and manipulate multiple onOffice resources, including estates, addresses, activities, and more.
-  - title: Powerful Pagination and Filtering
-    details: Use methods like where, limit, each, and chunking to handle large datasets with ease.
+  - title: Query Builder
+    details: select(), where(), orderBy(), limit() and offset() on onOffice resources.
+  - title: Repositories
+    details: Estates, addresses, activities, appointments, tasks, files, relations and more.
+  - title: Pagination
+    details: get() reads every page. each() processes one page at a time.
   - title: Middlewares
-    details: Insert custom logic before sending requests to adapt your calls or record logs automatically.
-  - title: Rich Debugging Tools
-    details: Use dd(), dump(), raw(), or record request/response pairs for thorough debugging.
-  - title: File Management
-    details: Seamlessly upload, chunk, and link files with onOffice.
+    details: Run code before and after each request.
+  - title: Debugging
+    details: dd(), dump(), raw(), and request/response recording.
+  - title: Files
+    details: Upload, chunk, and link files to records.
 
 ---

@@ -1,6 +1,6 @@
 # Log Repository
 
-Read API log entries for debugging and auditing.
+Read API log entries.
 
 ## Usage
 
@@ -22,9 +22,9 @@ LogRepository::query()->each(fn ($logs) => /* process */);
 ```
 
 ::: warning
-Log reads require an admin API user — anyone else gets an access violation (error 156).
+Log reads require an admin API user. Other users get an access violation (error 156).
 
-The API requires a `listlimit` between 0 and 500, and `cntabsolute` echoes the number of returned rows instead of reporting a true total. `get()` and `each()` set the limit automatically; `first()` needs an explicit `limit(1)`. `count()` only returns the real total with `limit(0)` — any other limit makes it return that limit. `find($id)` sends no `listlimit` and is rejected by the API — filter with `get()` instead.
+The API requires a `listlimit` between 0 and 500, and `cntabsolute` echoes the number of returned rows instead of reporting a true total. `get()` and `each()` set the limit automatically; `first()` needs an explicit `limit(1)`. `count()` only returns the real total with `limit(0)`. Any other limit makes it return that limit. `find($id)` sends no `listlimit` and is rejected by the API. Filter with `get()` instead.
 :::
 
 ## Response
