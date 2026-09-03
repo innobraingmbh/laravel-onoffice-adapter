@@ -7,14 +7,14 @@ description: Query and manage onOffice CRM data (estates, addresses, activities,
 
 ## When to use this skill
 
-Use this skill when working with the `innobrain/laravel-onoffice-adapter` package — whenever code needs to talk to the onOffice (enterprise) real estate CRM API: querying or modifying estates, addresses, activities, relations, files, or writing tests for such code.
+Use this skill when code uses the `innobrain/laravel-onoffice-adapter` package to query or modify onOffice data, or when writing tests for such code.
 
 ## Core concepts
 
 - Every resource has a **Facade repository** in `Innobrain\OnOfficeAdapter\Facades\*` (e.g. `EstateRepository`, `AddressRepository`, `ActivityRepository`, `RelationRepository`, `FileRepository`, `SearchCriteriaRepository`, `FieldRepository`, `AppointmentRepository`, `TaskRepository`, `UserRepository`).
 - `Repository::query()` returns an Eloquent-like builder: `select()`, `where()`, `whereIn()`, `whereLike()`, `whereBetween()`, `orderBy()`, `orderByDesc()`, `limit()`, `offset()`, `when()`.
-- Terminal methods: `get()` (auto-paginates all pages), `first()`, `find($id)`, `count()`, `each(fn)` (chunked processing), `create()`, `modify()`. Special-purpose builders (relations, files, fields) support only a subset — e.g. the relation builder has no `select()`/`where()`/`orderBy()`/`find()`/`count()`.
-- Always `select()` only the fields you need to minimize API payload.
+- Terminal methods: `get()` (auto-paginates all pages), `first()`, `find($id)`, `count()`, `each(fn)` (chunked processing), `create()`, `modify()`. Special-purpose builders (relations, files, fields) support only a subset. The relation builder has no `select()`/`where()`/`orderBy()`/`find()`/`count()`.
+- `select()` only the fields needed.
 - For endpoints without a repository, use `BaseRepository::query()->call(new OnOfficeRequest(...))`.
 
 ## Querying
@@ -34,13 +34,15 @@ $estates = EstateRepository::query()
 $estate = EstateRepository::query()->find(123);
 ```
 
-For large datasets, process in chunks instead of loading everything:
+`each()` processes one page per callback:
 
 ```php
 EstateRepository::query()->each(function (array $estates) {
     // one page per callback invocation
 });
 ```
+
+A failed page throws `OnOfficeException`. No partial results. Chunks already passed to the `each()` callback are not rolled back.
 
 ## Writing data
 
@@ -70,7 +72,7 @@ ActivityRepository::query()
 
 ## Relations
 
-Link records (buyer ↔ estate, owner ↔ estate, etc.) with `RelationRepository` and the `OnOfficeRelationType` enum:
+Link records with `RelationRepository` and the `OnOfficeRelationType` enum:
 
 ```php
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeRelationType;
@@ -113,7 +115,7 @@ $pictures = EstateRepository::pictures(123)
 
 ## Batching multiple actions in one HTTP call
 
-Use the `Query` facade to bundle builders (or raw `OnOfficeRequest` objects) into a single API call. Batched actions are **never paginated** — you get the first page only (max 500 records per action). Only builders implementing `toRequest()` are batchable: estate, address, activity, appointment, task, user, last-seen, relation, and link builders. Others (files, fields, search criteria, ...) throw.
+`Query::batch()` sends builders or raw `OnOfficeRequest` objects in one API call. Batched actions are never paginated: only the first page is returned (max 500 records per action). Only builders implementing `toRequest()` are batchable: estate, address, activity, appointment, task, user, last-seen, relation, and link. Others throw.
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\Query;
@@ -125,7 +127,7 @@ $results = Query::batch([
 
 $estates = data_get($results[0], 'data.records');
 
-// Single-record reads inside a batch: withId() is the lazy form of find()
+// Single-record reads inside a batch
 $results = Query::batch([
     EstateRepository::query()->withId(5),
     AddressRepository::query()->withId(9),
@@ -134,7 +136,7 @@ $results = Query::batch([
 
 ## Testing
 
-Never hit the real API in tests. Fake repositories with response pages built from record factories:
+Fake repositories in tests:
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
@@ -155,7 +157,7 @@ EstateRepository::assertSent(fn ($request) => /* inspect OnOfficeRequest */ true
 
 - Multiple `page()` entries in one `response()` fake pagination; multiple `response()` entries fake sequential calls.
 - `Repository::preventStrayRequests()` makes unstubbed requests throw.
-- Batches are faked through `Query::fake()` only — per-repository fakes are never consumed by a batch. Fake exactly one page per batched action.
+- Batches are faked through `Query::fake()` only. Per-repository fakes are never consumed by a batch. Fake exactly one page per batched action.
 - Factories exist for each record type (`EstateFactory`, `AddressFactory`, `ActivityFactory`, `RelationFactory`, `FileFactory`, ...).
 
 ## Useful extras
@@ -181,7 +183,7 @@ EstateRepository::query()->withCredentials($token, $secret)->get();
 
 ## Field names
 
-onOffice field names are customer-specific and mostly German (`kaufpreis`, `wohnflaeche`, `objektart`). When unsure which fields exist or which values a select field permits, query them via `FieldRepository` instead of guessing:
+Field names are customer-specific and mostly German (`kaufpreis`, `wohnflaeche`, `objektart`). Query `FieldRepository` for available fields and permitted values:
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\FieldRepository;

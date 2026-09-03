@@ -65,7 +65,7 @@ $address = AddressRepository::query()
         'Land' => 'DEU',
     ]);
 
-// With duplicate check — pass the flag in the data array;
+// Duplicate check. The flag goes in the data array;
 // parameters() has no effect on create() for addresses
 $address = AddressRepository::query()
     ->create([
@@ -79,11 +79,11 @@ AddressRepository::query()
 ```
 
 ::: warning
-`checkDuplicate` is a silent upsert: when an email in the payload matches any stored email entry of an existing record — including non-default secondary entries — that record's fields are overwritten with the payload and its ID is returned, indistinguishable from a fresh create.
+`checkDuplicate` is a silent upsert. When an email in the payload matches any stored email entry of an existing record, including secondary entries, that record is overwritten with the payload and its ID is returned. The response is identical to a fresh create.
 :::
 
 ::: warning
-`Status` accepts writes but never applies them. Archive or activate an address via `Status2Adr` with the select key (`status2adr_active` / `status2adr_archive`) — raw integers are rejected. `Status2Adr` cascades into `Status`.
+`Status` accepts writes but never applies them. Archive or activate an address via `Status2Adr` with the select key `status2adr_active` or `status2adr_archive`. Raw integers are rejected. `Status2Adr` cascades into `Status`.
 :::
 
 ### Modifying Contact Details
@@ -101,7 +101,7 @@ AddressRepository::query()
     ->modify(10505);
 ```
 
-Reads only expose the default entry — an entry added without `'default' => true` is invisible to every subsequent read.
+Reads only expose the default entry. An entry added without `'default' => true` never appears in a read.
 
 ### Contact Parameters
 
@@ -137,10 +137,10 @@ AddressRepository::query()->each(fn ($addresses) => /* process */);
 
 | Field | Description |
 |-------|-------------|
-| `Status` | 1 = Active, 0 = Archive — read-only, write `Status2Adr` |
-| `Status2Adr` | `status2adr_active` / `status2adr_archive` — the writable status |
+| `Status` | 1 = Active, 0 = Archive. Read-only; write `Status2Adr` |
+| `Status2Adr` | `status2adr_active` / `status2adr_archive`. The writable status |
 | `Anrede` | Salutation |
 | `Vorname` / `Name` | First/last name |
 | `Strasse` / `Plz` / `Ort` / `Land` | Address |
-| `Benutzer` | Support user — takes the login name, not the numeric user ID |
+| `Benutzer` | Support user. Takes the login name, not the numeric user ID |
 | `newsletter_aktiv` | 0=No, 1=Yes, 2=Cancelled, 3=DOI pending, 4=Unspecified, 5=Undeliverable |

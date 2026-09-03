@@ -1,6 +1,6 @@
 # Repositories
 
-Repositories are the primary entry point for retrieving and modifying data in onOffice. Each repository corresponds to a specific resource (Estates, Addresses, Activities, etc.). This page provides a quick overview of the available repositories.
+Each repository corresponds to one onOffice resource.
 
 ## Available Repositories
 1. [Action](./action-repository.md)
@@ -37,8 +37,3 @@ $count = EstateRepository::query()
     ->count();
 ```
 
-::: tip
-See each repository’s dedicated page for advanced operations such as create, modify, chunking, and special parameters.
-:::
-
-Check out the docs for each repository to see usage examples and best practices.

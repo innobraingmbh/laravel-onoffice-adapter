@@ -1,6 +1,6 @@
 # Getting Started
 
-A fluent query builder for the onOffice API, designed to feel like Eloquent.
+A query builder for the onOffice API with an Eloquent-style interface.
 
 ## Installation
 
@@ -20,13 +20,13 @@ ON_OFFICE_SECRET=your-secret
 ```
 
 ::: tip
-For advanced configuration (retry settings, custom headers), publish the config file:
+To change retry settings or headers, publish the config file:
 ```bash
 php artisan vendor:publish --tag="onoffice-adapter-config"
 ```
 :::
 
-## Your First Query
+## Queries
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
@@ -46,7 +46,7 @@ $count = EstateRepository::query()->count();
 
 `get()` returns a Laravel `Collection` of records, where each record is an array with `id`, `type`, and `elements` keys. `find()` and `first()` return a single record array (or `null`); `count()` returns an `int`.
 
-Element values come back as strings: booleans are `"0"`/`"1"` (empty: `""`) and empty dates are the literal `"0000-00-00"`. Datetimes carry no timezone marker and mix zones per field — creation-style fields (`erstellt_am`, `Eintragsdatum`) are Europe/Berlin wall time while modification-style fields (`modified`, `Letzte_Aktion`) are UTC. Only appointment listings return timezone-qualified UTC.
+Element values come back as strings: booleans are `"0"`/`"1"` (empty: `""`) and empty dates are the literal `"0000-00-00"`. Datetimes carry no timezone marker. Creation fields such as `erstellt_am` and `Eintragsdatum` are Europe/Berlin wall time. Modification fields such as `modified` and `Letzte_Aktion` are UTC. Only appointment listings return timezone-qualified UTC.
 
 ## Building Queries
 
@@ -83,26 +83,30 @@ $estates = EstateRepository::query()
 
 ## Pagination
 
-Builders that read lists return real Laravel paginators:
+List builders return Laravel paginators:
 
 ```php
-// LengthAwarePaginator, ready for Blade/Livewire pagination links
+// LengthAwarePaginator
 $estates = EstateRepository::query()->paginate(perPage: 25);
 
 // Paginator without a total count query
 $estates = EstateRepository::query()->simplePaginate(perPage: 25);
 
-// Just constrain the query to one page
+// One page, no paginator
 $estates = EstateRepository::query()->forPage(page: 2, perPage: 25)->get();
 ```
 
-For processing large datasets without loading everything into memory, use `each()`:
+`each()` processes one page per callback:
 
 ```php
 EstateRepository::query()->each(function (array $estates) {
     // Process one page of records per call
 });
 ```
+
+::: warning
+A failed page throws `OnOfficeException`. No partial results. Chunks already passed to the `each()` callback are not rolled back.
+:::
 
 ## Available Repositories
 
@@ -128,11 +132,11 @@ EstateRepository::query()->each(function (array $estates) {
 | `TaskRepository` | Tasks |
 | `UserRepository` | onOffice users |
 
-See [Repositories](./repositories/index.md) for detailed documentation on each.
+See [Repositories](./repositories/index.md).
 
-## Testing Your Code
+## Testing
 
-The package includes a built-in fake system for testing. Stub API responses with factories:
+Fake responses with record factories:
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
@@ -151,7 +155,7 @@ expect($estates)->toHaveCount(2);
 EstateRepository::assertSentCount(1);
 ```
 
-Use `preventStrayRequests()` to ensure all API calls are stubbed:
+`preventStrayRequests()` makes unstubbed requests throw:
 
 ```php
 EstateRepository::preventStrayRequests();
@@ -160,4 +164,4 @@ EstateRepository::fake(/* ... */);
 // Any unstubbed request will throw StrayRequestException
 ```
 
-See [Testing](./testing/factories.md) for factories, assertions, and advanced patterns.
+See [Testing](./testing/factories.md).
