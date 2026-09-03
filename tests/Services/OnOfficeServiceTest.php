@@ -270,7 +270,7 @@ describe('exceptions', function () {
 });
 
 describe('requestAll', function () {
-    it('logs the request error', function (int $statusCode) {
+    it('throws the request error', function (int $statusCode) {
         Http::preventStrayRequests();
         Http::fake([
             '*' => Http::response([
@@ -292,6 +292,39 @@ describe('requestAll', function () {
             resolve(OnOfficeService::class)->requestApi($request);
         });
     })->with([300, 301, 400, 401, 500, 501])->throws(OnOfficeException::class);
+
+    it('throws when a later page fails instead of returning partial data', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::sequence()->push([
+                'status' => ['code' => 200],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => ['cntabsolute' => 1000],
+                                'records' => [['id' => 1]],
+                            ],
+                        ],
+                    ],
+                ],
+            ])->push([
+                'status' => ['code' => 500, 'message' => 'Second page failed'],
+            ]),
+        ]);
+
+        $onOfficeService = resolve(OnOfficeService::class);
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        expect(fn () => $onOfficeService->requestAll(fn () => resolve(OnOfficeService::class)->requestApi($request)))
+            ->toThrow(OnOfficeException::class, 'Second page failed');
+
+        Http::assertSentCount(2);
+    });
 
     it('can handle null in result path', function () {
         Http::preventStrayRequests();
@@ -396,7 +429,7 @@ describe('requestAll', function () {
 });
 
 describe('requestAllChunked', function () {
-    it('logs the request error', function (int $statusCode) {
+    it('throws the request error', function (int $statusCode) {
         Http::preventStrayRequests();
         Http::fake([
             '*' => Http::response([
@@ -418,6 +451,44 @@ describe('requestAllChunked', function () {
             resolve(OnOfficeService::class)->requestApi($request);
         }, function () {});
     })->with([300, 301, 400, 401, 500, 501])->throws(OnOfficeException::class);
+
+    it('throws when a later page fails instead of stopping silently', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::sequence()->push([
+                'status' => ['code' => 200],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => ['cntabsolute' => 1000],
+                                'records' => [['id' => 1]],
+                            ],
+                        ],
+                    ],
+                ],
+            ])->push([
+                'status' => ['code' => 500, 'message' => 'Second page failed'],
+            ]),
+        ]);
+
+        $onOfficeService = resolve(OnOfficeService::class);
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::Estate,
+        );
+
+        $pages = new Collection;
+
+        expect(fn () => $onOfficeService->requestAllChunked(
+            fn () => resolve(OnOfficeService::class)->requestApi($request),
+            fn (array $records) => $pages->push($records),
+        ))->toThrow(OnOfficeException::class, 'Second page failed');
+
+        expect($pages)->toHaveCount(1);
+        Http::assertSentCount(2);
+    });
 
     it('will call the callback', function () {
         Http::fake([

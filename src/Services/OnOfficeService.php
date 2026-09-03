@@ -9,7 +9,6 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeApiCredentials;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
@@ -220,15 +219,7 @@ class OnOfficeService
         $maxPage = $pageOverwrite ?? 0;
         $data = new Collection;
         do {
-            try {
-                $response = $request($pageSize, $offset);
-            } catch (OnOfficeException $exception) {
-                Log::error("{$exception->getMessage()} - {$exception->getCode()}");
-
-                throw_if($maxPage === 0 || $pageOverwrite !== null, $exception);
-
-                return $data;
-            }
+            $response = $request($pageSize, $offset);
 
             // If the maxPage is 0,
             // we need to calculate it from the total count of estates
@@ -284,15 +275,7 @@ class OnOfficeService
         $maxPage = $pageOverwrite ?? 0;
         $elementCount = 0;
         do {
-            try {
-                $response = $request($pageSize, $offset);
-            } catch (OnOfficeException $exception) {
-                Log::error("{$exception->getMessage()} - {$exception->getCode()}");
-
-                throw_if($maxPage === 0 || $pageOverwrite !== null, $exception);
-
-                return;
-            }
+            $response = $request($pageSize, $offset);
 
             // If the maxPage is 0,
             // we need to calculate it from the total count of estates

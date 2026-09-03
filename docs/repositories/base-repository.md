@@ -38,6 +38,10 @@ BaseRepository::query()
     );
 ```
 
+::: warning
+A failing page throws an `OnOfficeException` and stops the read. Pages already passed to the callback are not rolled back.
+:::
+
 ## Check User Record Rights
 ```php
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;

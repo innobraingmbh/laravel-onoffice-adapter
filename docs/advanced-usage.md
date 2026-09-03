@@ -74,7 +74,7 @@ EstateRepository::query()
 ```
 
 ::: warning
-Each chunk requests the next page automatically.
+Each chunk requests the next page automatically. If any page fails, the `OnOfficeException` is thrown immediately and no further pages are requested. Chunks that were already passed to the callback are not rolled back, so make the callback safe to run again or wrap the whole `each()` call in a transaction.
 :::
 
 ## Extending the Adapter

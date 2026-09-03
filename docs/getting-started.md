@@ -104,6 +104,10 @@ EstateRepository::query()->each(function (array $estates) {
 });
 ```
 
+::: warning
+`get()` and `each()` read every page of the result. If any page fails, an `OnOfficeException` is thrown and the result is never partial. With `each()`, pages that already reached the callback stay processed, so the callback should be safe to run again.
+:::
+
 ## Available Repositories
 
 | Repository | Description |
