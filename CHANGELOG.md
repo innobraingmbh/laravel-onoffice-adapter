@@ -3,6 +3,7 @@
 ## v2.0.0
 - feat: add `EstateRepository::languages()` to read an estate's language variants (`EstateRepository::languages(31)->get()`)
 - breaking: a failing page anywhere in a paginated read (`get()`, `each()`, `chunked()`) now throws the `OnOfficeException` instead of logging it and returning the pages collected so far; faked repositories already behaved this way
+- breaking: the deprecated `ActivityBuilder` methods `estate()`, `address()`, `recordIdsAsEstate()`, `recordIdsAsAddress()` and `recordIds()` are removed — use `estateId()` and `addressIds()`
 
 ## v1.20.0
 
