@@ -7,9 +7,10 @@ namespace Katalam\OnOfficeAdapter\Facades;
 use Illuminate\Support\Facades\Facade;
 use Katalam\OnOfficeAdapter\Facades\Testing\FileRepositoryFake;
 use Katalam\OnOfficeAdapter\Query\UploadBuilder;
+use Katalam\OnOfficeAdapter\Repositories\SettingRepository;
 
 /**
- * @see \Katalam\OnOfficeAdapter\Repositories\SettingRepository
+ * @see SettingRepository
  *
  * @method static UploadBuilder upload()
  */
