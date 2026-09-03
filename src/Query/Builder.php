@@ -331,17 +331,7 @@ class Builder implements BuilderInterface
                 $ids = $response->json(OnOfficeResponsePath::RECORD_IDS, []);
 
                 if ($ids === []) {
-                    $responseBody = $response->json();
-                    data_set($responseBody, $resultPath, []);
-                    $psrResponse = $response->toPsrResponse();
-
-                    return new Response(new Psr7Response(
-                        $psrResponse->getStatusCode(),
-                        $psrResponse->getHeaders(),
-                        json_encode($responseBody, JSON_THROW_ON_ERROR),
-                        $psrResponse->getProtocolVersion(),
-                        $psrResponse->getReasonPhrase(),
-                    ));
+                    return $this->replaceRecordsAt($response, $resultPath, []);
                 }
 
                 $userRightsResponse = BaseRepositoryFacade::query()
@@ -365,22 +355,35 @@ class Builder implements BuilderInterface
 
                 $records = array_filter($records, static fn (array $record): bool => in_array((int) $record['id'], $allowedIds, true));
 
-                $responseBody = $response->json();
-                data_set($responseBody, $resultPath, array_values($records));
-                $psrResponse = $response->toPsrResponse();
-
-                return new Response(new Psr7Response(
-                    $psrResponse->getStatusCode(),
-                    $psrResponse->getHeaders(),
-                    json_encode($responseBody, JSON_THROW_ON_ERROR),
-                    $psrResponse->getProtocolVersion(),
-                    $psrResponse->getReasonPhrase(),
-                ));
+                return $this->replaceRecordsAt($response, $resultPath, array_values($records));
             },
             $action,
             $module,
             $userId,
         ]);
+    }
+
+    /**
+     * Rebuild the response with the records at the given path replaced, leaving
+     * every other field in the response body (e.g. count_absolute) untouched.
+     *
+     * @param  array<int, mixed>  $records
+     *
+     * @throws JsonException
+     */
+    private function replaceRecordsAt(Response $response, string $resultPath, array $records): Response
+    {
+        $responseBody = $response->json();
+        data_set($responseBody, $resultPath, $records);
+        $psrResponse = $response->toPsrResponse();
+
+        return new Response(new Psr7Response(
+            $psrResponse->getStatusCode(),
+            $psrResponse->getHeaders(),
+            json_encode($responseBody, JSON_THROW_ON_ERROR),
+            $psrResponse->getProtocolVersion(),
+            $psrResponse->getReasonPhrase(),
+        ));
     }
 
     /**
