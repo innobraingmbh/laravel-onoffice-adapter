@@ -25,9 +25,9 @@ LastSeenRepository::query()
 ```
 
 ::: warning
-The endpoint supports neither `count()` nor `find()` — both throw an `OnOfficeException`.
+`count()` and `find()` are not supported and throw an `OnOfficeException`.
 :::
 
 ## Additional Methods
-- **`withModule()`**: Filter logs by module.
-- **`withUserId()`**: Filter logs by user ID.
+- `withModule()`: filter by module
+- `withUserId()`: filter by user ID

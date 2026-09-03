@@ -30,7 +30,7 @@ SettingRepository::regions()->each(function (array $regions) {
 
 ## Imprint
 
-The imprint is a single settings record, so `first()` is the way to read it:
+The imprint is a single record. Read it with `first()`:
 
 ```php
 $imprint = SettingRepository::imprint()->get();

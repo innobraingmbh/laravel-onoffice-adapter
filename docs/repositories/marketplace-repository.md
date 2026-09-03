@@ -4,8 +4,6 @@ Unlock onOffice Marketplace providers.
 
 ## Unlocking Providers
 
-Unlock a marketplace provider for use.
-
 ```php
 use Innobrain\OnOfficeAdapter\Facades\MarketplaceRepository;
 
@@ -20,8 +18,4 @@ $success = MarketplaceRepository::query()
 
 Returns `true` on success, `false` otherwise.
 
-## Usage Notes
-
-The Marketplace API is primarily used for third-party integrations with onOffice enterprise.
-
-For detailed marketplace integration documentation, refer to the [onOffice Marketplace documentation](https://apidoc.onoffice.de/).
+See the [onOffice Marketplace documentation](https://apidoc.onoffice.de/).

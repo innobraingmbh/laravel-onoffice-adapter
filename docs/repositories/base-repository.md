@@ -1,6 +1,6 @@
 # Base Repository
 
-Use `BaseRepository` for endpoints not covered by built-in repositories, or for making fully custom calls.
+`BaseRepository` sends any request.
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
@@ -15,15 +15,14 @@ $collection = BaseRepository::query()
     ));
 ```
 
-You can pass strings for resource types not present in `OnOfficeResourceType`. For example, `'myCustomType'`.
+Resource types not in `OnOfficeResourceType` can be passed as strings.
 
 ## Single-call Execution
-The `once()` method executes a single API request and returns the `Illuminate\Http\Client\Response` object.
+`once()` sends one request and returns the `Illuminate\Http\Client\Response`.
 ```php
 $response = BaseRepository::query()
     ->once(new OnOfficeRequest(...));
 
-// You can then process the response, for example:
 // $record = $response->json('response.results.0.data.records.0');
 ```
 
@@ -50,16 +49,12 @@ EstateRepository::query()
     ->checkUserRecordsRight('edit', 'estate', 1)
     ->get();
 ```
-This chainable method checks if the given user has rights to the records in the response. It removes every record that the user does not have access to from the response. This is useful when using the Master User credentials for requests but acting as a different user in the application.
+Removes every record the given user cannot access from the response. Use it when requests run with master credentials on behalf of another user.
 
 ## Debug Tools
-- **`dd()`**: Dump request and die
-- **`dump()`**: Dump request without halting execution
-- **`raw()`**: Dump raw request array and die
-- **`record()`** + `lastRecorded()`: Inspect the last request/response pair
-- **`lastRecordedRequest()`** / **`lastRecordedResponse()`**: Inspect only the request or only the response
-- **`stopRecording()`**: Stop recording requests
-
-::: tip
-Use `BaseRepository` when your use case is unique or not yet fully supported by specialized repositories.
-:::
+- `dd()`: dump the request and exit
+- `dump()`: dump the request and continue
+- `raw()`: dump the raw request array and exit
+- `record()` + `lastRecorded()`: the last request/response pair
+- `lastRecordedRequest()` / `lastRecordedResponse()`: only the request or only the response
+- `stopRecording()`: stop recording

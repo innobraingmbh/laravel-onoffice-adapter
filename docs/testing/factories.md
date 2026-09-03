@@ -1,6 +1,6 @@
 # Testing with Fake Responses
 
-This package provides a testing API that lets you stub onOffice API responses without making real HTTP requests.
+Fake onOffice responses without HTTP requests.
 
 ## Quick Start
 
@@ -22,7 +22,7 @@ EstateRepository::assertSentCount(1);
 
 ## Response Structure
 
-The `fake()` method accepts a nested structure that mirrors the onOffice API:
+`fake()` takes a nested structure that mirrors the API:
 
 ```php
 Repository::fake(Repository::response([    // One response (API call)
@@ -32,15 +32,15 @@ Repository::fake(Repository::response([    // One response (API call)
 ]));
 ```
 
-- **Response**: Represents a complete API response (can contain multiple pages)
-- **Page**: A single page of results (onOffice API paginates at 500 records)
-- **RecordFactories**: Individual record factories that generate test data
+- `response()`: one API response with one or more pages
+- `page()`: one page of records (the API paginates at 500)
+- record factories: the records on a page
 
 ## Factories
 
 ### Base Methods
 
-All factories extend `BaseFactory` and provide:
+All factories extend `BaseFactory`:
 
 ```php
 // Create a factory instance
@@ -61,7 +61,7 @@ $factory->data([
     'kaufpreis' => 275000,
 ]);
 
-// Magic setter (setFieldName sets fieldName — only the first letter is lowercased)
+// Magic setter: setFieldName sets fieldName, only the first letter is lowercased
 $factory->setKaufpreis(275000);
 
 // Create multiple factory instances
@@ -71,8 +71,6 @@ $factories = EstateFactory::times(5);
 ## Module Examples
 
 ### Estates
-
-Common estate fields from the onOffice API:
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
@@ -130,8 +128,6 @@ expect($estates)->toHaveCount(2);
 ```
 
 ### Addresses
-
-Common address fields:
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
@@ -253,8 +249,6 @@ SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
 
 ### Relations
 
-Relations link records between modules (e.g., buyer linked to estate):
-
 ```php
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeRelationType;
 use Innobrain\OnOfficeAdapter\Facades\RelationRepository;
@@ -324,7 +318,7 @@ $languages = EstateRepository::languages(100)->get();
 
 ### Files
 
-Fake the response to an upload. `save()` returns the `tmpUploadId` from the faked response:
+`save()` returns the `tmpUploadId` from the faked response:
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\FileRepository;
@@ -345,7 +339,7 @@ Calling `tmpUploadId()` without an argument generates a random UUID.
 
 ## Multiple Pages
 
-Simulate paginated responses:
+Several pages in one response:
 
 ```php
 EstateRepository::fake(EstateRepository::response([
@@ -359,14 +353,13 @@ EstateRepository::fake(EstateRepository::response([
     ]),
 ]));
 
-// The repository will automatically handle pagination
 $estates = EstateRepository::query()->get();
 expect($estates)->toHaveCount(4);
 ```
 
 ## Multiple Responses (Sequences)
 
-For tests that make multiple API calls:
+One response per call:
 
 ```php
 EstateRepository::fake([
@@ -388,7 +381,7 @@ $first = EstateRepository::query()->get();  // Returns ID 1
 $second = EstateRepository::query()->get(); // Returns ID 2
 ```
 
-To repeat the same response several times, use `sequence()`:
+`sequence()` repeats a response:
 
 ```php
 EstateRepository::fake(EstateRepository::sequence(
@@ -403,7 +396,7 @@ EstateRepository::fake(EstateRepository::sequence(
 
 ## Stray Requests
 
-By default, requests without a matching stub pass through to the real API. Call `preventStrayRequests()` to make them throw instead:
+Unstubbed requests pass through to the real API by default. `preventStrayRequests()` makes them throw:
 
 ```php
 // Throw StrayRequestException for requests without a matching stub
@@ -415,7 +408,7 @@ EstateRepository::allowStrayRequests();
 
 ## Error Responses
 
-Simulate API errors:
+Fake an error response:
 
 ```php
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
@@ -427,7 +420,7 @@ EstateRepository::fake(EstateRepository::response([
     ),
 ]));
 
-// This will throw an exception
+// throws OnOfficeException
 EstateRepository::query()->get();
 ```
 
@@ -551,15 +544,9 @@ it('fetches active estates for sale', function () {
 | `ActionFactory` | `actionkind` | Action types |
 | `TaskFactory` | `task` | Task records |
 
-## Tips
+## Extending Factories
 
-1. **Use realistic data**: Include fields that your code actually reads to catch issues early.
-
-2. **Test error handling**: Use error responses to verify your app handles API failures gracefully.
-
-3. **Assert on requests**: Verify that your code sends the expected parameters to the API.
-
-4. **Extend factories**: Create custom factories for your project's common test scenarios:
+Subclass a factory to add project-specific states:
 
 ```php
 class MyEstateFactory extends EstateFactory

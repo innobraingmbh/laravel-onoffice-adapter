@@ -6,18 +6,18 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/innobraingmbh/laravel-onoffice-adapter/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/innobraingmbh/laravel-onoffice-adapter/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/innobrain/laravel-onoffice-adapter.svg?style=flat-square)](https://packagist.org/packages/innobrain/laravel-onoffice-adapter)
 
-A fluent query builder for the onOffice API, designed to feel like Eloquent.
+A query builder for the onOffice API with an Eloquent-style interface.
 
 **[View Full Documentation](https://oo-adapter.innobra.in/)**
 
 ## Features
 
-- **ORM-like Querying** - Use familiar Laravel Eloquent-style methods like `where()`, `select()`, `orderBy()`
-- **Comprehensive Repositories** - Access estates, addresses, activities, search criteria, files, and more
-- **Pagination & Chunking** - Handle large datasets with `each()`, `limit()`, and automatic pagination
-- **Middlewares** - Insert custom logic before requests for logging, modification, or validation
-- **Testing Support** - Built-in fake system with factories for easy unit testing
-- **File Management** - Upload, chunk, and link files with onOffice
+- **Query builder** - `select()`, `where()`, `orderBy()`, `limit()`, `offset()`
+- **Repositories** - Estates, addresses, activities, appointments, tasks, search criteria, files, relations, and more
+- **Pagination** - `get()` reads every page; `each()` processes one page at a time
+- **Middlewares** - Run code before and after each request
+- **Testing** - Fake responses and record factories
+- **Files** - Upload, chunk, and link files to records
 
 ## Installation
 
@@ -32,7 +32,7 @@ ON_OFFICE_TOKEN=your-token
 ON_OFFICE_SECRET=your-secret
 ```
 
-For advanced configuration (retry settings, custom headers), publish the config file:
+To change retry settings or headers, publish the config file:
 
 ```bash
 php artisan vendor:publish --tag="onoffice-adapter-config"
@@ -88,7 +88,7 @@ $estates = EstateRepository::query()
 
 ### Large Datasets
 
-Handle large datasets without memory issues using chunked processing:
+`each()` processes one page per callback:
 
 ```php
 EstateRepository::query()
@@ -160,7 +160,7 @@ ActivityRepository::query()
 
 ## Middlewares
 
-Inject custom logic before each request:
+Run code before each request:
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\BaseRepository;
@@ -190,7 +190,7 @@ $lastPair = BaseRepository::lastRecorded(); // [OnOfficeRequest, array]
 
 ## Helpers
 
-Use default fields and clean empty values:
+Default field lists and empty-value cleanup:
 
 ```php
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
@@ -205,7 +205,7 @@ $estates = $estates->map(fn (array $estate) => clear_elements($estate));
 
 ## Testing
 
-The package includes a built-in fake system for testing:
+Fake responses in tests:
 
 ```php
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
@@ -264,7 +264,7 @@ EstateRepository::fake(EstateRepository::sequence(
 ));
 ```
 
-See the [Testing Documentation](https://oo-adapter.innobra.in/testing/factories) for factories, assertions, and advanced patterns.
+See [Testing](https://oo-adapter.innobra.in/testing/factories) for factories and assertions.
 
 ## Development
 
@@ -276,11 +276,11 @@ composer format     # Code formatting (Laravel Pint)
 
 ## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+See [CHANGELOG](CHANGELOG.md).
 
 ## Security Vulnerabilities
 
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+See the [security policy](../../security/policy).
 
 ## Credits
 
@@ -289,4 +289,4 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+MIT. See [LICENSE](LICENSE.md).

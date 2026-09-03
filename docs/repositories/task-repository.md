@@ -33,7 +33,7 @@ $tasks = TaskRepository::query()->relatedProject(7)->get();
 
 ## Creating Tasks
 
-The related record methods also work for create and modify — the ids are sent alongside the task data:
+The related record methods also apply to create and modify. The ids are sent with the task data:
 
 ```php
 TaskRepository::query()
@@ -55,11 +55,11 @@ TaskRepository::query()
 
 ## Field Gotchas
 
-- `Art` is mandatory on create, but the field metadata reports no permitted values for it — read an existing task to find a valid key.
+- `Art` is mandatory on create, but the field metadata reports no permitted values for it. Read an existing task to find a valid key.
 - `Status` is written with numeric keys but read back as German labels (`In Bearbeitung`).
 - `Status` and `erledigt` are stored independently; the API does not sync them, so complete a task by setting both.
 - `Deadline` is stored but stays inactive unless `Deadline_strikt` is also set.
-- `Verantwortung` and `Bearbeiter` accept any string verbatim — a typo produces a task with no functional assignee, without an error.
+- `Verantwortung` and `Bearbeiter` accept any string. A typo produces a task with no assignee and no error.
 - The endpoint rejects `sortby`, so results cannot be ordered server-side; `orderBy()` has no effect.
 
 ## Count & Chunked
@@ -73,5 +73,5 @@ TaskRepository::query()->each(function (array $tasks) {
 ```
 
 ::: warning
-The task endpoint reports `cntabsolute` as the number of returned rows, not a true total. `count()` works around this by requesting the maximum page size, so it is capped at 500 — more matching tasks than that still return 500.
+The task endpoint reports `cntabsolute` as the number of returned rows, not a true total. `count()` works around this by requesting the maximum page size, so it is capped at 500.
 :::

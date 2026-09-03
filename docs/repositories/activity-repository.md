@@ -30,7 +30,7 @@ Cannot filter by: `Benutzer`, `Adress_nr`, `Objekt_nr`, `dauer`. Use `addressIds
 
 ## Creating Activities
 
-Set the related records via `addressIds()` and `estateId()` — they take precedence over raw `addressids`/`estateid` keys in the data array:
+`addressIds()` and `estateId()` take precedence over `addressids` and `estateid` keys in the data array:
 
 ```php
 ActivityRepository::query()
@@ -47,7 +47,7 @@ ActivityRepository::query()
 ```
 
 ::: warning
-`Datum` cannot be set on create — the server discards the supplied value and stamps the current time, without an error.
+`Datum` cannot be set on create. The server discards the value and stores the current time without an error.
 :::
 
 ## Advisory Levels
