@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -55,6 +56,36 @@ describe('credentials', function () {
             ->and($onOfficeService->getSecret())->toBe($secret)
             ->and($onOfficeService->getApiClaim())->toBe($apiClaim);
     });
+});
+
+it('signs the exact timestamp included in the request', function () {
+    $token = str_repeat('t', 32);
+    $secret = str_repeat('s', 64);
+    $timestamp = Carbon::create(2026, 7, 2, 23, 59, 59)->timestamp;
+
+    config([
+        'onoffice.token' => $token,
+        'onoffice.secret' => $secret,
+    ]);
+
+    Carbon::setTestNow(Carbon::createFromTimestampUTC($timestamp + 1));
+
+    $getHmac = new ReflectionMethod(OnOfficeService::class, 'getHmac');
+    $hmac = $getHmac->invoke(
+        app(OnOfficeService::class),
+        OnOfficeAction::Read,
+        OnOfficeResourceType::Address,
+        $timestamp,
+    );
+
+    Carbon::setTestNow();
+
+    expect($hmac)->toBe(base64_encode(hash_hmac(
+        'sha256',
+        $timestamp.$token.OnOfficeResourceType::Address->value.OnOfficeAction::Read->value,
+        $secret,
+        true,
+    )));
 });
 
 describe('exceptions', function () {

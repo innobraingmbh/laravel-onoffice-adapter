@@ -1,4 +1,5 @@
 .idea
+.env
 .phpunit.cache
 build
 composer.lock
