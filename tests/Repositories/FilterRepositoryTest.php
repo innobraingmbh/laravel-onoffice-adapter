@@ -30,6 +30,47 @@ describe('fake responses', function () {
 
         FilterRepository::assertSentCount(1);
     });
+
+    test('first', function () {
+        FilterRepository::fake(FilterRepository::response([
+            FilterRepository::page(recordFactories: [
+                FilterFactory::make()
+                    ->id(1)
+                    ->data([
+                        'scope' => 'office',
+                        'name' => 'Büroadressen',
+                        'userId' => null,
+                        'groupId' => 195,
+                    ]),
+            ]),
+        ]));
+
+        $response = FilterRepository::query()->address()->first();
+
+        expect($response['id'])->toBe(1);
+
+        FilterRepository::assertSentCount(1);
+    });
+
+    test('each', function () {
+        FilterRepository::fake(FilterRepository::response([
+            FilterRepository::page(recordFactories: [
+                FilterFactory::make()->id(1),
+                FilterFactory::make()->id(2),
+            ]),
+        ]));
+
+        $records = [];
+        FilterRepository::query()->estate()->each(function (array $page) use (&$records): void {
+            $records = [...$records, ...$page];
+        });
+
+        expect($records)->toHaveCount(2)
+            ->and($records[0]['id'])->toBe(1)
+            ->and($records[1]['id'])->toBe(2);
+
+        FilterRepository::assertSentCount(1);
+    });
 });
 
 describe('real responses', function () {
