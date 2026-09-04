@@ -640,6 +640,42 @@ class Builder implements BuilderInterface
         })->all();
     }
 
+    /**
+     * The sort parameter for endpoints that take `sortby` as a
+     * `{column: direction}` map: the estate, user and activity reads. This is
+     * the only encoding that preserves multi-column ordering, but it is not
+     * universal — the address read silently ignores it and the search
+     * endpoints reject it, so those use getSplitSortParameters() instead.
+     *
+     * @return array<string, array<string, string>>
+     */
+    protected function getSortByParameter(): array
+    {
+        return [
+            OnOfficeService::SORTBY => $this->getOrderBy(),
+        ];
+    }
+
+    /**
+     * The sort parameters for endpoints that take `sortby` as a column name
+     * with the direction in a separate `sortorder`: the address read (which
+     * silently ignores the map form) and the search endpoints (which reject
+     * it). This encoding can only express a single sort column.
+     *
+     * @return array<string, string|null>
+     */
+    protected function getSplitSortParameters(): array
+    {
+        $orderBy = $this->getOrderBy();
+
+        $column = array_key_first($orderBy);
+
+        return [
+            OnOfficeService::SORTBY => $column,
+            OnOfficeService::SORTORDER => $column === null ? null : $orderBy[$column],
+        ];
+    }
+
     public function parameter(string $key, mixed $value): static
     {
         $this->customParameters[$key] = $value;

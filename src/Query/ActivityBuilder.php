@@ -27,8 +27,6 @@ class ActivityBuilder extends Builder
 
     protected function buildReadRequest(): OnOfficeRequest
     {
-        $orderBy = $this->getOrderBy();
-
         return new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Activity,
@@ -36,8 +34,7 @@ class ActivityBuilder extends Builder
                 ...$this->prepareEstateOrAddressParameters(),
                 OnOfficeService::DATA => $this->columns,
                 OnOfficeService::FILTER => $this->getFilters(),
-                OnOfficeService::SORTBY => data_get(array_keys($orderBy), 0),
-                OnOfficeService::SORTORDER => data_get($orderBy, 0),
+                ...$this->getSortByParameter(),
                 ...$this->customParameters,
             ]
         );
