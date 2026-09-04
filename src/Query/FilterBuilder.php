@@ -24,17 +24,7 @@ class FilterBuilder extends Builder
      */
     public function get(): Collection
     {
-        throw_unless(isset($this->module), OnOfficeQueryException::class, 'Filter Builder module is not set');
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Filters,
-            parameters: [
-                OnOfficeService::MODULE => $this->module,
-            ]
-        );
-
-        return $this->requestAll($request);
+        return $this->requestAll($this->buildReadRequest());
     }
 
     /**
@@ -43,19 +33,8 @@ class FilterBuilder extends Builder
      */
     public function first(): ?array
     {
-        throw_unless(isset($this->module), OnOfficeQueryException::class, 'Filter Builder module is not set');
-
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Filters,
-            parameters: [
-                'module' => $this->module,
-            ]
-        );
-
-        return $this->requestApi($request)
+        return $this->requestApi($this->buildReadRequest())
             ->json(OnOfficeResponsePath::FIRST_RECORD);
-
     }
 
     /**
@@ -64,17 +43,25 @@ class FilterBuilder extends Builder
      */
     public function each(callable $callback): void
     {
+        $this->requestAllChunked($this->buildReadRequest(), $callback);
+    }
+
+    /**
+     * Build the filter read request shared by get(), first() and each().
+     *
+     * @throws Throwable<OnOfficeQueryException>
+     */
+    protected function buildReadRequest(): OnOfficeRequest
+    {
         throw_unless(isset($this->module), OnOfficeQueryException::class, 'Filter Builder module is not set');
 
-        $request = new OnOfficeRequest(
+        return new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Filters,
             parameters: [
                 OnOfficeService::MODULE => $this->module,
             ],
         );
-
-        $this->requestAllChunked($request, $callback);
     }
 
     public function estate(): static
