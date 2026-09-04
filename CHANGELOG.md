@@ -3,6 +3,7 @@
 ## main
 
 ## v2.0.0
+- See [UPGRADE.md](UPGRADE.md) for the breaking changes below.
 - feat: add `EstateRepository::languages()` to read an estate's language variants (`EstateRepository::languages(31)->get()`)
 - fix: `AddressBuilder`/`ActivityBuilder` reads and `EstateBuilder`/`AddressBuilder` search() encoded `orderBy()` incorrectly, silently dropping the requested sort direction (or sorting on garbage); all builders now share one `sortby` encoding
 - breaking: a failing page anywhere in a paginated read (`get()`, `each()`, `chunked()`) now throws the `OnOfficeException` instead of logging it and returning the pages collected so far; faked repositories already behaved this way

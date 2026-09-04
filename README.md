@@ -276,7 +276,7 @@ composer format     # Code formatting (Laravel Pint)
 
 ## Changelog
 
-See [CHANGELOG](CHANGELOG.md).
+See [CHANGELOG](CHANGELOG.md). For breaking changes, see [UPGRADE](UPGRADE.md).
 
 ## Security Vulnerabilities
 
