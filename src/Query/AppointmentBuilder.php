@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Innobrain\OnOfficeAdapter\Query;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Dtos\PaginatedResponse;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
@@ -16,7 +18,9 @@ use Throwable;
 
 class AppointmentBuilder extends Builder
 {
-    use Paginate;
+    use Paginate {
+        getPageWithMeta as private fetchUnwindowedPage;
+    }
 
     public ?string $startDate = null;
 
@@ -81,6 +85,73 @@ class AppointmentBuilder extends Builder
         $this->showRecurrent = $show;
 
         return $this;
+    }
+
+    /**
+     * The appointment list endpoint ignores listlimit and listoffset: every
+     * read returns the full result set for the date-range filter, and
+     * meta.cntabsolute reports its true size. The window parameters are
+     * therefore never sent; reads emulate the window client-side instead.
+     */
+    protected function applyListWindow(OnOfficeRequest $request, int $listLimit, int $offset): void {}
+
+    /**
+     * Every response holds the whole result set (see applyListWindow), so the
+     * requested page is cut from it here — without this, every page of a
+     * paginator would hold every record.
+     */
+    protected function getPageWithMeta(): PaginatedResponse
+    {
+        $response = $this->fetchUnwindowedPage();
+
+        return new PaginatedResponse(
+            items: $response->items->slice($this->offset, $this->pageSize)->values(),
+            total: $response->total,
+        );
+    }
+
+    /**
+     * One request already returns the full result set (see applyListWindow),
+     * so reading everything is a single call. The inherited page loop would
+     * refetch that same full set once per computed page and duplicate every
+     * record past the first 500.
+     *
+     * @return Collection<int, array<string, mixed>>
+     *
+     * @throws OnOfficeException
+     */
+    public function get(): Collection
+    {
+        /** @var array<int, array<string, mixed>> $records */
+        $records = $this->requestApi($this->readRequest())->json(OnOfficeResponsePath::RECORDS, []);
+
+        $window = collect($records)->slice($this->offset);
+
+        if ($this->limit > -1) {
+            $window = $window->take($this->limit);
+        }
+
+        return $window->values();
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     *
+     * @throws OnOfficeException
+     */
+    public function first(): ?array
+    {
+        return $this->get()->first();
+    }
+
+    /**
+     * @throws OnOfficeException
+     */
+    public function each(callable $callback): void
+    {
+        $this->get()
+            ->chunk($this->pageSize)
+            ->each(fn (Collection $chunk) => $callback($chunk->values()->all()));
     }
 
     protected function buildReadRequest(): OnOfficeRequest
@@ -216,9 +287,9 @@ class AppointmentBuilder extends Builder
      */
     /**
      * @param  array<string, mixed>|null  $filter
-     * @return \Illuminate\Support\Collection<int, array<string, mixed>>
+     * @return Collection<int, array<string, mixed>>
      */
-    public function resources(?array $filter = null): \Illuminate\Support\Collection
+    public function resources(?array $filter = null): Collection
     {
         $parameters = [...$this->customParameters];
 
