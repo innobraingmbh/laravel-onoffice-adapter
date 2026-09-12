@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Innobrain\OnOfficeAdapter\Services;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
@@ -21,6 +22,12 @@ class OnOfficeService
 {
     use OnOfficeDefaultFieldConst;
     use OnOfficeParameterConst;
+
+    /**
+     * Container key of the Guzzle handler shared by every request this
+     * package sends, so the connection to the API is reused.
+     */
+    public const HTTP_HANDLER = 'onoffice.http_handler';
 
     public function __construct(
         private ?OnOfficeApiCredentials $credentials = null
@@ -77,6 +84,11 @@ class OnOfficeService
     public function retryOnlyOnConnectionError(): bool
     {
         return Config::get('onoffice.retry.only_on_connection_error', true) ?? true;
+    }
+
+    public function reuseConnection(): bool
+    {
+        return Config::get('onoffice.reuse_connection', true) ?? true;
     }
 
     /*
@@ -188,13 +200,34 @@ class OnOfficeService
 
         $response = null;
         retry($this->getRetryCount(), function () use ($body, $throwIfFailed, &$response) {
-            $response = Http::withHeaders(config('onoffice.headers'))->post(config('onoffice.base_url'), $body());
+            $response = $this->pendingRequest()->post(config('onoffice.base_url'), $body());
 
             $throwIfFailed($response);
         }, $this->getRetryDelay(), $retryOnlyOnConnectionError);
 
         /** @var Response $response */
         return $response;
+    }
+
+    /**
+     * The HTTP client every request is sent through.
+     *
+     * By default Laravel builds a new Guzzle client, and with it a new curl
+     * handler, per request, so no connection outlives the request that opened
+     * it. Handing every request the process-wide handler from the container
+     * lets curl keep the connection to the API open between calls. The handler
+     * sits at the bottom of Laravel's handler stack, so Http::fake(), stray
+     * request prevention and the request events keep working on top of it.
+     */
+    protected function pendingRequest(): PendingRequest
+    {
+        $pendingRequest = Http::withHeaders(config('onoffice.headers'));
+
+        if ($this->reuseConnection()) {
+            $pendingRequest->setHandler(resolve(self::HTTP_HANDLER));
+        }
+
+        return $pendingRequest;
     }
 
     /**
