@@ -12,4 +12,12 @@ enum OnOfficeAction: string
     case Get = 'urn:onoffice-de-ns:smart:2.5:smartml:action:get';
     case Do = 'urn:onoffice-de-ns:smart:2.5:smartml:action:do';
     case Delete = 'urn:onoffice-de-ns:smart:2.5:smartml:action:delete';
+
+    public function mutates(): bool
+    {
+        return match ($this) {
+            self::Read, self::Get => false,
+            self::Create, self::Modify, self::Delete, self::Do => true,
+        };
+    }
 }

@@ -9,13 +9,15 @@ readonly class OnOfficeApiCredentials
     public function __construct(
         public string $token,
         public string $secret,
-        public string $apiClaim = ''
+        public string $apiClaim = '',
+        public bool $readOnly = false,
     ) {}
 
     public function equals(self $other): bool
     {
         return $this->token === $other->token
             && $this->secret === $other->secret
-            && $this->apiClaim === $other->apiClaim;
+            && $this->apiClaim === $other->apiClaim
+            && $this->readOnly === $other->readOnly;
     }
 }
