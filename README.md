@@ -18,6 +18,7 @@ A query builder for the onOffice API with an Eloquent-style interface.
 - **Middlewares** - Run code before and after each request
 - **Testing** - Fake responses and record factories
 - **Files** - Upload, chunk, and link files to records
+- **Read-only mode** - Refuse every write, globally, per credentials, or per query
 
 ## Installation
 
@@ -174,6 +175,24 @@ BaseRepository::query()
     })
     ->call(new OnOfficeRequest(/* ... */));
 ```
+
+## Read-Only Mode
+
+Refuses every mutating action (`create`, `modify`, `delete` and `do`) before it
+is sent and throws a `ReadOnlyViolationException`. Reads are unaffected.
+
+```php
+// Globally
+ON_OFFICE_READ_ONLY=true
+
+// Per credentials
+EstateRepository::query()->withCredentials($token, $secret, readOnly: true)->get();
+
+// Per query
+EstateRepository::query()->readOnly()->get();
+```
+
+Any layer can turn it on, none can turn it off.
 
 ## Debugging
 
