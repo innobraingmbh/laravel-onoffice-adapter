@@ -1,6 +1,7 @@
 # Changelog
 
 ## main
+- perf: the HTTP connection to the onOffice API is reused across requests within a process. Every request after the first skips the TCP and TLS handshake (about 130ms per call). One Guzzle handler is bound as a container singleton under `OnOfficeService::HTTP_HANDLER`; set `onoffice.reuse_connection` to `false` to restore a fresh connection per request
 
 ## v2.0.0
 - See [UPGRADE.md](UPGRADE.md) for the breaking changes below.

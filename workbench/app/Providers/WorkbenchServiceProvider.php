@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Workbench\App\Console\Commands\ProbeAppointmentsCommand;
 use Workbench\App\Console\Commands\ProbeBatchCommand;
+use Workbench\App\Console\Commands\ProbeConnectionReuseCommand;
 use Workbench\App\Console\Commands\ProbeDocsVerify2Command;
 use Workbench\App\Console\Commands\ProbeDocsVerify3Command;
 use Workbench\App\Console\Commands\ProbeDocsVerifyCommand;
@@ -38,6 +39,7 @@ class WorkbenchServiceProvider extends ServiceProvider
             $this->commands([
                 ProbeAppointmentsCommand::class,
                 ProbeBatchCommand::class,
+                ProbeConnectionReuseCommand::class,
                 ProbeDocsVerifyCommand::class,
                 ProbeDocsVerify2Command::class,
                 ProbeDocsVerify3Command::class,

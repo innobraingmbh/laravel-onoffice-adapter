@@ -38,6 +38,8 @@ To change retry settings or headers, publish the config file:
 php artisan vendor:publish --tag="onoffice-adapter-config"
 ```
 
+The package keeps one HTTP connection to the onOffice API open per PHP process and reuses it for every request, which skips the TCP and TLS handshake on all but the first call. Long-lived processes such as queue workers and Octane benefit most. If a stale connection is closed by the server, the request fails with a connection error and the retry settings above take over. Set `reuse_connection` to `false` in the config to open a fresh connection per request instead.
+
 ## Usage
 
 ### Basic Queries

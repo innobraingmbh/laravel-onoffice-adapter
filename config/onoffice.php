@@ -29,6 +29,13 @@ return [
     ],
 
     /**
+     * Reuse the HTTP connection to the onOffice API within a PHP process,
+     * saving the TCP and TLS handshake (about 130ms) on every call after the first.
+     * Disable this if your process forks after it has talked to the API.
+     */
+    'reuse_connection' => true,
+
+    /**
      * The token and secret to be used for authentication with the OnOffice API.
      */
     'token' => env('ON_OFFICE_TOKEN', ''),

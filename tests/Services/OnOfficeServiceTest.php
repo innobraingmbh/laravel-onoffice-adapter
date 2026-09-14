@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -699,5 +702,70 @@ describe('retry', function () {
         $onOfficeService->requestApi($request);
 
         Http::assertSentCount(2);
+    });
+});
+
+describe('http connection', function () {
+    $okResponse = fn (): GuzzleResponse => new GuzzleResponse(200, ['Content-Type' => 'application/json'], json_encode([
+        'status' => ['code' => 200, 'errorcode' => 0, 'message' => 'OK'],
+        'response' => ['results' => []],
+    ]));
+
+    it('binds one http handler for the whole process', function () {
+        expect(resolve(OnOfficeService::HTTP_HANDLER))
+            ->toBeCallable()
+            ->toBe(resolve(OnOfficeService::HTTP_HANDLER));
+    });
+
+    it('sends every request through the shared handler', function () use ($okResponse) {
+        $handler = new MockHandler([$okResponse(), $okResponse()]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        $request = new OnOfficeRequest(OnOfficeAction::Get, OnOfficeResourceType::Estate);
+
+        resolve(OnOfficeService::class)->requestApi($request);
+        // A second service instance, as withCredentials() creates, shares the same handler.
+        (new OnOfficeService)->requestApi($request);
+
+        expect($handler->count())->toBe(0)
+            ->and((string) $handler->getLastRequest()?->getUri())->toBe(config('onoffice.base_url'));
+    });
+
+    it('keeps fakes and stray request prevention above the shared handler', function () {
+        $handler = new MockHandler;
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response(['status' => ['code' => 200]]),
+        ]);
+
+        $request = new OnOfficeRequest(OnOfficeAction::Get, OnOfficeResourceType::Estate);
+
+        resolve(OnOfficeService::class)->requestApi($request);
+
+        Http::assertSentCount(1);
+        expect($handler->getLastRequest())->toBeNull();
+    });
+
+    it('is reused by default', function () {
+        expect(resolve(OnOfficeService::class)->reuseConnection())->toBeTrue();
+    });
+
+    it('opens a fresh connection per request when turned off', function () use ($okResponse) {
+        Config::set([
+            'onoffice.reuse_connection' => false,
+            'onoffice.base_url' => 'http://127.0.0.1:1',
+            'onoffice.retry.count' => 1,
+        ]);
+
+        $handler = new MockHandler([$okResponse()]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        $request = new OnOfficeRequest(OnOfficeAction::Get, OnOfficeResourceType::Estate);
+
+        expect(fn () => resolve(OnOfficeService::class)->requestApi($request))
+            ->toThrow(ConnectionException::class)
+            ->and($handler->count())->toBe(1);
     });
 });

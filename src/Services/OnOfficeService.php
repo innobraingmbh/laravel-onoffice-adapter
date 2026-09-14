@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Innobrain\OnOfficeAdapter\Services;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
@@ -21,6 +22,11 @@ class OnOfficeService
 {
     use OnOfficeDefaultFieldConst;
     use OnOfficeParameterConst;
+
+    /**
+     * Container key of the Guzzle handler shared by every request.
+     */
+    public const HTTP_HANDLER = 'onoffice.http_handler';
 
     public function __construct(
         private ?OnOfficeApiCredentials $credentials = null
@@ -77,6 +83,11 @@ class OnOfficeService
     public function retryOnlyOnConnectionError(): bool
     {
         return Config::get('onoffice.retry.only_on_connection_error', true) ?? true;
+    }
+
+    public function reuseConnection(): bool
+    {
+        return Config::get('onoffice.reuse_connection', true) ?? true;
     }
 
     /*
@@ -188,13 +199,27 @@ class OnOfficeService
 
         $response = null;
         retry($this->getRetryCount(), function () use ($body, $throwIfFailed, &$response) {
-            $response = Http::withHeaders(config('onoffice.headers'))->post(config('onoffice.base_url'), $body());
+            $response = $this->pendingRequest()->post(config('onoffice.base_url'), $body());
 
             $throwIfFailed($response);
         }, $this->getRetryDelay(), $retryOnlyOnConnectionError);
 
         /** @var Response $response */
         return $response;
+    }
+
+    /**
+     * The shared handler sits below Laravel's stack, so fakes still apply.
+     */
+    protected function pendingRequest(): PendingRequest
+    {
+        $pendingRequest = Http::withHeaders(Config::get('onoffice.headers'));
+
+        if ($this->reuseConnection()) {
+            $pendingRequest->setHandler(resolve(self::HTTP_HANDLER));
+        }
+
+        return $pendingRequest;
     }
 
     /**
