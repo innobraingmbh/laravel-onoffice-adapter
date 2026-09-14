@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -711,9 +711,6 @@ describe('http connection', function () {
         'response' => ['results' => []],
     ]));
 
-    $handlerOf = fn (OnOfficeService $service): mixed => (new ReflectionProperty(PendingRequest::class, 'handler'))
-        ->getValue((fn (): PendingRequest => $this->pendingRequest())->call($service));
-
     it('binds one http handler for the whole process', function () {
         expect(resolve(OnOfficeService::HTTP_HANDLER))
             ->toBeCallable()
@@ -751,12 +748,24 @@ describe('http connection', function () {
         expect($handler->getLastRequest())->toBeNull();
     });
 
-    it('can be turned off', function (bool $reuse) use ($handlerOf) {
-        Config::set(['onoffice.reuse_connection' => $reuse]);
+    it('is reused by default', function () {
+        expect(resolve(OnOfficeService::class)->reuseConnection())->toBeTrue();
+    });
 
-        $service = resolve(OnOfficeService::class);
+    it('opens a fresh connection per request when turned off', function () use ($okResponse) {
+        Config::set([
+            'onoffice.reuse_connection' => false,
+            'onoffice.base_url' => 'http://127.0.0.1:1',
+            'onoffice.retry.count' => 1,
+        ]);
 
-        expect($service->reuseConnection())->toBe($reuse)
-            ->and($handlerOf($service))->toBe($reuse ? resolve(OnOfficeService::HTTP_HANDLER) : null);
-    })->with([true, false]);
+        $handler = new MockHandler([$okResponse()]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        $request = new OnOfficeRequest(OnOfficeAction::Get, OnOfficeResourceType::Estate);
+
+        expect(fn () => resolve(OnOfficeService::class)->requestApi($request))
+            ->toThrow(ConnectionException::class)
+            ->and($handler->count())->toBe(1);
+    });
 });
