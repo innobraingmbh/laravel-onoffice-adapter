@@ -25,10 +25,7 @@ class OnOfficeAdapterServiceProvider extends PackageServiceProvider
 
     public function registeringPackage(): void
     {
-        // One Guzzle handler for the whole process. The curl handles it pools
-        // keep their connections open, so every request after the first skips
-        // the TCP and TLS handshake. A singleton (not scoped) so it survives
-        // across queue jobs and Octane requests.
+        // Shared for the whole process so curl can reuse its connection to the API.
         $this->app->singleton(OnOfficeService::HTTP_HANDLER, static fn (): callable => Utils::chooseHandler());
     }
 

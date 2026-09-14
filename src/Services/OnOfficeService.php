@@ -24,8 +24,7 @@ class OnOfficeService
     use OnOfficeParameterConst;
 
     /**
-     * Container key of the Guzzle handler shared by every request this
-     * package sends, so the connection to the API is reused.
+     * Container key of the Guzzle handler shared by every request.
      */
     public const HTTP_HANDLER = 'onoffice.http_handler';
 
@@ -210,18 +209,11 @@ class OnOfficeService
     }
 
     /**
-     * The HTTP client every request is sent through.
-     *
-     * By default Laravel builds a new Guzzle client, and with it a new curl
-     * handler, per request, so no connection outlives the request that opened
-     * it. Handing every request the process-wide handler from the container
-     * lets curl keep the connection to the API open between calls. The handler
-     * sits at the bottom of Laravel's handler stack, so Http::fake(), stray
-     * request prevention and the request events keep working on top of it.
+     * The shared handler sits below Laravel's stack, so fakes still apply.
      */
     protected function pendingRequest(): PendingRequest
     {
-        $pendingRequest = Http::withHeaders(config('onoffice.headers'));
+        $pendingRequest = Http::withHeaders(Config::get('onoffice.headers'));
 
         if ($this->reuseConnection()) {
             $pendingRequest->setHandler(resolve(self::HTTP_HANDLER));
