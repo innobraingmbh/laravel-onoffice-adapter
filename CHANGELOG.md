@@ -2,6 +2,7 @@
 
 ## main
 - perf: the HTTP connection to the onOffice API is reused across requests within a process. Every request after the first skips the TCP and TLS handshake (about 130ms per call). One Guzzle handler is bound as a container singleton under `OnOfficeService::HTTP_HANDLER`; set `onoffice.reuse_connection` to `false` to restore a fresh connection per request
+- feat: read-only mode refuses every mutating action (`create`, `modify`, `delete`, `do`) before it is sent and throws a `ReadOnlyViolationException` — switch it on globally (`ON_OFFICE_READ_ONLY` / `onoffice.read_only`), per credentials (`new OnOfficeApiCredentials(..., readOnly: true)`, `withCredentials($token, $secret, readOnly: true)`) or per query (`->readOnly()`); each layer only ever turns it on, and it guards the package's own code paths, not the token itself
 
 ## v2.0.0
 - See [UPGRADE.md](UPGRADE.md) for the breaking changes below.
