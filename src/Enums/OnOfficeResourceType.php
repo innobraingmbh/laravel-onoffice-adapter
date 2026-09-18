@@ -25,6 +25,7 @@ enum OnOfficeResourceType: string
     case Activity = 'agentslog';
     case GetSearchCriteria = 'searchcriterias';
     case SearchCriteria = 'searchcriteria';
+    case SearchCriteriaFields = 'searchCriteriaFields';
     case ActionTypes = 'actionkindtypes';
     case Relation = 'relation';
     case Search = 'search';

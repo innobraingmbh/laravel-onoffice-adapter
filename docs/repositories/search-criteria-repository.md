@@ -31,6 +31,20 @@ The endpoint cannot list search criteria without ids, so `first()` and `each()` 
 `find([29, 30])` issues one request but only returns the first record. Use `recordIds([29, 30])->get()` to get them all.
 :::
 
+## Fields
+
+The fields a customer has configured as search criteria, grouped by category. Each field carries its label, type, whether it is a range (`rangefield`) or knockout (`ko`) criterion, and the permitted `values` of select fields.
+
+```php
+$categories = SearchCriteriaRepository::fields()
+    ->parameter('language', 'ENG')
+    ->parameter('additionalTranslations', true)
+    ->get();
+
+$categories->first()['elements']['name'];   // "Preise"
+$categories->first()['elements']['fields']; // [['id' => 'kaufpreis', 'rangefield' => 'true', ...], ...]
+```
+
 ## Creating
 
 ```php
