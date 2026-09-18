@@ -1,8 +1,12 @@
 # Changelog
 
 ## main
+
+## v2.2.0
 - feat: add `SearchCriteriaRepository::fields()` to read the fields configured as search criteria, grouped by category (resource type `searchCriteriaFields`); pass `language` / `additionalTranslations` via `parameter()`
 - fix: `SettingRepository::regions()` crashed with `Unknown named parameter` as soon as a custom parameter such as `language` was set; custom parameters are now sent as request parameters
+
+## v2.1.0
 - perf: the HTTP connection to the onOffice API is reused across requests within a process. Every request after the first skips the TCP and TLS handshake (about 130ms per call). One Guzzle handler is bound as a container singleton under `OnOfficeService::HTTP_HANDLER`; set `onoffice.reuse_connection` to `false` to restore a fresh connection per request
 
 ## v2.0.0
