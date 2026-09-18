@@ -62,7 +62,7 @@ class RegionBuilder extends Builder
         return new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Regions,
-            ...$this->customParameters,
+            parameters: $this->customParameters,
         );
     }
 }

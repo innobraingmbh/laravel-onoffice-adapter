@@ -22,6 +22,7 @@ $count = SettingRepository::users()->count();
 ```php
 $regions = SettingRepository::regions()->get();
 $region = SettingRepository::regions()->first();
+$regions = SettingRepository::regions()->parameter('language', 'ENG')->get();
 
 SettingRepository::regions()->each(function (array $regions) {
     // Process chunk
