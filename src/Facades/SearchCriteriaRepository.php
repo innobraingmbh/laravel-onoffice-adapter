@@ -7,12 +7,14 @@ namespace Innobrain\OnOfficeAdapter\Facades;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Query\SearchCriteriaBuilder;
+use Innobrain\OnOfficeAdapter\Query\SearchCriteriaFieldBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\SearchCriteriaRepository as RootRepository;
 
 /**
  * @see RootRepository
  *
  * @method static SearchCriteriaBuilder query()
+ * @method static SearchCriteriaFieldBuilder fields()
  */
 class SearchCriteriaRepository extends BaseRepository
 {

@@ -16,12 +16,11 @@ use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Throwable;
 
 /**
- * The regions endpoint is not paginated: it returns the full tree in one response
- * and reports `meta.cntabsolute` as the total node count. Reads issue a single
- * request rather than looping through requestAll(), which would re-fetch and
- * duplicate the tree once per `ceil(cntabsolute / pageSize)` page.
+ * The fields configured as search criteria, one record per category. Each
+ * record's elements hold the category `name` and its `fields`. The endpoint
+ * is not paginated.
  */
-class RegionBuilder extends Builder
+class SearchCriteriaFieldBuilder extends Builder
 {
     use NonFilterable;
     use NonOrderable;
@@ -47,21 +46,11 @@ class RegionBuilder extends Builder
             ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
-    /**
-     * @deprecated Not paginated; use get(). Only ever invokes the callback once.
-     *
-     * @throws OnOfficeException
-     */
-    public function each(callable $callback): void
-    {
-        $callback($this->requestApi($this->buildReadRequest())->json(OnOfficeResponsePath::RECORDS, []));
-    }
-
     private function buildReadRequest(): OnOfficeRequest
     {
         return new OnOfficeRequest(
             OnOfficeAction::Get,
-            OnOfficeResourceType::Regions,
+            OnOfficeResourceType::SearchCriteriaFields,
             parameters: $this->customParameters,
         );
     }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\RegionFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\GetRegionsResponse;
@@ -22,6 +23,18 @@ describe('fake responses', function () {
             ->and($response->first()['id'])->toBe(1);
 
         SettingRepository::assertSentCount(1);
+    });
+
+    test('get sends custom parameters as request parameters', function () {
+        SettingRepository::fake(SettingRepository::response([
+            SettingRepository::page(recordFactories: [
+                RegionFactory::make()->id(1),
+            ]),
+        ]));
+
+        SettingRepository::regions()->parameter('language', 'ENG')->get();
+
+        SettingRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->parameters === ['language' => 'ENG']);
     });
 });
 

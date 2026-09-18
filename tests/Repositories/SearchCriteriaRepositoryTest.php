@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
+use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Facades\SearchCriteriaRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\SearchCriteriaFactory;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
@@ -45,6 +47,31 @@ describe('fake responses', function () {
         SearchCriteriaRepository::assertSentCount(1);
         SearchCriteriaRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->parameters[OnOfficeService::IDS] === [7, 8]
             && $request->parameters[OnOfficeService::MODE] === 'internal');
+    });
+
+    test('fields reads the search criteria field categories in one request', function () {
+        SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
+            SearchCriteriaRepository::page(recordFactories: [
+                SearchCriteriaFactory::make()->data([
+                    'name' => 'Preise',
+                    'fields' => [
+                        ['id' => 'kaufpreis', 'name' => 'Purchase price', 'rangefield' => 'true'],
+                    ],
+                ]),
+            ]),
+        ]));
+
+        $response = SearchCriteriaRepository::fields()
+            ->parameter('language', 'ENG')
+            ->get();
+
+        expect($response)->toHaveCount(1)
+            ->and($response->first()['elements']['fields'][0]['id'])->toBe('kaufpreis');
+
+        SearchCriteriaRepository::assertSentCount(1);
+        SearchCriteriaRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->actionId === OnOfficeAction::Get
+            && $request->resourceType === OnOfficeResourceType::SearchCriteriaFields
+            && $request->parameters === ['language' => 'ENG']);
     });
 });
 
