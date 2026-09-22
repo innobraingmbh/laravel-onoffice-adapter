@@ -26,6 +26,49 @@ BaseRepository::query()
 Multiple `before()` calls run in order.
 :::
 
+## Read-Only Mode
+
+Refuses every mutating action (`create`, `modify`, `delete` and `do`) before it
+is sent and throws a `ReadOnlyViolationException`. `read` and `get` are
+unaffected.
+
+```php
+use Innobrain\OnOfficeAdapter\Exceptions\ReadOnlyViolationException;
+
+try {
+    EstateRepository::query()->addModify('kaufpreis', 1)->modify(123);
+} catch (ReadOnlyViolationException $e) {
+    $e->request; // the refused OnOfficeRequest
+}
+```
+
+It can be turned on at three levels:
+
+```php
+// 1. Globally: ON_OFFICE_READ_ONLY=true, or in config/onoffice.php
+'read_only' => env('ON_OFFICE_READ_ONLY', false),
+
+// 2. Per credentials
+EstateRepository::query()
+    ->withCredentials($token, $secret, readOnly: true)
+    ->get();
+
+EstateRepository::query()
+    ->withCredentials(new OnOfficeApiCredentials($token, $secret, readOnly: true))
+    ->get();
+
+// 3. Per query
+EstateRepository::query()->readOnly()->get();
+```
+
+Any layer can turn it on, none can turn it off. `readOnly()` takes no
+argument for that reason.
+
+::: warning
+This only guards requests made through this package. The token itself can
+still write.
+:::
+
 ## Custom Endpoints with BaseRepository
 `BaseRepository` sends any request:
 

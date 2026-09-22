@@ -40,4 +40,10 @@ return [
      */
     'token' => env('ON_OFFICE_TOKEN', ''),
     'secret' => env('ON_OFFICE_SECRET', ''),
+
+    /**
+     * Refuse every mutating action (create, modify, delete and do) before it
+     * is sent and throw a ReadOnlyViolationException instead.
+     */
+    'read_only' => env('ON_OFFICE_READ_ONLY', false),
 ];
