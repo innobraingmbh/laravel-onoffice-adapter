@@ -1,6 +1,9 @@
 # Changelog
 ## main
 
+## v0.10.4
+- Backport from v2.0.0: a failing page anywhere in a paginated read (`get()`, `each()`) now throws the `OnOfficeException` instead of logging it and returning the pages collected so far
+
 ## v0.10.3
 - Added previously added upload in chunks method to fake builder
 

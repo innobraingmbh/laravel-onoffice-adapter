@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeError;
@@ -167,11 +166,7 @@ describe('exceptions', function () {
 });
 
 describe('requestAll', function () {
-    it('logs the request error', function (int $statusCode) {
-        Log::shouldReceive('error')
-            ->once()
-            ->with("Error message - $statusCode");
-
+    it('throws the request error', function (int $statusCode) {
         Http::preventStrayRequests();
         Http::fake([
             '*' => Http::response([
@@ -190,7 +185,39 @@ describe('requestAll', function () {
                 OnOfficeResourceType::Estate,
             );
         });
-    })->with([300, 301, 400, 401, 500, 501]);
+    })->with([300, 301, 400, 401, 500, 501])->throws(OnOfficeException::class);
+
+    it('throws when a later page fails instead of returning partial data', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::sequence()->push([
+                'status' => ['code' => 200],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => ['cntabsolute' => 1000],
+                                'records' => [['id' => 1]],
+                            ],
+                        ],
+                    ],
+                ],
+            ])->push([
+                'status' => ['code' => 500, 'message' => 'Second page failed'],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        expect(fn () => $onOfficeService->requestAll(function () {
+            return app(OnOfficeService::class)->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Estate,
+            );
+        }))->toThrow(OnOfficeException::class, 'Second page failed');
+
+        Http::assertSentCount(2);
+    });
 
     it('can handle null in result path', function () {
         Http::preventStrayRequests();
@@ -228,11 +255,7 @@ describe('requestAll', function () {
 });
 
 describe('requestAllChunked', function () {
-    it('logs the request error', function (int $statusCode) {
-        Log::shouldReceive('error')
-            ->once()
-            ->with("Error message - $statusCode");
-
+    it('throws the request error', function (int $statusCode) {
         Http::preventStrayRequests();
         Http::fake([
             '*' => Http::response([
@@ -251,7 +274,44 @@ describe('requestAllChunked', function () {
                 OnOfficeResourceType::Estate,
             );
         }, function () {});
-    })->with([300, 301, 400, 401, 500, 501]);
+    })->with([300, 301, 400, 401, 500, 501])->throws(OnOfficeException::class);
+
+    it('throws when a later page fails instead of stopping silently', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::sequence()->push([
+                'status' => ['code' => 200],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => ['cntabsolute' => 1000],
+                                'records' => [['id' => 1]],
+                            ],
+                        ],
+                    ],
+                ],
+            ])->push([
+                'status' => ['code' => 500, 'message' => 'Second page failed'],
+            ]),
+        ]);
+
+        $onOfficeService = app(OnOfficeService::class);
+
+        $pages = collect();
+
+        expect(fn () => $onOfficeService->requestAllChunked(function () {
+            return app(OnOfficeService::class)->requestApi(
+                OnOfficeAction::Get,
+                OnOfficeResourceType::Estate,
+            );
+        }, function (array $records) use ($pages) {
+            $pages->push($records);
+        }))->toThrow(OnOfficeException::class, 'Second page failed');
+
+        expect($pages)->toHaveCount(1);
+        Http::assertSentCount(2);
+    });
 
     it('will call the callback', function () {
         Http::fake([

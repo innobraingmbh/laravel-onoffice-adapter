@@ -9,7 +9,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeAction;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Katalam\OnOfficeAdapter\Enums\OnOfficeResourceType;
@@ -127,13 +126,7 @@ class OnOfficeService
         $maxPage = 0;
         $data = collect();
         do {
-            try {
-                $response = $request($pageSize, $offset);
-            } catch (OnOfficeException $exception) {
-                Log::error("{$exception->getMessage()} - {$exception->getCode()}");
-
-                return $data;
-            }
+            $response = $request($pageSize, $offset);
 
             // If the maxPage is 0,
             // we need to calculate it from the total count of estates
@@ -175,13 +168,7 @@ class OnOfficeService
     ): void {
         $maxPage = 0;
         do {
-            try {
-                $response = $request($pageSize, $offset);
-            } catch (OnOfficeException $exception) {
-                Log::error("{$exception->getMessage()} - {$exception->getCode()}");
-
-                return;
-            }
+            $response = $request($pageSize, $offset);
 
             // If the maxPage is 0,
             // we need to calculate it from the total count of estates
