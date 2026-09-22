@@ -86,7 +86,8 @@ class OnOfficeService
 
         $timestamp = Carbon::now()->timestamp;
 
-        $response = Http::onOffice()
+        $response = Http::withHeaders(Config::get('onoffice.headers'))
+            ->baseUrl(Config::get('onoffice.base_url'))
             ->post('/', [
                 'token' => $this->getToken(),
                 'request' => [
