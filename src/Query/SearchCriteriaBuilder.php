@@ -186,9 +186,7 @@ class SearchCriteriaBuilder extends Builder
             OnOfficeAction::Delete,
             OnOfficeResourceType::SearchCriteria,
             $id,
-            parameters: [
-                ...$this->customParameters,
-            ],
+            parameters: $this->customParameters,
         );
 
         return $this->requestApi($request)

@@ -256,16 +256,12 @@ class ProbeSearchCriteriaCommand extends Command
         }
 
         $note = 'adapter probe '.now()->toDateTimeString();
-        $id = 0;
+        $id = (int) (SearchCriteriaRepository::query()->addressId($addressId)->create([
+            'vermarktungsart' => 'kauf',
+            'krit_bemerkung_oeffentlich' => $note,
+        ])['id'] ?? 0);
 
-        $this->components->task("create()  for address {$addressId}", function () use ($addressId, $note, &$id): bool {
-            $id = (int) (SearchCriteriaRepository::query()->addressId($addressId)->create([
-                'vermarktungsart' => 'kauf',
-                'krit_bemerkung_oeffentlich' => $note,
-            ])['id'] ?? 0);
-
-            return $id > 0;
-        });
+        $this->components->task("create()  for address {$addressId}  [id {$id}]", fn (): bool => $id > 0);
 
         if ($id === 0) {
             return;
