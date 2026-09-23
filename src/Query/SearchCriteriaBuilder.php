@@ -55,6 +55,10 @@ class SearchCriteriaBuilder extends Builder
     #[Override]
     public function get(): Collection
     {
+        if ($this->mode === 'filter') {
+            return $this->getFiltered();
+        }
+
         $request = new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::GetSearchCriteria,
@@ -69,6 +73,64 @@ class SearchCriteriaBuilder extends Builder
         $records = $this->requestApi($request)->json(OnOfficeResponsePath::RECORDS, []);
 
         return collect($records);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    #[Override]
+    public function first(): ?array
+    {
+        throw_unless($this->mode === 'filter', OnOfficeQueryException::class, 'first() is only supported in filter mode. Use find() to read by id.');
+
+        return (clone $this)->limit(1)->getFiltered()->first();
+    }
+
+    /**
+     * The filter mode reports `meta.cntabsolute` as the number of records on the
+     * page instead of the total, so pages are read until one comes back short.
+     *
+     * @return Collection<int, array<string, mixed>>
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    private function getFiltered(): Collection
+    {
+        throw_if($this->orderBy === [], OnOfficeQueryException::class, 'The filter mode requires a sort order, e.g. orderBy(\'creationdate\').');
+
+        $records = collect();
+
+        if ($this->limit === 0) {
+            return $records;
+        }
+
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::GetSearchCriteria,
+            parameters: [
+                OnOfficeService::MODE => 'filter',
+                OnOfficeService::FILTER => $this->getFilters(),
+                ...$this->getSplitSortParameters(),
+                ...$this->customParameters,
+            ],
+        );
+
+        $offset = $this->offset;
+
+        do {
+            $pageSize = $this->limit === -1 ? $this->pageSize : min($this->pageSize, $this->limit - $records->count());
+            $this->applyListWindow($request, $pageSize, $offset);
+
+            /** @var array<int, array<string, mixed>> $page */
+            $page = $this->requestApi($request)->json(OnOfficeResponsePath::RECORDS, []);
+
+            $records->push(...$page);
+            $offset += $pageSize;
+        } while (count($page) === $pageSize && ($this->limit === -1 || $records->count() < $this->limit));
+
+        return $records;
     }
 
     /**
@@ -87,11 +149,48 @@ class SearchCriteriaBuilder extends Builder
             parameters: [
                 OnOfficeService::ADDRESSID => $this->addressId,
                 OnOfficeService::DATA => $data,
+                ...$this->customParameters,
             ],
         );
 
         return $this->requestApi($request)
             ->json(OnOfficeResponsePath::FIRST_RECORD);
+    }
+
+    /**
+     * @throws Throwable<OnOfficeException>
+     */
+    public function modify(int $id): bool
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Modify,
+            OnOfficeResourceType::SearchCriteria,
+            $id,
+            parameters: [
+                OnOfficeService::DATA => $this->modifies,
+                ...$this->customParameters,
+            ],
+        );
+
+        $this->requestApi($request);
+
+        return true;
+    }
+
+    /**
+     * @throws Throwable<OnOfficeException>
+     */
+    public function delete(int $id): bool
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Delete,
+            OnOfficeResourceType::SearchCriteria,
+            $id,
+            parameters: $this->customParameters,
+        );
+
+        return $this->requestApi($request)
+            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_SUCCESS) === 'success';
     }
 
     public function mode(string $mode): self

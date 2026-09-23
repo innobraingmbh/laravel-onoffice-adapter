@@ -8,6 +8,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Query\SearchCriteriaBuilder;
 use Innobrain\OnOfficeAdapter\Query\SearchCriteriaFieldBuilder;
+use Innobrain\OnOfficeAdapter\Query\SearchCriteriaMatchBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\SearchCriteriaRepository as RootRepository;
 
 /**
@@ -15,6 +16,7 @@ use Innobrain\OnOfficeAdapter\Repositories\SearchCriteriaRepository as RootRepos
  *
  * @method static SearchCriteriaBuilder query()
  * @method static SearchCriteriaFieldBuilder fields()
+ * @method static SearchCriteriaMatchBuilder matching(array<string, mixed> $values = [])
  */
 class SearchCriteriaRepository extends BaseRepository
 {

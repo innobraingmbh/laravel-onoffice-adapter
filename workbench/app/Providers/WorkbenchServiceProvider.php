@@ -17,6 +17,7 @@ use Workbench\App\Console\Commands\ProbeEstateLanguagesCommand;
 use Workbench\App\Console\Commands\ProbeFindCommand;
 use Workbench\App\Console\Commands\ProbeOrderByCommand;
 use Workbench\App\Console\Commands\ProbeRegionsCommand;
+use Workbench\App\Console\Commands\ProbeSearchCriteriaCommand;
 
 class WorkbenchServiceProvider extends ServiceProvider
 {
@@ -47,6 +48,7 @@ class WorkbenchServiceProvider extends ServiceProvider
                 ProbeFindCommand::class,
                 ProbeOrderByCommand::class,
                 ProbeRegionsCommand::class,
+                ProbeSearchCriteriaCommand::class,
             ]);
         }
     }
