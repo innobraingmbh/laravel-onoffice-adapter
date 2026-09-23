@@ -2,6 +2,13 @@
 
 ## main
 
+## v2.3.0
+- feat: add `SearchCriteriaRepository::matching()` to find the search criteria that match a set of field values (action `get`, resource type `search`, resource id `searchcriteria`), with `searchData()`, `select()`/`outputAll()`, `groupByAddress()`, `orderBy()`, `count()` and `paginate()`; the endpoint pages with `offset`/`limit` and cannot order by `Id`
+- feat: add `SearchCriteriaBuilder::modify()` to change a search criteria's fields (`addModify(...)->modify($id)`)
+- feat: add `SearchCriteriaBuilder::delete()` to delete a search criteria
+- feat: `SearchCriteriaRepository::query()->mode('filter')` lists search criteria without ids, filtered and sorted by their `_meta` fields (`where()`, `orderBy()` (required), `offset()`, `limit()`, `first()`); pages are read until one comes back short because the endpoint reports the page size as `cntabsolute`
+- fix: `SearchCriteriaBuilder::create()` sends custom parameters set via `parameter()`
+
 ## v2.2.0
 - feat: add `SearchCriteriaRepository::fields()` to read the fields configured as search criteria, grouped by category (resource type `searchCriteriaFields`); pass `language` / `additionalTranslations` via `parameter()`
 - fix: `SettingRepository::regions()` crashed with `Unknown named parameter` as soon as a custom parameter such as `language` was set; custom parameters are now sent as request parameters
