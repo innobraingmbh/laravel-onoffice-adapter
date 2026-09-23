@@ -51,6 +51,107 @@ describe('fake responses', function () {
             && $request->parameters[OnOfficeService::MODE] === 'internal');
     });
 
+    test('filter mode sends the filter and sort order', function () {
+        SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
+            SearchCriteriaRepository::page(recordFactories: [
+                SearchCriteriaFactory::make()->id(47),
+            ]),
+        ]));
+
+        $response = SearchCriteriaRepository::query()
+            ->mode('filter')
+            ->where('advisor', 12)
+            ->whereBetween('creationdate', '2024-01-01', '2024-12-31')
+            ->orderByDesc('creationdate')
+            ->get();
+
+        expect($response->pluck('id')->all())->toBe([47]);
+
+        SearchCriteriaRepository::assertSentCount(1);
+        SearchCriteriaRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->actionId === OnOfficeAction::Get
+            && $request->resourceType === OnOfficeResourceType::GetSearchCriteria
+            && $request->parameters === [
+                OnOfficeService::MODE => 'filter',
+                OnOfficeService::FILTER => [
+                    'advisor' => [['op' => '=', 'val' => 12]],
+                    'creationdate' => [['op' => 'between', 'val' => ['2024-01-01', '2024-12-31']]],
+                ],
+                OnOfficeService::SORTBY => 'creationdate',
+                OnOfficeService::SORTORDER => 'DESC',
+                OnOfficeService::LISTLIMIT => 500,
+                OnOfficeService::LISTOFFSET => 0,
+            ]);
+    });
+
+    test('filter mode reads pages until one comes back short', function () {
+        SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
+            SearchCriteriaRepository::page(recordFactories: [
+                SearchCriteriaFactory::make()->id(1),
+                SearchCriteriaFactory::make()->id(2),
+            ], countAbsolute: 2),
+            SearchCriteriaRepository::page(recordFactories: [
+                SearchCriteriaFactory::make()->id(3),
+            ], countAbsolute: 1),
+        ]));
+
+        $response = SearchCriteriaRepository::query()
+            ->mode('filter')
+            ->orderBy('internaladdressid')
+            ->pageSize(2)
+            ->get();
+
+        expect($response->pluck('id')->all())->toBe([1, 2, 3]);
+
+        SearchCriteriaRepository::assertSentCount(2);
+    });
+
+    test('filter mode stops reading at the limit', function () {
+        SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
+            SearchCriteriaRepository::page(recordFactories: [
+                SearchCriteriaFactory::make()->id(1),
+                SearchCriteriaFactory::make()->id(2),
+            ]),
+        ]));
+
+        $response = SearchCriteriaRepository::query()
+            ->mode('filter')
+            ->orderBy('internaladdressid')
+            ->offset(10)
+            ->limit(2)
+            ->get();
+
+        expect($response->pluck('id')->all())->toBe([1, 2]);
+
+        SearchCriteriaRepository::assertSentCount(1);
+        SearchCriteriaRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->parameters[OnOfficeService::LISTLIMIT] === 2
+            && $request->parameters[OnOfficeService::LISTOFFSET] === 10);
+    });
+
+    test('filter mode reads the first record', function () {
+        SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
+            SearchCriteriaRepository::page(recordFactories: [
+                SearchCriteriaFactory::make()->id(55),
+            ]),
+        ]));
+
+        $record = SearchCriteriaRepository::query()
+            ->mode('filter')
+            ->orderByDesc('creationdate')
+            ->first();
+
+        expect($record['id'])->toBe(55);
+
+        SearchCriteriaRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->parameters[OnOfficeService::LISTLIMIT] === 1);
+    });
+
+    test('filter mode requires a sort order', function () {
+        SearchCriteriaRepository::query()->mode('filter')->where('advisor', 12)->get();
+    })->throws(OnOfficeQueryException::class);
+
+    test('first requires filter mode', function () {
+        SearchCriteriaRepository::query()->mode('searchcriteria')->first();
+    })->throws(OnOfficeQueryException::class);
+
     test('fields reads the search criteria field categories in one request', function () {
         SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
             SearchCriteriaRepository::page(recordFactories: [
