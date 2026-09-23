@@ -72,4 +72,18 @@ trait OnOfficeParameterConst
     public const TYPE = 'type';
 
     public const USER = 'user';
+
+    public const SEARCHDATA = 'searchdata';
+
+    public const OUTPUTALL = 'outputall';
+
+    public const OUTPUTFIELDS = 'outputfields';
+
+    public const GROUPBYADDRESS = 'groupbyaddress';
+
+    public const ORDER = 'order';
+
+    public const LIMIT = 'limit';
+
+    public const OFFSET = 'offset';
 }

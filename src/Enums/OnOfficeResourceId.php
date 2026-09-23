@@ -9,5 +9,6 @@ enum OnOfficeResourceId: string
     case Estate = 'estate';
     case Address = 'address';
     case AgentsLog = 'agentslog';
+    case SearchCriteria = 'searchcriteria';
     case None = '';
 }

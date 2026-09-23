@@ -71,6 +71,28 @@ SearchCriteriaRepository::query()
     ->modify(29);
 ```
 
+## Matching
+
+Find the search criteria that match a set of field values, e.g. the ones a listing would satisfy. Each record holds the search criteria `Id` and the linked address (`adresse`).
+
+```php
+$matches = SearchCriteriaRepository::matching(['vermarktungsart' => 'kauf', 'range_plz' => '52074'])
+    ->select(['Id', 'adresse', 'kaufpreis__bis']) // or ->outputAll()
+    ->groupByAddress(false) // default: one search criteria per address
+    ->orderByDesc('kaufpreis__bis')
+    ->get();
+
+$total = SearchCriteriaRepository::matching(['vermarktungsart' => 'kauf'])->count();
+
+$page = SearchCriteriaRepository::matching(['vermarktungsart' => 'kauf'])
+    ->when($zip, fn ($query) => $query->searchData(['range_plz' => $zip]))
+    ->paginate(perPage: 25);
+```
+
+::: warning
+The endpoint cannot order by `Id`; order by a search criteria field instead.
+:::
+
 ## Response Structure
 
 Field values by type:
