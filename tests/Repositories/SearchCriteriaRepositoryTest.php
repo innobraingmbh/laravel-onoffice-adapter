@@ -198,6 +198,46 @@ describe('fake responses', function () {
             ]);
     });
 
+    test('create sends the address, data and custom parameters', function () {
+        SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
+            SearchCriteriaRepository::page(recordFactories: [
+                SearchCriteriaFactory::make()->id(83),
+            ]),
+        ]));
+
+        $created = SearchCriteriaRepository::query()
+            ->addressId(32)
+            ->parameter('extendedclaim', 'claim')
+            ->create(['vermarktungsart' => 'kauf']);
+
+        expect($created['id'])->toBe(83);
+
+        SearchCriteriaRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->actionId === OnOfficeAction::Create
+            && $request->resourceType === OnOfficeResourceType::SearchCriteria
+            && $request->parameters === [
+                OnOfficeService::ADDRESSID => 32,
+                OnOfficeService::DATA => ['vermarktungsart' => 'kauf'],
+                'extendedclaim' => 'claim',
+            ]);
+    });
+
+    test('delete removes the search criteria', function () {
+        SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
+            SearchCriteriaRepository::page(recordFactories: [
+                SearchCriteriaFactory::make()->data(['success' => 'success']),
+            ]),
+        ]));
+
+        $result = SearchCriteriaRepository::query()->delete(83);
+
+        expect($result)->toBeTrue();
+
+        SearchCriteriaRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->actionId === OnOfficeAction::Delete
+            && $request->resourceType === OnOfficeResourceType::SearchCriteria
+            && $request->resourceId === 83
+            && $request->parameters === []);
+    });
+
     test('matching searches the search criteria that fit the search data', function () {
         SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
             SearchCriteriaRepository::page(recordFactories: [

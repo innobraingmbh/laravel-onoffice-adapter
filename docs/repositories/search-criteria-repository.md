@@ -1,6 +1,6 @@
 # Search Criteria Repository
 
-Manage search criteria. Reads (`find()`, `get()`, `first()`) use resource type `searchcriterias`; `create()` and `modify()` use `searchcriteria`.
+Manage search criteria. Reads (`find()`, `get()`, `first()`) use resource type `searchcriterias`; `create()`, `modify()` and `delete()` use `searchcriteria`.
 
 ## Modes
 
@@ -93,6 +93,12 @@ SearchCriteriaRepository::query()
         'krit_bemerkung_oeffentlich' => 'Only south-facing',
     ])
     ->modify(29);
+```
+
+## Deleting
+
+```php
+SearchCriteriaRepository::query()->delete(29);
 ```
 
 ## Matching

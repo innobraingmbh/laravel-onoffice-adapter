@@ -149,6 +149,7 @@ class SearchCriteriaBuilder extends Builder
             parameters: [
                 OnOfficeService::ADDRESSID => $this->addressId,
                 OnOfficeService::DATA => $data,
+                ...$this->customParameters,
             ],
         );
 
@@ -174,6 +175,24 @@ class SearchCriteriaBuilder extends Builder
         $this->requestApi($request);
 
         return true;
+    }
+
+    /**
+     * @throws Throwable<OnOfficeException>
+     */
+    public function delete(int $id): bool
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Delete,
+            OnOfficeResourceType::SearchCriteria,
+            $id,
+            parameters: [
+                ...$this->customParameters,
+            ],
+        );
+
+        return $this->requestApi($request)
+            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_SUCCESS) === 'success';
     }
 
     public function mode(string $mode): self
