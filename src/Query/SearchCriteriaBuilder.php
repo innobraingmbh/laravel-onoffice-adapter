@@ -94,6 +94,26 @@ class SearchCriteriaBuilder extends Builder
             ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
+    /**
+     * @throws Throwable<OnOfficeException>
+     */
+    public function modify(int $id): bool
+    {
+        $request = new OnOfficeRequest(
+            OnOfficeAction::Modify,
+            OnOfficeResourceType::SearchCriteria,
+            $id,
+            parameters: [
+                OnOfficeService::DATA => $this->modifies,
+                ...$this->customParameters,
+            ],
+        );
+
+        $this->requestApi($request);
+
+        return true;
+    }
+
     public function mode(string $mode): self
     {
         $this->mode = $mode;

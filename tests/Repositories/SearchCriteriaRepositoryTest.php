@@ -73,6 +73,27 @@ describe('fake responses', function () {
             && $request->resourceType === OnOfficeResourceType::SearchCriteriaFields
             && $request->parameters === ['language' => 'ENG']);
     });
+
+    test('modify sends the changes as data of the search criteria', function () {
+        SearchCriteriaRepository::fake(SearchCriteriaRepository::response([
+            SearchCriteriaRepository::page(),
+        ]));
+
+        $result = SearchCriteriaRepository::query()
+            ->addModify('kaufpreis__bis', '500000')
+            ->addModify(['sys_ko' => ['kaufpreis']])
+            ->modify(25);
+
+        expect($result)->toBeTrue();
+
+        SearchCriteriaRepository::assertSentCount(1);
+        SearchCriteriaRepository::assertSent(fn (OnOfficeRequest $request): bool => $request->actionId === OnOfficeAction::Modify
+            && $request->resourceType === OnOfficeResourceType::SearchCriteria
+            && $request->resourceId === 25
+            && $request->parameters === [
+                OnOfficeService::DATA => ['kaufpreis__bis' => '500000', 'sys_ko' => ['kaufpreis']],
+            ]);
+    });
 });
 
 describe('real responses', function () {

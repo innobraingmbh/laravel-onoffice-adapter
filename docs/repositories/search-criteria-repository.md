@@ -1,6 +1,6 @@
 # Search Criteria Repository
 
-Manage search criteria. Reads (`find()`, `get()`) use resource type `searchcriterias`; `create()` uses `searchcriteria`.
+Manage search criteria. Reads (`find()`, `get()`) use resource type `searchcriterias`; `create()` and `modify()` use `searchcriteria`.
 
 ## Modes
 
@@ -55,6 +55,20 @@ $created = SearchCriteriaRepository::query()
         'objektart' => ['haus', 'wohnung'],
         'range_kaufpreis' => [100000, 500000],
     ]);
+```
+
+## Modifying
+
+Only the fields you pass are changed. Range fields take the `__von` / `__bis` suffixes.
+
+```php
+SearchCriteriaRepository::query()
+    ->addModify('kaufpreis__bis', '500000')
+    ->addModify([
+        'sys_ko' => ['kaufpreis', 'objektart'],
+        'krit_bemerkung_oeffentlich' => 'Only south-facing',
+    ])
+    ->modify(29);
 ```
 
 ## Response Structure
