@@ -29,12 +29,20 @@ class OnOfficeService
     public const HTTP_HANDLER = 'onoffice.http_handler';
 
     public function __construct(
-        private ?OnOfficeApiCredentials $credentials = null
+        private ?OnOfficeApiCredentials $credentials = null,
+        private ?int $timeout = null,
     ) {}
 
     public function setCredentials(?OnOfficeApiCredentials $credentials): static
     {
         $this->credentials = $credentials;
+
+        return $this;
+    }
+
+    public function setTimeout(?int $seconds): static
+    {
+        $this->timeout = $seconds;
 
         return $this;
     }
@@ -88,6 +96,13 @@ class OnOfficeService
     public function reuseConnection(): bool
     {
         return Config::get('onoffice.reuse_connection', true) ?? true;
+    }
+
+    public function getTimeout(): int
+    {
+        $timeout = $this->timeout ?? Config::get('onoffice.timeout', 30) ?? 30;
+
+        return max($timeout, 1);
     }
 
     /*
@@ -213,7 +228,8 @@ class OnOfficeService
      */
     protected function pendingRequest(): PendingRequest
     {
-        $pendingRequest = Http::withHeaders(Config::get('onoffice.headers'));
+        $pendingRequest = Http::withHeaders(Config::get('onoffice.headers'))
+            ->timeout($this->getTimeout());
 
         if ($this->reuseConnection()) {
             $pendingRequest->setHandler(resolve(self::HTTP_HANDLER));

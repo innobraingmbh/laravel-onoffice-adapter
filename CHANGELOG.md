@@ -2,6 +2,9 @@
 
 ## main
 
+## v2.4.0
+- feat: configurable HTTP timeout. `onoffice.timeout` (default 30 seconds, as before) sets how long to wait for the onOffice API; `timeout(int $seconds)` on any query overrides it for that query only, e.g. `SettingRepository::regions()->timeout(120)->get()`
+
 ## v2.3.0
 - feat: add `SearchCriteriaRepository::matching()` to find the search criteria that match a set of field values (action `get`, resource type `search`, resource id `searchcriteria`), with `searchData()`, `select()`/`outputAll()`, `groupByAddress()`, `orderBy()`, `count()` and `paginate()`; the endpoint pages with `offset`/`limit` and cannot order by `Id`
 - feat: add `SearchCriteriaBuilder::modify()` to change a search criteria's fields (`addModify(...)->modify($id)`)

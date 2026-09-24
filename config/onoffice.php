@@ -36,6 +36,12 @@ return [
     'reuse_connection' => true,
 
     /**
+     * Seconds to wait for the onOffice API to answer a request.
+     * Override it per query with timeout() for calls known to be slow.
+     */
+    'timeout' => 30,
+
+    /**
      * The token and secret to be used for authentication with the OnOffice API.
      */
     'token' => env('ON_OFFICE_TOKEN', ''),

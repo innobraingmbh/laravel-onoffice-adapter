@@ -127,6 +127,11 @@ class Builder implements BuilderInterface
     protected array $afterSendingCallbacks = [];
 
     /**
+     * Seconds to wait for the API, overriding the configured timeout.
+     */
+    protected ?int $timeout = null;
+
+    /**
      * The last request that was made. Needed for the stubbing.
      */
     private ?OnOfficeRequest $requestCache = null;
@@ -158,6 +163,13 @@ class Builder implements BuilderInterface
         return $this->credentials;
     }
 
+    public function timeout(int $seconds): static
+    {
+        $this->timeout = $seconds;
+
+        return $this;
+    }
+
     /**
      * Whether this builder must not hit the live API: its repository
      * queued fake responses or opted into stray-request prevention.
@@ -170,7 +182,7 @@ class Builder implements BuilderInterface
     protected function getOnOfficeService(): OnOfficeService
     {
         return tap($this->onOfficeService ?? $this->createOnOfficeService(),
-            fn (OnOfficeService $service) => $service->setCredentials($this->credentials)
+            fn (OnOfficeService $service) => $service->setCredentials($this->credentials)->setTimeout($this->timeout)
         );
     }
 

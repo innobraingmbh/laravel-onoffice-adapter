@@ -748,6 +748,45 @@ describe('http connection', function () {
         expect($handler->getLastRequest())->toBeNull();
     });
 
+    it('waits 30 seconds for an answer by default', function () use ($okResponse) {
+        $handler = new MockHandler([$okResponse()]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        resolve(OnOfficeService::class)->requestApi(new OnOfficeRequest(OnOfficeAction::Get, OnOfficeResourceType::Estate));
+
+        expect($handler->getLastOptions()['timeout'])->toBe(30);
+    });
+
+    it('waits as long as configured', function () use ($okResponse) {
+        Config::set(['onoffice.timeout' => 90]);
+
+        $handler = new MockHandler([$okResponse()]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        resolve(OnOfficeService::class)->requestApi(new OnOfficeRequest(OnOfficeAction::Get, OnOfficeResourceType::Estate));
+
+        expect($handler->getLastOptions()['timeout'])->toBe(90);
+    });
+
+    it('prefers the timeout set on the service over the config', function () use ($okResponse) {
+        Config::set(['onoffice.timeout' => 90]);
+
+        $handler = new MockHandler([$okResponse()]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        resolve(OnOfficeService::class)
+            ->setTimeout(120)
+            ->requestApi(new OnOfficeRequest(OnOfficeAction::Get, OnOfficeResourceType::Estate));
+
+        expect($handler->getLastOptions()['timeout'])->toBe(120);
+    });
+
+    it('waits at least one second', function (int $given) {
+        Config::set(['onoffice.timeout' => $given]);
+
+        expect(resolve(OnOfficeService::class)->getTimeout())->toBe(1);
+    })->with([0, -5]);
+
     it('is reused by default', function () {
         expect(resolve(OnOfficeService::class)->reuseConnection())->toBeTrue();
     });

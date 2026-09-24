@@ -2,7 +2,11 @@
 
 declare(strict_types=1);
 
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 use Innobrain\OnOfficeAdapter\Query\Builder;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 
 describe('select', function () {
     it('should set the columns property to the given columns', function () {
@@ -472,5 +476,39 @@ describe('getOrderBy', function () {
             'ID' => 'DESC',
             'Name' => 'ASC',
         ]);
+    });
+});
+
+describe('timeout', function () {
+    $regionsResponse = fn (): GuzzleResponse => new GuzzleResponse(200, ['Content-Type' => 'application/json'], json_encode([
+        'status' => ['code' => 200, 'errorcode' => 0, 'message' => 'OK'],
+        'response' => ['results' => [[
+            'actionid' => 'urn:onoffice-de-ns:smart:2.5:smartml:action:get',
+            'resourceid' => '',
+            'resourcetype' => 'regions',
+            'cacheable' => true,
+            'identifier' => '',
+            'data' => ['meta' => ['cntabsolute' => 0], 'records' => []],
+            'status' => ['errorcode' => 0, 'message' => 'OK'],
+        ]]],
+    ]));
+
+    it('sends the query with its own timeout', function () use ($regionsResponse) {
+        $handler = new MockHandler([$regionsResponse()]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        SettingRepository::regions()->timeout(120)->get();
+
+        expect($handler->getLastOptions()['timeout'])->toBe(120);
+    });
+
+    it('does not leak its timeout into the next query', function () use ($regionsResponse) {
+        $handler = new MockHandler([$regionsResponse(), $regionsResponse()]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        SettingRepository::regions()->timeout(120)->get();
+        SettingRepository::regions()->get();
+
+        expect($handler->getLastOptions()['timeout'])->toBe(30);
     });
 });
