@@ -28,10 +28,12 @@ class OnOfficeService
      */
     public const HTTP_HANDLER = 'onoffice.http_handler';
 
+    private ?int $timeout = null;
+
+    private ?int $retryCount = null;
+
     public function __construct(
-        private ?OnOfficeApiCredentials $credentials = null,
-        private ?int $timeout = null,
-        private ?int $retryCount = null,
+        private ?OnOfficeApiCredentials $credentials = null
     ) {}
 
     public function setCredentials(?OnOfficeApiCredentials $credentials): static
