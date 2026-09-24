@@ -3,6 +3,7 @@
 ## main
 
 ## v2.5.0
+- fix: a batch sent after a query with `timeout()` (v2.4.0) or `retry()` used that query's timeout and retry count instead of the configured ones
 - feat: `retry(int $times)` on any query overrides `onoffice.retry.count` for that query only, e.g. `SettingRepository::regions()->timeout(90)->retry(1)->get()` to try a slow call once instead of three times
 
 ## v2.4.0

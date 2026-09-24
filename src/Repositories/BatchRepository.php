@@ -73,7 +73,10 @@ class BatchRepository extends BaseRepository
 
     protected function onOfficeService(?OnOfficeApiCredentials $credentials): OnOfficeService
     {
-        return resolve(OnOfficeService::class)->setCredentials($credentials);
+        return resolve(OnOfficeService::class)
+            ->setCredentials($credentials)
+            ->setTimeout(null)
+            ->setRetryCount(null);
     }
 
     /**

@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
@@ -13,9 +18,11 @@ use Innobrain\OnOfficeAdapter\Exceptions\StrayRequestException;
 use Innobrain\OnOfficeAdapter\Facades\AddressRepository;
 use Innobrain\OnOfficeAdapter\Facades\EstateRepository;
 use Innobrain\OnOfficeAdapter\Facades\Query;
+use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 use Innobrain\OnOfficeAdapter\Facades\TaskRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\AddressFactory;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\EstateFactory;
+use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 
 describe('fake responses', function () {
     test('once returns one result per action', function () {
@@ -482,5 +489,33 @@ describe('real responses', function () {
 
         Http::assertSent(fn (Request $request): bool => data_get($request->data(), 'token') === 'tenant-token'
             && data_get($request->data(), 'request.actions.0.parameters.extendedclaim') === 'tenant-claim');
+    });
+
+    test('a batch does not inherit the timeout or retry count of an earlier query', function () {
+        Config::set(['onoffice.retry.count' => 3, 'onoffice.retry.delay' => 1]);
+
+        $emptyResult = fn (): GuzzleResponse => new GuzzleResponse(200, ['Content-Type' => 'application/json'], json_encode([
+            'status' => ['code' => 200, 'errorcode' => 0, 'message' => 'OK'],
+            'response' => ['results' => [[
+                'data' => ['meta' => ['cntabsolute' => 0], 'records' => []],
+                'status' => ['errorcode' => 0, 'message' => 'OK'],
+            ]]],
+        ]));
+
+        $handler = new MockHandler([
+            $emptyResult(),
+            new ConnectException('Operation timed out', new GuzzleRequest('POST', 'https://api.onoffice.de')),
+            $emptyResult(),
+        ]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        SettingRepository::regions()->timeout(90)->retry(1)->get();
+
+        Query::batch([
+            new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate),
+        ])->once();
+
+        expect($handler->count())->toBe(0)
+            ->and($handler->getLastOptions()['timeout'])->toBe(30);
     });
 });
