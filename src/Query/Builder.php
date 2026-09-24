@@ -132,6 +132,11 @@ class Builder implements BuilderInterface
     protected ?int $timeout = null;
 
     /**
+     * How many times to try each request, overriding the configured retry count.
+     */
+    protected ?int $retryCount = null;
+
+    /**
      * The last request that was made. Needed for the stubbing.
      */
     private ?OnOfficeRequest $requestCache = null;
@@ -170,6 +175,13 @@ class Builder implements BuilderInterface
         return $this;
     }
 
+    public function retry(int $times): static
+    {
+        $this->retryCount = $times;
+
+        return $this;
+    }
+
     /**
      * Whether this builder must not hit the live API: its repository
      * queued fake responses or opted into stray-request prevention.
@@ -182,7 +194,10 @@ class Builder implements BuilderInterface
     protected function getOnOfficeService(): OnOfficeService
     {
         return tap($this->onOfficeService ?? $this->createOnOfficeService(),
-            fn (OnOfficeService $service) => $service->setCredentials($this->credentials)->setTimeout($this->timeout)
+            fn (OnOfficeService $service) => $service
+                ->setCredentials($this->credentials)
+                ->setTimeout($this->timeout)
+                ->setRetryCount($this->retryCount)
         );
     }
 

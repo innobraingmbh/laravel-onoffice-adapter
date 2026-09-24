@@ -2,6 +2,9 @@
 
 ## main
 
+## v2.5.0
+- feat: `retry(int $times)` on any query overrides `onoffice.retry.count` for that query only, e.g. `SettingRepository::regions()->timeout(90)->retry(1)->get()` to try a slow call once instead of three times
+
 ## v2.4.0
 - feat: configurable HTTP timeout. `onoffice.timeout` (default 30 seconds, as before) sets how long to wait for the onOffice API; `timeout(int $seconds)` on any query overrides it for that query only, e.g. `SettingRepository::regions()->timeout(120)->get()`
 

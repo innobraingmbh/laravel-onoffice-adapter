@@ -674,6 +674,23 @@ describe('retry', function () {
         expect($onOfficeService->retryOnlyOnConnectionError())->toBe($given);
     })->with([true, false]);
 
+    it('prefers the retry count set on the service over the config', function () {
+        Http::preventStrayRequests();
+        Http::fake(['*' => Http::response(status: 500)]);
+
+        Config::set([
+            'onoffice.retry.count' => 3,
+            'onoffice.retry.only_on_connection_error' => false,
+        ]);
+
+        $request = new OnOfficeRequest(OnOfficeAction::Get, OnOfficeResourceType::Estate);
+
+        expect(fn () => resolve(OnOfficeService::class)->setRetryCount(1)->requestApi($request))
+            ->toThrow(OnOfficeException::class);
+
+        Http::assertSentCount(1);
+    });
+
     it('will use the retry settings', function () {
         Http::preventStrayRequests();
         Http::fake([

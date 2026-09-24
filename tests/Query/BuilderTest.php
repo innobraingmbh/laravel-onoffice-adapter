@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Config;
 use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 use Innobrain\OnOfficeAdapter\Query\Builder;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
@@ -510,5 +514,36 @@ describe('timeout', function () {
         SettingRepository::regions()->get();
 
         expect($handler->getLastOptions()['timeout'])->toBe(30);
+    });
+});
+
+describe('retry', function () {
+    $connectionFailure = fn (): ConnectException => new ConnectException('Operation timed out', new GuzzleRequest('POST', 'https://api.onoffice.de'));
+    $regionsResponse = fn (): GuzzleResponse => new GuzzleResponse(200, ['Content-Type' => 'application/json'], json_encode([
+        'status' => ['code' => 200, 'errorcode' => 0, 'message' => 'OK'],
+        'response' => ['results' => [[
+            'data' => ['meta' => ['cntabsolute' => 0], 'records' => []],
+            'status' => ['errorcode' => 0, 'message' => 'OK'],
+        ]]],
+    ]));
+
+    beforeEach(fn () => Config::set(['onoffice.retry.count' => 3, 'onoffice.retry.delay' => 1]));
+
+    it('tries the query only as often as asked', function () use ($connectionFailure, $regionsResponse) {
+        $handler = new MockHandler([$connectionFailure(), $regionsResponse()]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        expect(fn () => SettingRepository::regions()->retry(1)->get())->toThrow(ConnectionException::class)
+            ->and($handler->count())->toBe(1);
+    });
+
+    it('does not leak its retry count into the next query', function () use ($connectionFailure, $regionsResponse) {
+        $handler = new MockHandler([$connectionFailure(), $connectionFailure(), $regionsResponse()]);
+        app()->instance(OnOfficeService::HTTP_HANDLER, $handler);
+
+        rescue(fn () => SettingRepository::regions()->retry(1)->get(), report: false);
+        SettingRepository::regions()->get();
+
+        expect($handler->count())->toBe(0);
     });
 });

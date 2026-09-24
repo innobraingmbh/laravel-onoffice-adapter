@@ -31,6 +31,7 @@ class OnOfficeService
     public function __construct(
         private ?OnOfficeApiCredentials $credentials = null,
         private ?int $timeout = null,
+        private ?int $retryCount = null,
     ) {}
 
     public function setCredentials(?OnOfficeApiCredentials $credentials): static
@@ -43,6 +44,13 @@ class OnOfficeService
     public function setTimeout(?int $seconds): static
     {
         $this->timeout = $seconds;
+
+        return $this;
+    }
+
+    public function setRetryCount(?int $times): static
+    {
+        $this->retryCount = $times;
 
         return $this;
     }
@@ -76,7 +84,7 @@ class OnOfficeService
 
     public function getRetryCount(): int
     {
-        $count = Config::get('onoffice.retry.count', 3) ?? 3;
+        $count = $this->retryCount ?? Config::get('onoffice.retry.count', 3) ?? 3;
 
         return max($count, 1);
     }
