@@ -115,3 +115,83 @@ describe('get operation', function () {
             ->toThrow(Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException::class);
     });
 });
+
+describe('client-side list window', function () {
+    beforeEach(function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::response([
+                'status' => ['code' => 200],
+                'response' => [
+                    'results' => [
+                        [
+                            'data' => [
+                                'meta' => ['cntabsolute' => 5],
+                                'records' => collect(range(1, 5))
+                                    ->map(fn (int $id): array => ['id' => $id, 'type' => 'appointmentList', 'elements' => []])
+                                    ->all(),
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+    });
+
+    function appointmentQuery(): AppointmentBuilder
+    {
+        return (new AppointmentBuilder)
+            ->setRepository(new AppointmentRepository)
+            ->dateRange('2026-01-01', '2026-12-31');
+    }
+
+    it('never sends listlimit or listoffset', function () {
+        appointmentQuery()->paginate(perPage: 2, page: 2);
+
+        Http::assertSent(function (Request $request) {
+            $parameters = data_get(json_decode($request->body(), true), 'request.actions.0.parameters');
+
+            return ! array_key_exists('listlimit', $parameters)
+                && ! array_key_exists('listoffset', $parameters);
+        });
+    });
+
+    it('paginates by slicing the full result set', function () {
+        $page1 = appointmentQuery()->paginate(perPage: 2, page: 1);
+        $page2 = appointmentQuery()->paginate(perPage: 2, page: 2);
+        $page3 = appointmentQuery()->paginate(perPage: 2, page: 3);
+
+        expect($page1->total())->toBe(5)
+            ->and(collect($page1->items())->pluck('id')->all())->toBe([1, 2])
+            ->and(collect($page2->items())->pluck('id')->all())->toBe([3, 4])
+            ->and(collect($page3->items())->pluck('id')->all())->toBe([5]);
+    });
+
+    it('reads the full set with a single request on get', function () {
+        $records = appointmentQuery()->get();
+
+        expect($records->pluck('id')->all())->toBe([1, 2, 3, 4, 5]);
+        Http::assertSentCount(1);
+    });
+
+    it('applies offset and limit client-side on get', function () {
+        $records = appointmentQuery()->offset(2)->limit(2)->get();
+
+        expect($records->pluck('id')->all())->toBe([3, 4]);
+    });
+
+    it('returns the first record on first', function () {
+        expect(appointmentQuery()->first()['id'])->toBe(1);
+    });
+
+    it('walks every record exactly once with each', function () {
+        $seen = [];
+
+        appointmentQuery()->each(function (array $records) use (&$seen): void {
+            $seen = [...$seen, ...collect($records)->pluck('id')->all()];
+        });
+
+        expect($seen)->toBe([1, 2, 3, 4, 5]);
+        Http::assertSentCount(1);
+    });
+});
