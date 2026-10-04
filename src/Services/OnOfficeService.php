@@ -29,11 +29,11 @@ class OnOfficeService
      */
     public const HTTP_HANDLER = 'onoffice.http_handler';
 
+    protected bool $readOnly = false;
+
     private ?int $timeout = null;
 
     private ?int $retryCount = null;
-
-    protected bool $readOnly = false;
 
     public function __construct(
         private ?OnOfficeApiCredentials $credentials = null
