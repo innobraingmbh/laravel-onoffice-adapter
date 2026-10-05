@@ -6,9 +6,10 @@ declare(strict_types=1);
 return [
     /**
      * The base URL of the OnOffice API.
-     * Change that if you are using a different version of the API.
+     * Change that if you are using a different version of the API
+     * or send the requests through a proxy.
      */
-    'base_url' => 'https://api.onoffice.de/api/stable/api.php',
+    'base_url' => env('ON_OFFICE_BASE_URL', 'https://api.onoffice.de/api/stable/api.php'),
 
     /**
      * The headers to be sent with the request.

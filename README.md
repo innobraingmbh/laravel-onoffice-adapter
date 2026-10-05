@@ -32,6 +32,8 @@ ON_OFFICE_TOKEN=your-token
 ON_OFFICE_SECRET=your-secret
 ```
 
+Requests go to `https://api.onoffice.de/api/stable/api.php`. Set `ON_OFFICE_BASE_URL` to use another API version or a proxy.
+
 To change retry settings or headers, publish the config file:
 
 ```bash
