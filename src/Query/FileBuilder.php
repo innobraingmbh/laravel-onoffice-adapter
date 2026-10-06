@@ -11,12 +11,15 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceId;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Query\Concerns\WritesRecords;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 abstract class FileBuilder extends Builder
 {
+    use WritesRecords;
+
     /**
      * The onOffice resource the files are attached to (e.g. Estate, Address).
      */
@@ -149,18 +152,11 @@ abstract class FileBuilder extends Builder
      */
     public function delete(int $id): bool
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Delete,
-            OnOfficeResourceType::FileRelation,
-            parameters: [
-                'fileId' => $id,
-                OnOfficeService::PARENTID => $this->parentId(),
-                OnOfficeService::RELATIONTYPE => $this->relationType(),
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_SUCCESS) === 'success';
+        return $this->deleteRecord(OnOfficeResourceType::FileRelation, [
+            'fileId' => $id,
+            OnOfficeService::PARENTID => $this->parentId(),
+            OnOfficeService::RELATIONTYPE => $this->relationType(),
+            ...$this->customParameters,
+        ]);
     }
 }
