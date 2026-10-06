@@ -16,6 +16,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeError;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Exceptions\ReadOnlyViolationException;
 use Throwable;
 
 class OnOfficeService
@@ -27,6 +28,8 @@ class OnOfficeService
      * Container key of the Guzzle handler shared by every request.
      */
     public const HTTP_HANDLER = 'onoffice.http_handler';
+
+    protected bool $readOnly = false;
 
     private ?int $timeout = null;
 
@@ -55,6 +58,42 @@ class OnOfficeService
         $this->retryCount = $times;
 
         return $this;
+    }
+
+    public function setReadOnly(bool $readOnly): static
+    {
+        $this->readOnly = $readOnly;
+
+        return $this;
+    }
+
+    public function isReadOnly(): bool
+    {
+        return (bool) Config::get('onoffice.read_only', false)
+            || ($this->credentials->readOnly ?? false)
+            || $this->readOnly;
+    }
+
+    /**
+     * @throws ReadOnlyViolationException
+     */
+    public function ensureRequestIsAllowed(OnOfficeRequest $request): void
+    {
+        if ($this->isReadOnly() && $request->actionId->mutates()) {
+            throw new ReadOnlyViolationException($request);
+        }
+    }
+
+    /**
+     * @param  array<int, OnOfficeRequest>  $requests
+     *
+     * @throws ReadOnlyViolationException
+     */
+    public function ensureRequestsAreAllowed(array $requests): void
+    {
+        foreach ($requests as $request) {
+            $this->ensureRequestIsAllowed($request);
+        }
     }
 
     public function getToken(): string
@@ -157,6 +196,8 @@ class OnOfficeService
      */
     public function requestApi(OnOfficeRequest $request): Response
     {
+        $this->ensureRequestIsAllowed($request);
+
         return $this->post(
             fn (): array => $this->requestBody([$request]),
             fn (Response $response) => $this->throwIfResponseIsFailed($response),
@@ -177,6 +218,8 @@ class OnOfficeService
      */
     public function requestApiBatch(array $requests): Response
     {
+        $this->ensureRequestsAreAllowed($requests);
+
         return $this->post(
             fn (): array => $this->requestBody($requests),
             fn (Response $response) => $this->throwIfBatchResponseIsFailed($response, count($requests)),

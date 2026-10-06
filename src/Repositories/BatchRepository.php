@@ -43,11 +43,13 @@ class BatchRepository extends BaseRepository
      * @throws OnOfficeException
      * @throws Throwable
      */
-    public function dispatch(array $requests, ?OnOfficeApiCredentials $credentials = null, bool $preventStrayRequests = false): Collection
+    public function dispatch(array $requests, ?OnOfficeApiCredentials $credentials = null, bool $preventStrayRequests = false, bool $readOnly = false): Collection
     {
         throw_if($requests === [], OnOfficeException::class, 'Cannot send an empty batch');
 
-        $service = $this->onOfficeService($credentials);
+        $service = $this->onOfficeService($credentials, $readOnly);
+
+        $service->ensureRequestsAreAllowed($requests);
 
         $response = $this->stubResponse();
 
@@ -71,12 +73,13 @@ class BatchRepository extends BaseRepository
         return collect($results);
     }
 
-    protected function onOfficeService(?OnOfficeApiCredentials $credentials): OnOfficeService
+    protected function onOfficeService(?OnOfficeApiCredentials $credentials, bool $readOnly = false): OnOfficeService
     {
         return resolve(OnOfficeService::class)
             ->setCredentials($credentials)
             ->setTimeout(null)
-            ->setRetryCount(null);
+            ->setRetryCount(null)
+            ->setReadOnly($readOnly);
     }
 
     /**

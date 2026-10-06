@@ -102,6 +102,8 @@ class Builder implements BuilderInterface
      */
     protected bool $preventStrayRequests = false;
 
+    protected bool $readOnly = false;
+
     /**
      * The OnOffice service.
      */
@@ -150,17 +152,33 @@ class Builder implements BuilderInterface
         protected ?OnOfficeApiCredentials $credentials = null
     ) {}
 
-    public function withCredentials(string|OnOfficeApiCredentials $token, string $secret = '', string $apiClaim = ''): static
+    public function withCredentials(string|OnOfficeApiCredentials $token, string $secret = '', string $apiClaim = '', bool $readOnly = false): static
     {
+        if ($readOnly) {
+            $this->readOnly();
+        }
+
         if ($token instanceof OnOfficeApiCredentials) {
             $this->credentials = $token;
 
             return $this;
         }
 
-        $this->credentials = new OnOfficeApiCredentials(token: $token, secret: $secret, apiClaim: $apiClaim);
+        $this->credentials = new OnOfficeApiCredentials(token: $token, secret: $secret, apiClaim: $apiClaim, readOnly: $readOnly);
 
         return $this;
+    }
+
+    public function readOnly(): static
+    {
+        $this->readOnly = true;
+
+        return $this;
+    }
+
+    public function isReadOnly(): bool
+    {
+        return $this->readOnly || ($this->credentials->readOnly ?? false);
     }
 
     public function getCredentials(): ?OnOfficeApiCredentials
@@ -198,6 +216,7 @@ class Builder implements BuilderInterface
                 ->setCredentials($this->credentials)
                 ->setTimeout($this->timeout)
                 ->setRetryCount($this->retryCount)
+                ->setReadOnly($this->readOnly)
         );
     }
 
@@ -284,14 +303,18 @@ class Builder implements BuilderInterface
     {
         $request = $this->runBeforeSendingCallbacks($request);
 
+        $service = $this->getOnOfficeService();
+
+        $service->ensureRequestIsAllowed($request);
+
         $response = $this->getStubCallable($request);
 
         if (is_null($response)) {
             throw_if($this->preventStrayRequests, StrayRequestException::class, request: $request);
 
-            $response = $this->getOnOfficeService()->requestApi($request);
+            $response = $service->requestApi($request);
         } else {
-            $this->getOnOfficeService()->throwIfResponseIsFailed($response);
+            $service->throwIfResponseIsFailed($response);
         }
 
         $this->repository->recordRequestResponsePair($request, $response->json());
@@ -363,6 +386,7 @@ class Builder implements BuilderInterface
 
                 $userRightsResponse = BaseRepositoryFacade::query()
                     ->when($this->credentials, fn (Builder $query, OnOfficeApiCredentials $credentials) => $query->withCredentials($credentials))
+                    ->when($this->readOnly, fn (Builder $query) => $query->readOnly())
                     ->requestApi(new OnOfficeRequest(
                         actionId: OnOfficeAction::Get,
                         resourceType: OnOfficeResourceType::CheckUserRecordsRight,

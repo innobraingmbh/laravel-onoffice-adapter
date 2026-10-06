@@ -38,6 +38,8 @@ class PendingBatch
      */
     protected bool $preventStrayRequests = false;
 
+    protected bool $readOnly = false;
+
     /**
      * @param  array<int, OnOfficeRequest|Builder>  $requests
      */
@@ -67,6 +69,7 @@ class PendingBatch
             if ($request instanceof Builder) {
                 $this->useCredentials($request->getCredentials());
                 $this->preventStrayRequests = $this->preventStrayRequests || $request->preventsStrayRequests();
+                $this->readOnly = $this->readOnly || $request->isReadOnly();
 
                 $request = $request->toRequest();
             }
@@ -86,13 +89,24 @@ class PendingBatch
      *
      * @throws Throwable
      */
-    public function withCredentials(string|OnOfficeApiCredentials $token, string $secret = '', string $apiClaim = ''): static
+    public function withCredentials(string|OnOfficeApiCredentials $token, string $secret = '', string $apiClaim = '', bool $readOnly = false): static
     {
+        if ($readOnly) {
+            $this->readOnly();
+        }
+
         if (! $token instanceof OnOfficeApiCredentials) {
-            $token = new OnOfficeApiCredentials(token: $token, secret: $secret, apiClaim: $apiClaim);
+            $token = new OnOfficeApiCredentials(token: $token, secret: $secret, apiClaim: $apiClaim, readOnly: $readOnly);
         }
 
         $this->useCredentials($token);
+
+        return $this;
+    }
+
+    public function readOnly(): static
+    {
+        $this->readOnly = true;
 
         return $this;
     }
@@ -129,6 +143,6 @@ class PendingBatch
      */
     public function once(): Collection
     {
-        return $this->repository->dispatch($this->requests, $this->credentials, $this->preventStrayRequests);
+        return $this->repository->dispatch($this->requests, $this->credentials, $this->preventStrayRequests, $this->readOnly);
     }
 }

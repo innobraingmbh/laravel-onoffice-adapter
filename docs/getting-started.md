@@ -26,6 +26,9 @@ php artisan vendor:publish --tag="onoffice-adapter-config"
 ```
 :::
 
+Set `ON_OFFICE_READ_ONLY=true` to refuse every write. See
+[Read-Only Mode](./advanced-usage.md#read-only-mode).
+
 ## Queries
 
 ```php
