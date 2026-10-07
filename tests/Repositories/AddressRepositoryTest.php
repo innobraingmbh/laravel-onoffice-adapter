@@ -64,6 +64,9 @@ describe('real responses', function () {
         expect($response)->toBe(1500);
 
         AddressRepository::assertSentCount(1);
+        AddressRepository::assertSent(fn (OnOfficeRequest $request) => $request->parameters['data'] === []
+            && $request->parameters['listlimit'] === 1
+            && $request->parameters['listoffset'] === PHP_INT_MAX);
     });
 });
 

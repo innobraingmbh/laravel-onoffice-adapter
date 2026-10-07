@@ -132,8 +132,9 @@ trait Paginate
     }
 
     /**
-     * Returns the number of records that match the query. This number is from the API
-     * and might be lower than the actual number of records when queried with get().
+     * Returns the number of records that match the query, firm-wide. A user
+     * whose record rights hide some of them gets fewer records from get(),
+     * so this number may be higher than the records actually readable.
      *
      * @throws OnOfficeException
      * @throws Throwable
@@ -144,10 +145,23 @@ trait Paginate
 
         if ($this->readResourceId === null) {
             data_set($request->parameters, OnOfficeService::DATA, []);
-            data_set($request->parameters, OnOfficeService::LISTLIMIT, $this->countListLimit());
+            $this->applyListWindow($request, $this->countListLimit(), $this->countListOffset());
         }
 
         return $this->requestApi($request)->json(OnOfficeResponsePath::META_COUNT_ABSOLUTE, 0);
+    }
+
+    /**
+     * The listoffset a count request is sent with: one no book reaches.
+     * onOffice applies the user's record rights after slicing the page and,
+     * on some endpoints (addresses, estates), subtracts the rows it hid from
+     * cntabsolute, so the total a page reports depends on which rows that
+     * page happened to hold. A page past the end holds none and reports the
+     * firm-wide total exactly.
+     */
+    protected function countListOffset(): int
+    {
+        return $this->supportsListOffset ? PHP_INT_MAX : 0;
     }
 
     /**
