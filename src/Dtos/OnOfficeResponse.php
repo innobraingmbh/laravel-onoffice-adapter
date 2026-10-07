@@ -15,6 +15,16 @@ readonly class OnOfficeResponse
         protected Collection $pages,
     ) {}
 
+    /**
+     * A copy with its own page queue. The pages are shifted off as the fake
+     * serves them, so a plain clone, which shares the queue, would be spent
+     * by the time it is reached.
+     */
+    public function copy(): self
+    {
+        return new self(collect($this->pages->all()));
+    }
+
     public function shift(): OnOfficeResponsePage
     {
         /** @var OnOfficeResponsePage */
