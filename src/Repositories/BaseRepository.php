@@ -89,7 +89,7 @@ class BaseRepository
     {
         return collect()
             ->range(1, $times)
-            ->map(fn () => clone $response)
+            ->map(fn () => $response->copy())
             ->values()
             ->toArray();
     }

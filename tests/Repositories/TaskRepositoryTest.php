@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
+use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Facades\TaskRepository;
 use Innobrain\OnOfficeAdapter\Facades\Testing\RecordFactories\TaskFactory;
 use Innobrain\OnOfficeAdapter\Tests\Stubs\ReadTaskResponse;
@@ -83,5 +84,7 @@ describe('real responses', function () {
         expect($count)->toBe(99);
 
         TaskRepository::assertSentCount(1);
+        TaskRepository::assertSent(fn (OnOfficeRequest $request) => $request->parameters['listlimit'] === 500
+            && ! array_key_exists('listoffset', $request->parameters));
     });
 });

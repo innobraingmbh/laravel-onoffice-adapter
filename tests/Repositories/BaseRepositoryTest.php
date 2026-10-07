@@ -186,6 +186,20 @@ describe('fake', function () {
         expect($m->getValue($builder)->toArray())->toHaveCount(20);
     });
 
+    it('serves every response of a sequence', function () {
+        $builder = new BaseRepository;
+
+        $builder->fake($builder->sequence(
+            $builder->response([$builder->page(recordFactories: [BaseFactory::make()->id(7)])]),
+            2,
+        ));
+
+        $request = new OnOfficeRequest(OnOfficeAction::Read, OnOfficeResourceType::Estate);
+
+        expect($builder->query()->call($request)->first()['id'])->toBe(7)
+            ->and($builder->query()->call($request)->first()['id'])->toBe(7);
+    });
+
     it('can fake a response with more than one page', function () {
         $builder = new BaseRepository;
 
