@@ -15,11 +15,47 @@ namespace Innobrain\OnOfficeAdapter\Services;
 final class OnOfficeResponsePath
 {
     /**
+     * The top-level status envelope of the response.
+     *
+     * Resolves to `status`.
+     */
+    public const STATUS = 'status';
+
+    /**
+     * The HTTP-like status code of the top-level response envelope.
+     *
+     * Resolves to `status.code`.
+     */
+    public const STATUS_CODE = self::STATUS.'.code';
+
+    /**
+     * The error code of the top-level response envelope.
+     *
+     * Resolves to `status.errorcode`.
+     */
+    public const STATUS_ERROR_CODE = self::STATUS.'.errorcode';
+
+    /**
+     * The message of the top-level response envelope.
+     *
+     * Resolves to `status.message`.
+     */
+    public const STATUS_MESSAGE = self::STATUS.'.message';
+
+    /**
+     * Every result block onOffice returns for a request.
+     *
+     * A batch request returns one result block per action; a single
+     * request returns exactly one. Resolves to `response.results`.
+     */
+    public const RESULTS = 'response.results';
+
+    /**
      * The single result block onOffice returns for a request.
      *
      * Resolves to `response.results.0`.
      */
-    public const FIRST_RESULT = 'response.results.0';
+    public const FIRST_RESULT = self::RESULTS.'.0';
 
     /**
      * All records of the first result block.
@@ -87,7 +123,7 @@ final class OnOfficeResponsePath
      */
     public static function result(int $index): string
     {
-        return 'response.results.'.$index;
+        return self::RESULTS.'.'.$index;
     }
 
     /**
