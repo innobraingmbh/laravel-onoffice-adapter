@@ -29,16 +29,7 @@ class ImprintBuilder extends Builder
      */
     public function get(): Collection
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Read,
-            OnOfficeResourceType::Impressum,
-            parameters: [
-                OnOfficeService::DATA => $this->columns,
-                ...$this->customParameters,
-            ]
-        );
-
-        return $this->requestAll($request);
+        return $this->requestAll($this->buildReadRequest());
     }
 
     /**
@@ -46,7 +37,15 @@ class ImprintBuilder extends Builder
      */
     public function first(): ?array
     {
-        $request = new OnOfficeRequest(
+        return $this->requestFirstRecord($this->buildReadRequest());
+    }
+
+    /**
+     * Build the impressum read request shared by get() and first().
+     */
+    protected function buildReadRequest(): OnOfficeRequest
+    {
+        return new OnOfficeRequest(
             OnOfficeAction::Read,
             OnOfficeResourceType::Impressum,
             parameters: [
@@ -54,7 +53,5 @@ class ImprintBuilder extends Builder
                 ...$this->customParameters,
             ]
         );
-
-        return $this->requestFirstRecord($request);
     }
 }

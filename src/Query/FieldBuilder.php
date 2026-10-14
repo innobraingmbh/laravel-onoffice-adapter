@@ -25,16 +25,7 @@ class FieldBuilder extends Builder
      */
     public function get(): Collection
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Fields,
-            parameters: [
-                'modules' => $this->modules,
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestAll($request);
+        return $this->requestAll($this->buildReadRequest());
     }
 
     /**
@@ -42,16 +33,7 @@ class FieldBuilder extends Builder
      */
     public function first(): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::Fields,
-            parameters: [
-                'modules' => $this->modules,
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
+        return $this->requestApi($this->buildReadRequest())
             ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
@@ -60,7 +42,15 @@ class FieldBuilder extends Builder
      */
     public function each(callable $callback): void
     {
-        $request = new OnOfficeRequest(
+        $this->requestAllChunked($this->buildReadRequest(), $callback);
+    }
+
+    /**
+     * Build the fields read request shared by get(), first() and each().
+     */
+    protected function buildReadRequest(): OnOfficeRequest
+    {
+        return new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::Fields,
             parameters: [
@@ -68,8 +58,6 @@ class FieldBuilder extends Builder
                 ...$this->customParameters,
             ],
         );
-
-        $this->requestAllChunked($request, $callback);
     }
 
     /**
