@@ -12,6 +12,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeQueryException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
+use Innobrain\OnOfficeAdapter\Query\Concerns\WritesRecords;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Override;
@@ -20,6 +21,7 @@ use Throwable;
 class SearchCriteriaBuilder extends Builder
 {
     use RecordIds;
+    use WritesRecords;
 
     private string $mode = 'internal';
 
@@ -143,18 +145,11 @@ class SearchCriteriaBuilder extends Builder
     {
         throw_unless(isset($this->addressId), OnOfficeQueryException::class, 'Address ID is required to create a search criteria');
 
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Create,
-            OnOfficeResourceType::SearchCriteria,
-            parameters: [
-                OnOfficeService::ADDRESSID => $this->addressId,
-                OnOfficeService::DATA => $data,
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->createRecord(OnOfficeResourceType::SearchCriteria, [
+            OnOfficeService::ADDRESSID => $this->addressId,
+            OnOfficeService::DATA => $data,
+            ...$this->customParameters,
+        ]);
     }
 
     /**
@@ -162,19 +157,10 @@ class SearchCriteriaBuilder extends Builder
      */
     public function modify(int $id): bool
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Modify,
-            OnOfficeResourceType::SearchCriteria,
-            $id,
-            parameters: [
-                OnOfficeService::DATA => $this->modifies,
-                ...$this->customParameters,
-            ],
-        );
-
-        $this->requestApi($request);
-
-        return true;
+        return $this->modifyRecord(OnOfficeResourceType::SearchCriteria, [
+            OnOfficeService::DATA => $this->modifies,
+            ...$this->customParameters,
+        ], $id);
     }
 
     /**
@@ -182,15 +168,7 @@ class SearchCriteriaBuilder extends Builder
      */
     public function delete(int $id): bool
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Delete,
-            OnOfficeResourceType::SearchCriteria,
-            $id,
-            parameters: $this->customParameters,
-        );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_SUCCESS) === 'success';
+        return $this->deleteRecord(OnOfficeResourceType::SearchCriteria, $this->customParameters, $id);
     }
 
     public function mode(string $mode): self

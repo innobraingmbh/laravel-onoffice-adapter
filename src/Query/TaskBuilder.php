@@ -9,13 +9,14 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
-use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
+use Innobrain\OnOfficeAdapter\Query\Concerns\WritesRecords;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class TaskBuilder extends Builder
 {
     use Paginate;
+    use WritesRecords;
 
     /**
      * The task read endpoint reports `meta.cntabsolute` as the number of rows
@@ -77,18 +78,11 @@ class TaskBuilder extends Builder
      */
     public function create(array $data): array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Create,
-            OnOfficeResourceType::Task,
-            parameters: array_filter([
-                OnOfficeService::DATA => $data,
-                ...$this->relatedParameters(),
-                ...$this->customParameters,
-            ], fn ($v) => ! is_null($v)),
-        );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->createRecord(OnOfficeResourceType::Task, array_filter([
+            OnOfficeService::DATA => $data,
+            ...$this->relatedParameters(),
+            ...$this->customParameters,
+        ], fn ($v) => ! is_null($v)));
     }
 
     /**
@@ -96,20 +90,11 @@ class TaskBuilder extends Builder
      */
     public function modify(int $id): bool
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Modify,
-            OnOfficeResourceType::Task,
-            $id,
-            parameters: array_filter([
-                OnOfficeService::DATA => $this->modifies,
-                ...$this->relatedParameters(),
-                ...$this->customParameters,
-            ], fn ($v) => ! is_null($v)),
-        );
-
-        $this->requestApi($request);
-
-        return true;
+        return $this->modifyRecord(OnOfficeResourceType::Task, array_filter([
+            OnOfficeService::DATA => $this->modifies,
+            ...$this->relatedParameters(),
+            ...$this->customParameters,
+        ], fn ($v) => ! is_null($v)), $id);
     }
 
     /**
