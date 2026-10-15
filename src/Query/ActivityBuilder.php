@@ -60,9 +60,7 @@ class ActivityBuilder extends Builder
      */
     public function create(array $data): array
     {
-        if ($this->estateIds !== []) {
-            throw new OnOfficeQueryException('An activity is linked to a single estate. Use estateId() to create one.');
-        }
+        throw_if($this->estateIds !== [], OnOfficeQueryException::class, 'An activity is linked to a single estate. Use estateId() to create one.');
 
         $data = array_replace($data, [
             ...$this->prepareEstateOrAddressParameters(create: true),
