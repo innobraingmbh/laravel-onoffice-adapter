@@ -9,6 +9,7 @@ use Innobrain\OnOfficeAdapter\Facades\ActivityRepository;
 
 $activities = ActivityRepository::query()->addressIds([34, 35])->get();
 $activities = ActivityRepository::query()->estateId(2507)->get();
+$activities = ActivityRepository::query()->estateIds([2507, 2508])->get();
 $activity = ActivityRepository::query()->find(67075);
 ```
 
@@ -25,7 +26,7 @@ $activities = ActivityRepository::query()
 ```
 
 ::: warning
-Cannot filter by: `Benutzer`, `Adress_nr`, `Objekt_nr`, `dauer`. Use `addressIds()` and `estateId()` instead.
+Cannot filter by: `Benutzer`, `Adress_nr`, `Objekt_nr`, `dauer`. Use `addressIds()` and `estateId()` / `estateIds()` instead.
 :::
 
 ## Creating Activities
@@ -45,6 +46,8 @@ ActivityRepository::query()
         'duration' => 3000,          // seconds
     ]);
 ```
+
+An activity is linked to a single estate, so `create()` throws an `OnOfficeQueryException` after `estateIds()`. Use `estateId()` instead.
 
 ::: warning
 `Datum` cannot be set on create. The server discards the value and stores the current time without an error.

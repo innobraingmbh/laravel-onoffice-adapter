@@ -1,6 +1,7 @@
 # Changelog
 
 ## main
+- feat: `ActivityBuilder::estateIds()` reads the activities of several estates in one request, e.g. `ActivityRepository::query()->estateIds([2507, 2508])->get()`. Creating an activity still takes a single `estateId()`
 
 ## v2.6.0
 - feat: `ON_OFFICE_BASE_URL` sets `onoffice.base_url`, so an application can send its requests to another API version or through a proxy without publishing the config

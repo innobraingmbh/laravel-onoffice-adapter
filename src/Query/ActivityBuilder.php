@@ -9,6 +9,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeQueryException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
@@ -19,6 +20,11 @@ class ActivityBuilder extends Builder
     use Paginate;
 
     public ?int $estateId = null;
+
+    /**
+     * @var array<int, int>
+     */
+    public array $estateIds = [];
 
     /**
      * @var array<int, int>
@@ -50,9 +56,14 @@ class ActivityBuilder extends Builder
      * @return array<string, mixed>
      *
      * @throws Throwable<OnOfficeException>
+     * @throws OnOfficeQueryException
      */
     public function create(array $data): array
     {
+        if ($this->estateIds !== []) {
+            throw new OnOfficeQueryException('An activity is linked to a single estate. Use estateId() to create one.');
+        }
+
         $data = array_replace($data, [
             ...$this->prepareEstateOrAddressParameters(create: true),
         ]);
@@ -70,6 +81,18 @@ class ActivityBuilder extends Builder
     public function estateId(int $estateId): static
     {
         $this->estateId = $estateId;
+        $this->estateIds = [];
+
+        return $this;
+    }
+
+    /**
+     * @param  int|array<int, int>  $estateIds
+     */
+    public function estateIds(int|array $estateIds): static
+    {
+        $this->estateId = null;
+        $this->estateIds = Arr::wrap($estateIds);
 
         return $this;
     }
@@ -93,6 +116,10 @@ class ActivityBuilder extends Builder
 
         if (! is_null($this->estateId)) {
             $parameters[OnOfficeService::ESTATEID] = $this->estateId;
+        }
+
+        if ($this->estateIds !== []) {
+            $parameters[OnOfficeService::ESTATEID] = $this->estateIds;
         }
 
         if ($this->addressIds !== []) {
