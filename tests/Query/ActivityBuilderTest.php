@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Http;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeQueryException;
 use Innobrain\OnOfficeAdapter\Query\ActivityBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\ActivityRepository;
 
@@ -68,6 +69,38 @@ describe('new estate/address methods', function () {
             'addressid' => [1, 2, 3],
         ]);
     });
+
+    it('sets estateIds parameter correctly with array of IDs', function () {
+        $builder = new ActivityBuilder;
+
+        $builder->estateIds([1, 2, 3]);
+
+        $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
+        $parameters = $m->invoke($builder);
+
+        expect($parameters)->toBe(['estateid' => [1, 2, 3]]);
+    });
+
+    it('sets estateIds parameter correctly with single ID', function () {
+        $builder = new ActivityBuilder;
+
+        $builder->estateIds(123);
+
+        $m = new ReflectionMethod($builder, 'prepareEstateOrAddressParameters');
+        $parameters = $m->invoke($builder);
+
+        expect($parameters)->toBe(['estateid' => [123]]);
+    });
+
+    it('uses whichever of estateId and estateIds was called last', function () {
+        $m = new ReflectionMethod(ActivityBuilder::class, 'prepareEstateOrAddressParameters');
+
+        $estateIdsLast = (new ActivityBuilder)->estateId(123)->estateIds([1, 2]);
+        $estateIdLast = (new ActivityBuilder)->estateIds([1, 2])->estateId(123);
+
+        expect($m->invoke($estateIdsLast))->toBe(['estateid' => [1, 2]])
+            ->and($m->invoke($estateIdLast))->toBe(['estateid' => 123]);
+    });
 });
 
 describe('CRUD operations', function () {
@@ -126,6 +159,34 @@ describe('CRUD operations', function () {
                 && data_get($body, 'request.actions.0.actionid') === OnOfficeAction::Read->value
                 && data_get($body, 'request.actions.0.resourcetype') === OnOfficeResourceType::Activity->value;
         });
+    });
+
+    it('gets activities of several estates', function () {
+        $builder = new ActivityBuilder;
+
+        $builder
+            ->setRepository(new ActivityRepository)
+            ->estateIds([123, 124])
+            ->get();
+
+        Http::assertSent(function (Illuminate\Http\Client\Request $request) {
+            $body = json_decode($request->body(), true);
+
+            return data_get($body, 'request.actions.0.parameters.estateid') === [123, 124]
+                && data_get($body, 'request.actions.0.actionid') === OnOfficeAction::Read->value;
+        });
+    });
+
+    it('refuses to create an activity linked to several estates', function () {
+        $builder = new ActivityBuilder;
+
+        expect(fn () => $builder
+            ->setRepository(new ActivityRepository)
+            ->estateIds([123, 124])
+            ->create(['note' => 'Test activity']))
+            ->toThrow(OnOfficeQueryException::class, 'Use estateId() to create one.');
+
+        Http::assertNothingSent();
     });
 
     it('creates activities with combined parameters', function () {
