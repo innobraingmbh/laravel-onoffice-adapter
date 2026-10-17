@@ -310,37 +310,22 @@ class OnOfficeService
         int $limit = -1,
         ?int $pageOverwrite = null,
     ): Collection {
-        $maxPage = $pageOverwrite ?? 0;
         $data = new Collection;
-        do {
-            $response = $request($pageSize, $offset);
 
-            // If the maxPage is 0,
-            // we need to calculate it from the total count of estates
-            // and the page size,
-            // the first time we get the response from the API
-            if ($maxPage === 0) {
-                $countAbsolute = $response->json($countPath, 0);
-                $maxPage = ceil($countAbsolute / $pageSize);
-            }
-            $responseResult = $response->json($resultPath);
-
-            if (is_array($responseResult)) {
-                $data->push(...$responseResult);
-            }
-
-            // if the take parameter is set,
-            // and we have more records than the take parameter,
-            // we break the loop and return the data except the
-            // records that are more than the take parameter
-            if ($limit > -1 && $data->count() > $limit) {
-                $data = $data->take($limit);
-                break;
-            }
-
-            $offset += $pageSize;
-            $currentPage = $offset / $pageSize;
-        } while ($maxPage > $currentPage);
+        $this->requestAllChunked(
+            $request,
+            static function (?array $elements) use ($data): void {
+                if (is_array($elements)) {
+                    $data->push(...$elements);
+                }
+            },
+            $resultPath,
+            $countPath,
+            $pageSize,
+            $offset,
+            $limit,
+            $pageOverwrite,
+        );
 
         return $data;
     }
