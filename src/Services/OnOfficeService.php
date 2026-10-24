@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Innobrain\OnOfficeAdapter\Services;
 
+use Generator;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
@@ -310,19 +311,9 @@ class OnOfficeService
         int $limit = -1,
         ?int $pageOverwrite = null,
     ): Collection {
-        $maxPage = $pageOverwrite ?? 0;
         $data = new Collection;
-        do {
-            $response = $request($pageSize, $offset);
 
-            // If the maxPage is 0,
-            // we need to calculate it from the total count of estates
-            // and the page size,
-            // the first time we get the response from the API
-            if ($maxPage === 0) {
-                $countAbsolute = $response->json($countPath, 0);
-                $maxPage = ceil($countAbsolute / $pageSize);
-            }
+        foreach ($this->paginateResponses($request, $countPath, $pageSize, $offset, $limit, $pageOverwrite, capCountToLimit: false) as $response) {
             $responseResult = $response->json($resultPath);
 
             if (is_array($responseResult)) {
@@ -337,10 +328,7 @@ class OnOfficeService
                 $data = $data->take($limit);
                 break;
             }
-
-            $offset += $pageSize;
-            $currentPage = $offset / $pageSize;
-        } while ($maxPage > $currentPage);
+        }
 
         return $data;
     }
@@ -366,31 +354,12 @@ class OnOfficeService
         int $limit = -1,
         ?int $pageOverwrite = null,
     ): void {
-        $maxPage = $pageOverwrite ?? 0;
         $elementCount = 0;
-        do {
-            $response = $request($pageSize, $offset);
 
-            // If the maxPage is 0,
-            // we need to calculate it from the total count of estates
-            // and the page size,
-            // the first time we get the response from the API
-            if ($maxPage === 0) {
-                $countAbsolute = $response->json($countPath, 0);
-
-                // if the take parameter is set,
-                // and we have more records than the take parameter,
-                // we set the countAbsolute to the take parameter
-                if ($limit > -1 && $countAbsolute > $limit) {
-                    $countAbsolute = $limit;
-                }
-
-                $maxPage = ceil($countAbsolute / $pageSize);
-            }
-
+        foreach ($this->paginateResponses($request, $countPath, $pageSize, $offset, $limit, $pageOverwrite, capCountToLimit: true) as $response) {
             // If the take parameter is set,
-            // and we have more records than the take parameter.
-            // We break the loop and return the sliced records
+            // and the records gathered so far exceed it,
+            // we slice the final page down to the remaining records,
             // because it is not guaranteed that the record page size
             // will be the same as the take parameter
             $elements = $response->json($resultPath);
@@ -400,6 +369,56 @@ class OnOfficeService
             }
 
             $callback($elements);
+        }
+    }
+
+    /**
+     * Walks the pages of an onOffice list request, yielding each page's
+     * response in turn.
+     *
+     * The page count is derived once, from the absolute record count carried by
+     * the first response: an endpoint that reports more records than $pageSize
+     * holds is paged until every page has been requested. A consumer that stops
+     * iterating early (e.g. once it has gathered enough records) abandons the
+     * generator, so no further pages are requested. When $capCountToLimit is
+     * true the derived page count is bounded by $limit, which a chunked consumer
+     * uses to avoid requesting pages whose records it would only discard.
+     *
+     * @param  callable(int, int): Response  $request
+     * @return Generator<int, Response>
+     */
+    private function paginateResponses(
+        callable $request,
+        string $countPath,
+        int $pageSize,
+        int $offset,
+        int $limit,
+        ?int $pageOverwrite,
+        bool $capCountToLimit,
+    ): Generator {
+        $maxPage = $pageOverwrite ?? 0;
+
+        do {
+            $response = $request($pageSize, $offset);
+
+            // If the maxPage is 0,
+            // we need to calculate it from the total count of records
+            // and the page size,
+            // the first time we get the response from the API
+            if ($maxPage === 0) {
+                $countAbsolute = $response->json($countPath, 0);
+
+                // if the take parameter is set,
+                // and we have more records than the take parameter,
+                // we set the countAbsolute to the take parameter
+                if ($capCountToLimit && $limit > -1 && $countAbsolute > $limit) {
+                    $countAbsolute = $limit;
+                }
+
+                $maxPage = ceil($countAbsolute / $pageSize);
+            }
+
+            yield $response;
 
             $offset += $pageSize;
             $currentPage = $offset / $pageSize;
