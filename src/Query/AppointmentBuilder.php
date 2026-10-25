@@ -10,6 +10,7 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
+use Innobrain\OnOfficeAdapter\Query\Concerns\WritesRecords;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
@@ -17,6 +18,7 @@ use Throwable;
 class AppointmentBuilder extends Builder
 {
     use Paginate;
+    use WritesRecords;
 
     public ?string $startDate = null;
 
@@ -116,17 +118,10 @@ class AppointmentBuilder extends Builder
      */
     public function create(array $data): array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Create,
-            OnOfficeResourceType::Calendar,
-            parameters: [
-                ...$data,
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->createRecord(OnOfficeResourceType::Calendar, [
+            ...$data,
+            ...$this->customParameters,
+        ]);
     }
 
     /**
@@ -154,17 +149,9 @@ class AppointmentBuilder extends Builder
      */
     public function delete(int $id): bool
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Delete,
-            OnOfficeResourceType::Calendar,
-            $id,
-            parameters: [
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_SUCCESS) === 'success';
+        return $this->deleteRecord(OnOfficeResourceType::Calendar, [
+            ...$this->customParameters,
+        ], $id);
     }
 
     /**

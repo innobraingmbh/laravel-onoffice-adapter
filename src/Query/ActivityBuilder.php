@@ -11,13 +11,14 @@ use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeQueryException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
-use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
+use Innobrain\OnOfficeAdapter\Query\Concerns\WritesRecords;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
 class ActivityBuilder extends Builder
 {
     use Paginate;
+    use WritesRecords;
 
     public ?int $estateId = null;
 
@@ -66,14 +67,7 @@ class ActivityBuilder extends Builder
             ...$this->prepareEstateOrAddressParameters(create: true),
         ]);
 
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Create,
-            OnOfficeResourceType::Activity,
-            parameters: $data,
-        );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->createRecord(OnOfficeResourceType::Activity, $data);
     }
 
     public function estateId(int $estateId): static

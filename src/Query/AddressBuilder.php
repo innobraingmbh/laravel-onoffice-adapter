@@ -13,7 +13,7 @@ use Innobrain\OnOfficeAdapter\Query\Concerns\Input;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Paginate;
 use Innobrain\OnOfficeAdapter\Query\Concerns\RecordIds;
 use Innobrain\OnOfficeAdapter\Query\Concerns\Searchable;
-use Innobrain\OnOfficeAdapter\Services\OnOfficeResponsePath;
+use Innobrain\OnOfficeAdapter\Query\Concerns\WritesRecords;
 use Innobrain\OnOfficeAdapter\Services\OnOfficeService;
 use Throwable;
 
@@ -23,6 +23,7 @@ class AddressBuilder extends Builder
     use Paginate;
     use RecordIds;
     use Searchable;
+    use WritesRecords;
 
     protected function buildReadRequest(): OnOfficeRequest
     {
@@ -49,16 +50,7 @@ class AddressBuilder extends Builder
      */
     public function modify(int $id): bool
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Modify,
-            OnOfficeResourceType::Address,
-            $id,
-            parameters: $this->modifies,
-        );
-
-        $this->requestApi($request);
-
-        return true;
+        return $this->modifyRecord(OnOfficeResourceType::Address, $this->modifies, $id);
     }
 
     /**
@@ -69,14 +61,7 @@ class AddressBuilder extends Builder
      */
     public function create(array $data): array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Create,
-            OnOfficeResourceType::Address,
-            parameters: $data,
-        );
-
-        return $this->requestApi($request)
-            ->json(OnOfficeResponsePath::FIRST_RECORD);
+        return $this->createRecord(OnOfficeResourceType::Address, $data);
     }
 
     protected function searchResourceId(): OnOfficeResourceId
