@@ -7,6 +7,7 @@ namespace Innobrain\OnOfficeAdapter\Enums;
 enum OnOfficeResourceType: string
 {
     case Address = 'address';
+    case AddressHierarchyContacts = 'addressHierarchyContacts';
     case Estate = 'estate';
     case EstatePictures = 'estatepictures';
     case EstateLanguage = 'estateLanguage';

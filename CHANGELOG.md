@@ -1,6 +1,7 @@
 # Changelog
 
 ## main
+- feat: `AddressRepository::hierarchyContacts($addressId)` reads the addresses to contact within the contact hierarchy of a parent address (action `get`, resource type `addressHierarchyContacts`). Which addresses come back depends on the parent's `receiverSelection`
 - feat: `ActivityBuilder::estateIds()` reads the activities of several estates in one request, e.g. `ActivityRepository::query()->estateIds([2507, 2508])->get()`. Creating an activity still takes a single `estateId()`
 
 ## v2.6.0

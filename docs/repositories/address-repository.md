@@ -113,6 +113,34 @@ Reads only expose the default entry. An entry added without `'default' => true` 
 | `email` | Email entries |
 | `defaultphone` / `defaultemail` | Main number/email |
 
+## Hierarchy Contacts
+
+Read the addresses to contact within the contact hierarchy of a parent address. The resource type is `addressHierarchyContacts`.
+
+```php
+$contacts = AddressRepository::hierarchyContacts(691)->get();
+$contact = AddressRepository::hierarchyContacts(691)->first();
+```
+
+Which addresses come back depends on the parent's `receiverSelection` (Empfänger-Auswahl), not on the hierarchy alone:
+
+| `receiverSelection` | Returned |
+|---------------------|----------|
+| `ownAdress` | Only the address itself |
+| `ownAdressAndRelations` | The address and its subordinate addresses |
+| `onlyRelations` | Only the subordinate addresses |
+
+Deeper levels follow their own `receiverSelection`: the subordinates of a subordinate address are only returned when that address includes them too.
+
+```php
+[
+    ['id' => 691, 'type' => 'address', 'elements' => ['id' => 691, 'customerno' => '599', 'firstname' => '', 'surname' => '', 'company' => 'Mufflon GmbH', 'primaryEmail' => 'info@my-onoffice.com']],
+    ['id' => 693, 'type' => 'address', 'elements' => ['id' => 693, 'customerno' => '600', 'firstname' => 'Geralinde', 'surname' => 'Mufflon', 'company' => 'Mufflon GmbH', 'primaryEmail' => 'g.mufflon@my-onoffice.com']],
+]
+```
+
+`get()` reads all contacts in a single request. There is no pagination and no `each()`. The `urn:onoffice-de-ns:smart:2.5:relationTypes:address:contact:address` relation holds the personal main and secondary contacts, not this hierarchy.
+
 ## Files, Count & Chunked
 
 ```php
