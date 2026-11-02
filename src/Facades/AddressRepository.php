@@ -8,6 +8,7 @@ use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Query\AddressBuilder;
 use Innobrain\OnOfficeAdapter\Query\AddressFileBuilder;
+use Innobrain\OnOfficeAdapter\Query\AddressHierarchyContactBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\AddressRepository as RootRepository;
 
 /**
@@ -15,6 +16,7 @@ use Innobrain\OnOfficeAdapter\Repositories\AddressRepository as RootRepository;
  *
  * @method static AddressBuilder query()
  * @method static AddressFileBuilder files(int $addressId)
+ * @method static AddressHierarchyContactBuilder hierarchyContacts(int $addressId)
  */
 class AddressRepository extends BaseRepository
 {
