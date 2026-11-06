@@ -9,7 +9,7 @@ use Innobrain\OnOfficeAdapter\Facades\FileRepository;
 
 // Upload in chunks, then link
 $tmpId = FileRepository::upload()
-    ->uploadInBlocks(20480)
+    ->uploadInBlocks(1048576)
     ->save(base64_encode($content));
 
 FileRepository::upload()->link($tmpId, [
@@ -30,6 +30,10 @@ FileRepository::upload()
         'setDefaultPublicationRights' => true,
     ]);
 ```
+
+::: tip
+onOffice appends every block to the temporary file. After the last block, `save()` compares the size onOffice reports with the file's size. On a mismatch it starts over once from a new temporary file, then throws `IncompleteUploadException`, so `saveAndLink()` never links a corrupt file.
+:::
 
 ## Modules
 

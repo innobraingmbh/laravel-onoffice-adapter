@@ -337,6 +337,8 @@ expect($tmpUploadId)->toBe('abc123');
 
 Calling `tmpUploadId()` without an argument generates a random UUID.
 
+`filesize()` fakes the bytes onOffice reports as stored. `save()` compares it with the decoded file's size and throws `IncompleteUploadException` on a mismatch. Without `filesize()` the check is skipped.
+
 ## Multiple Pages
 
 Several pages in one response:
