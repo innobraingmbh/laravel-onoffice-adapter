@@ -1,6 +1,7 @@
 # Changelog
 
 ## main
+- fix: `save()` and `saveAndLink()` check the size onOffice reports after the last block against the file's size. onOffice appends every block to the temporary file, so a block it received twice or not at all corrupted the file without an error. On a mismatch the upload starts over once from a new temporary file, then throws `IncompleteUploadException` (an `OnOfficeException`), so a corrupt file is never linked. Responses without a `filesize`, as most fakes return, skip the check; `FileUploadFactory::filesize()` sets one
 - feat: `AddressRepository::hierarchyContacts($addressId)` reads the addresses to contact within the contact hierarchy of a parent address (action `get`, resource type `addressHierarchyContacts`). Which addresses come back depends on the parent's `receiverSelection`
 - feat: `ActivityBuilder::estateIds()` reads the activities of several estates in one request, e.g. `ActivityRepository::query()->estateIds([2507, 2508])->get()`. Creating an activity still takes a single `estateId()`
 

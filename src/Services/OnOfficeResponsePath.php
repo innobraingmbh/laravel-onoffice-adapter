@@ -64,6 +64,13 @@ final class OnOfficeResponsePath
     public const FIRST_RECORD_ELEMENTS_TMP_UPLOAD_ID = self::FIRST_RECORD_ELEMENTS.'.tmpUploadId';
 
     /**
+     * The bytes onOffice has stored for a temporary upload so far.
+     *
+     * Resolves to `response.results.0.data.records.0.elements.filesize`.
+     */
+    public const FIRST_RECORD_ELEMENTS_FILESIZE = self::FIRST_RECORD_ELEMENTS.'.filesize';
+
+    /**
      * The resolved text returned when expanding a macro.
      *
      * Resolves to `response.results.0.data.records.0.elements.resolvedtext`.

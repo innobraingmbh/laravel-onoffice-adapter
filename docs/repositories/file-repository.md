@@ -31,6 +31,10 @@ FileRepository::upload()
     ]);
 ```
 
+::: tip
+onOffice appends every block to the temporary file. After the last block, `save()` compares the size onOffice reports with the file's size. On a mismatch it starts over once from a new temporary file, then throws `IncompleteUploadException`, so `saveAndLink()` never links a corrupt file.
+:::
+
 ## Modules
 
 `estate`, `address`, `agentsLog`, `task`, `tmpUpload`

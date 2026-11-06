@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\Http;
 
 class UploadFileResponse
 {
-    public static function make(array $data = [], string $tmpUploadId = 'a17ebec0-48f9-44cc-8629-f49ccc68f2d2'): PromiseInterface
+    public static function make(array $data = [], string $tmpUploadId = 'a17ebec0-48f9-44cc-8629-f49ccc68f2d2', int $filesize = 85): PromiseInterface
     {
-        return Http::response(self::getBody($data, $tmpUploadId));
+        return Http::response(self::getBody($data, $tmpUploadId, $filesize));
     }
 
-    private static function getBody(array $data, string $tmpUploadId): array
+    private static function getBody(array $data, string $tmpUploadId, int $filesize): array
     {
         return array_merge_recursive([
             'status' => [
@@ -39,7 +39,7 @@ class UploadFileResponse
                                     'id' => 0,
                                     'type' => '',
                                     'elements' => [
-                                        'filesize' => 85,
+                                        'filesize' => $filesize,
                                         'tmpUploadId' => $tmpUploadId,
                                     ],
                                 ],

@@ -36,4 +36,11 @@ class FileUploadFactory extends BaseFactory
 
         return $this;
     }
+
+    public function filesize(int $filesize): static
+    {
+        $this->elements['filesize'] = $filesize;
+
+        return $this;
+    }
 }

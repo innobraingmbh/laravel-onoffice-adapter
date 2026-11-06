@@ -18,6 +18,7 @@ use Workbench\App\Console\Commands\ProbeFindCommand;
 use Workbench\App\Console\Commands\ProbeOrderByCommand;
 use Workbench\App\Console\Commands\ProbeRegionsCommand;
 use Workbench\App\Console\Commands\ProbeSearchCriteriaCommand;
+use Workbench\App\Console\Commands\ProbeUploadSizeCommand;
 
 class WorkbenchServiceProvider extends ServiceProvider
 {
@@ -49,6 +50,7 @@ class WorkbenchServiceProvider extends ServiceProvider
                 ProbeOrderByCommand::class,
                 ProbeRegionsCommand::class,
                 ProbeSearchCriteriaCommand::class,
+                ProbeUploadSizeCommand::class,
             ]);
         }
     }

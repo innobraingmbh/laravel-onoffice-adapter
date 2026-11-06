@@ -7,6 +7,7 @@ namespace Innobrain\OnOfficeAdapter\Query;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeRequest;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeAction;
 use Innobrain\OnOfficeAdapter\Enums\OnOfficeResourceType;
+use Innobrain\OnOfficeAdapter\Exceptions\IncompleteUploadException;
 use Innobrain\OnOfficeAdapter\Exceptions\OnOfficeException;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonFilterable;
 use Innobrain\OnOfficeAdapter\Query\Concerns\NonOrderable;
@@ -27,34 +28,65 @@ class UploadBuilder extends Builder
      * File content as base64-encoded binary data.
      * Returns the temporary upload id.
      *
+     * onOffice appends every block to the temporary file, so a block that
+     * reaches it twice or not at all corrupts the file. When the size onOffice
+     * reports after the last block is not the file's size, the upload starts
+     * over once from a new temporary file before giving up.
+     *
      * @throws Throwable<OnOfficeException>
      */
     public function save(string $fileContent): string
     {
-        $fileContentSplit = $this->uploadInBlocks > 0 ? str_split($fileContent, $this->uploadInBlocks) : [$fileContent];
+        return retry(
+            2,
+            fn (): string => $this->uploadBlocks($fileContent),
+            when: fn (Throwable $exception): bool => $exception instanceof IncompleteUploadException,
+        );
+    }
+
+    /**
+     * A response without a size, as most fakes return, counts as complete.
+     *
+     * @throws Throwable<OnOfficeException>
+     */
+    private function uploadBlocks(string $fileContent): string
+    {
+        $blocks = $this->uploadInBlocks > 0 ? str_split($fileContent, $this->uploadInBlocks) : [$fileContent];
 
         $tmpUploadId = null;
+        $uploadedSize = null;
 
-        collect($fileContentSplit)
-            ->each(function (string $fileContent) use (&$tmpUploadId) {
-                $continueData = [];
-                if ($tmpUploadId) {
-                    $continueData = ['tmpUploadId' => $tmpUploadId];
-                }
+        foreach ($blocks as $block) {
+            $continueData = [];
+            if ($tmpUploadId) {
+                $continueData = ['tmpUploadId' => $tmpUploadId];
+            }
 
-                $request = new OnOfficeRequest(
-                    OnOfficeAction::Do,
-                    OnOfficeResourceType::UploadFile,
-                    parameters: [
-                        OnOfficeService::DATA => $fileContent,
-                        ...$continueData,
-                        ...$this->customParameters,
-                    ],
-                );
+            $request = new OnOfficeRequest(
+                OnOfficeAction::Do,
+                OnOfficeResourceType::UploadFile,
+                parameters: [
+                    OnOfficeService::DATA => $block,
+                    ...$continueData,
+                    ...$this->customParameters,
+                ],
+            );
 
-                $tmpUploadId = $this->requestApi($request)
-                    ->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_TMP_UPLOAD_ID);
-            });
+            $response = $this->requestApi($request);
+
+            $tmpUploadId = $response->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_TMP_UPLOAD_ID);
+            $uploadedSize = $response->json(OnOfficeResponsePath::FIRST_RECORD_ELEMENTS_FILESIZE);
+        }
+
+        $fileSize = strlen(base64_decode($fileContent));
+
+        if ($uploadedSize !== null && (int) $uploadedSize !== $fileSize) {
+            throw new IncompleteUploadException(sprintf(
+                'onOffice stored %d bytes of a %d byte file.',
+                $uploadedSize,
+                $fileSize,
+            ));
+        }
 
         return $tmpUploadId;
     }

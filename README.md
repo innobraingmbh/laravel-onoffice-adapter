@@ -149,6 +149,8 @@ FileRepository::upload()
     ]);
 ```
 
+`save()` checks the size onOffice reports after the last block. If a block arrived twice or not at all, it starts over once from a new temporary file, then throws `IncompleteUploadException` instead of linking a corrupt file.
+
 ### Creating Activities
 
 ```php
