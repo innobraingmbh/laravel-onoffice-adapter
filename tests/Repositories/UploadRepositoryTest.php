@@ -84,6 +84,25 @@ describe('real responses', function () {
         FileRepository::assertSentCount(1);
     });
 
+    test('uploadInBlocks() sends 1 MiB of base64 per request by default', function () {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
+                UploadFileResponse::make(filesize: 786432),
+                UploadFileResponse::make(filesize: 786435),
+            ]),
+        ]);
+
+        FileRepository::record();
+
+        FileRepository::query()
+            ->uploadInBlocks()
+            ->save(base64_encode(str_repeat('a', 786435)));
+
+        expect(FileRepository::recorded()->map(fn (array $pair) => strlen($pair[0]->parameters['data']))->all())
+            ->toBe([1048576, 4]);
+    });
+
     test('appends every block after the first to the same temporary file', function () {
         Http::preventStrayRequests();
         Http::fake([

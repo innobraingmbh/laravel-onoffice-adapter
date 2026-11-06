@@ -14,7 +14,7 @@ class ProbeUploadSizeCommand extends Command
 {
     protected $signature = 'probe:upload-size
         {--bytes=50000 : Size of the random file in bytes.}
-        {--block=20480 : Base64 characters per block.}';
+        {--block=1048576 : Base64 characters per block.}';
 
     protected $description = 'Upload a random file in blocks to a temporary file, which is never linked to a record, and print the size onOffice reports after each block.';
 

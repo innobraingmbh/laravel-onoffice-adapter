@@ -9,7 +9,7 @@ use Innobrain\OnOfficeAdapter\Facades\FileRepository;
 
 // Upload in chunks, then link
 $tmpId = FileRepository::upload()
-    ->uploadInBlocks(20480)
+    ->uploadInBlocks(1048576)
     ->save(base64_encode($content));
 
 FileRepository::upload()->link($tmpId, [
