@@ -68,7 +68,7 @@ class BatchRepository extends BaseRepository
         }
 
         /** @var array<int, array<string, mixed>> $results */
-        $results = $response->json('response.results', []);
+        $results = $response->json(OnOfficeResponsePath::RESULTS, []);
 
         return collect($results);
     }
@@ -132,7 +132,7 @@ class BatchRepository extends BaseRepository
     protected function actionResponse(Response $response, int $index): array
     {
         return [
-            'status' => $response->json('status'),
+            'status' => $response->json(OnOfficeResponsePath::STATUS),
             'response' => [
                 'results' => [
                     $response->json(OnOfficeResponsePath::result($index)),

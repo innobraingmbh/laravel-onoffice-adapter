@@ -15,11 +15,20 @@ namespace Innobrain\OnOfficeAdapter\Services;
 final class OnOfficeResponsePath
 {
     /**
+     * Every result block onOffice returns for a request.
+     *
+     * A request returns one result block per action sent, so this is a list.
+     *
+     * Resolves to `response.results`.
+     */
+    public const RESULTS = 'response.results';
+
+    /**
      * The single result block onOffice returns for a request.
      *
      * Resolves to `response.results.0`.
      */
-    public const FIRST_RESULT = 'response.results.0';
+    public const FIRST_RESULT = self::RESULTS.'.0';
 
     /**
      * All records of the first result block.
@@ -85,6 +94,37 @@ final class OnOfficeResponsePath
     public const META_COUNT_ABSOLUTE = self::FIRST_RESULT.'.data.meta.cntabsolute';
 
     /**
+     * The top-level status envelope onOffice returns for the whole request.
+     *
+     * This is the status of the request as a whole, as opposed to the
+     * per-result status reached via result()/statusErrorCode()/statusMessage().
+     *
+     * Resolves to `status`.
+     */
+    public const STATUS = 'status';
+
+    /**
+     * The HTTP-style code of the request's top-level status envelope.
+     *
+     * Resolves to `status.code`.
+     */
+    public const STATUS_CODE = self::STATUS.'.code';
+
+    /**
+     * The error code of the request's top-level status envelope.
+     *
+     * Resolves to `status.errorcode`.
+     */
+    public const STATUS_ERROR_CODE = self::STATUS.'.errorcode';
+
+    /**
+     * The message of the request's top-level status envelope.
+     *
+     * Resolves to `status.message`.
+     */
+    public const STATUS_MESSAGE = self::STATUS.'.message';
+
+    /**
      * The result block at the given index.
      *
      * A batch request returns one result block per action, so the index
@@ -94,7 +134,7 @@ final class OnOfficeResponsePath
      */
     public static function result(int $index): string
     {
-        return 'response.results.'.$index;
+        return self::RESULTS.'.'.$index;
     }
 
     /**
