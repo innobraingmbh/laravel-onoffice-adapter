@@ -42,17 +42,10 @@ abstract class FileBuilder extends Builder
      */
     public function get(): Collection
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::File,
-            $this->resourceId(),
-            parameters: [
-                $this->parentIdParameter() => $this->parentId(),
-                OnOfficeService::LISTLIMIT => $this->limit,
-                OnOfficeService::LISTOFFSET => $this->offset,
-                ...$this->customParameters,
-            ],
-        );
+        $request = $this->buildReadRequest([
+            OnOfficeService::LISTLIMIT => $this->limit,
+            OnOfficeService::LISTOFFSET => $this->offset,
+        ]);
 
         return $this->requestAll($request);
     }
@@ -62,17 +55,7 @@ abstract class FileBuilder extends Builder
      */
     public function first(): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::File,
-            $this->resourceId(),
-            parameters: [
-                $this->parentIdParameter() => $this->parentId(),
-                ...$this->customParameters,
-            ],
-        );
-
-        return $this->requestApi($request)
+        return $this->requestApi($this->buildReadRequest())
             ->json(OnOfficeResponsePath::FIRST_RECORD);
     }
 
@@ -81,16 +64,9 @@ abstract class FileBuilder extends Builder
      */
     public function find(int $id): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::File,
-            $this->resourceId(),
-            parameters: [
-                $this->parentIdParameter() => $this->parentId(),
-                OnOfficeService::FILEID => $id,
-                ...$this->customParameters,
-            ],
-        );
+        $request = $this->buildReadRequest([
+            OnOfficeService::FILEID => $id,
+        ]);
 
         $response = $this->requestApi($request);
 
@@ -110,17 +86,26 @@ abstract class FileBuilder extends Builder
      */
     public function each(callable $callback): void
     {
-        $request = new OnOfficeRequest(
+        $this->requestAllChunked($this->buildReadRequest(), $callback);
+    }
+
+    /**
+     * Build the file read request shared by get(), first(), find() and each().
+     *
+     * @param  array<string, mixed>  $extraParameters
+     */
+    protected function buildReadRequest(array $extraParameters = []): OnOfficeRequest
+    {
+        return new OnOfficeRequest(
             OnOfficeAction::Get,
             OnOfficeResourceType::File,
             $this->resourceId(),
             parameters: [
                 $this->parentIdParameter() => $this->parentId(),
+                ...$extraParameters,
                 ...$this->customParameters,
             ],
         );
-
-        $this->requestAllChunked($request, $callback);
     }
 
     /**
