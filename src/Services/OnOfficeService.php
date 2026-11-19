@@ -29,6 +29,16 @@ class OnOfficeService
      */
     public const HTTP_HANDLER = 'onoffice.http_handler';
 
+    /**
+     * The maximum number of records the onOffice API returns for a single
+     * action (one page). It bounds `listlimit`, the per-action batch page and
+     * every per-page setting, so it is the single source of truth for the cap
+     * rather than a `500` literal repeated across the builders.
+     *
+     * Read more: https://apidoc.onoffice.de/onoffice-api-request/aufbau/
+     */
+    public const MAX_PAGE_SIZE = 500;
+
     protected bool $readOnly = false;
 
     private ?int $timeout = null;
@@ -305,7 +315,7 @@ class OnOfficeService
         callable $request,
         string $resultPath = OnOfficeResponsePath::RECORDS,
         string $countPath = OnOfficeResponsePath::META_COUNT_ABSOLUTE,
-        int $pageSize = 500,
+        int $pageSize = self::MAX_PAGE_SIZE,
         int $offset = 0,
         int $limit = -1,
         ?int $pageOverwrite = null,
@@ -361,7 +371,7 @@ class OnOfficeService
         callable $callback,
         string $resultPath = OnOfficeResponsePath::RECORDS,
         string $countPath = OnOfficeResponsePath::META_COUNT_ABSOLUTE,
-        int $pageSize = 500,
+        int $pageSize = self::MAX_PAGE_SIZE,
         int $offset = 0,
         int $limit = -1,
         ?int $pageOverwrite = null,

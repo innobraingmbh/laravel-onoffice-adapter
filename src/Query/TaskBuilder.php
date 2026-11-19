@@ -23,7 +23,7 @@ class TaskBuilder extends Builder
      * It also accepts no listoffset, so the largest count it can report is the
      * API's maximum page size.
      */
-    private const MAX_LIST_LIMIT = 500;
+    private const MAX_LIST_LIMIT = OnOfficeService::MAX_PAGE_SIZE;
 
     public ?int $relatedAddressId = null;
 
