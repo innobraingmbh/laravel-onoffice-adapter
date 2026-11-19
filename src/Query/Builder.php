@@ -60,7 +60,7 @@ class Builder implements BuilderInterface
     /**
      * The page size for the result.
      */
-    public int $pageSize = 500;
+    public int $pageSize = OnOfficeService::MAX_PAGE_SIZE;
 
     /**
      * An array of columns to order by.
@@ -606,7 +606,7 @@ class Builder implements BuilderInterface
      */
     public function pageSize(int $value): static
     {
-        $this->pageSize = min(500, $value);
+        $this->pageSize = min(OnOfficeService::MAX_PAGE_SIZE, $value);
         $this->pageSize = max(1, $this->pageSize);
 
         return $this;
