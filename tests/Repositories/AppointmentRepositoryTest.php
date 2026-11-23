@@ -218,12 +218,10 @@ describe('fake responses', function () {
 });
 
 describe('real responses', function () {
-    test('get', function () {
+    test('get reads a large book in a single request', function () {
         Http::preventStrayRequests();
         Http::fake([
             'https://api.onoffice.de/api/stable/api.php' => Http::sequence([
-                GetAppointmentResponse::make(count: 1500),
-                GetAppointmentResponse::make(count: 1500),
                 GetAppointmentResponse::make(count: 1500),
             ]),
         ]);
@@ -234,9 +232,9 @@ describe('real responses', function () {
             ->dateRange('2025-01-01', '2025-12-31')
             ->get();
 
-        expect($response->count())->toBe(3);
+        expect($response->count())->toBe(1);
 
-        AppointmentRepository::assertSentCount(3);
+        AppointmentRepository::assertSentCount(1);
     });
 });
 
