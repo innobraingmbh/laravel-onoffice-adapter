@@ -33,15 +33,10 @@ class SearchCriteriaBuilder extends Builder
      */
     public function find(int|array $id): ?array
     {
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::GetSearchCriteria,
-            parameters: [
-                OnOfficeService::MODE => $this->mode,
-                OnOfficeService::IDS => Arr::wrap($id),
-                ...$this->customParameters,
-            ],
-        );
+        $request = $this->buildReadRequest([
+            OnOfficeService::MODE => $this->mode,
+            OnOfficeService::IDS => Arr::wrap($id),
+        ]);
 
         return $this->requestApi($request)
             ->json(OnOfficeResponsePath::FIRST_RECORD, []);
@@ -59,15 +54,10 @@ class SearchCriteriaBuilder extends Builder
             return $this->getFiltered();
         }
 
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::GetSearchCriteria,
-            parameters: [
-                OnOfficeService::MODE => $this->mode,
-                OnOfficeService::IDS => $this->recordIds,
-                ...$this->customParameters,
-            ],
-        );
+        $request = $this->buildReadRequest([
+            OnOfficeService::MODE => $this->mode,
+            OnOfficeService::IDS => $this->recordIds,
+        ]);
 
         /** @var array<int, array<string, mixed>> $records */
         $records = $this->requestApi($request)->json(OnOfficeResponsePath::RECORDS, []);
@@ -106,16 +96,11 @@ class SearchCriteriaBuilder extends Builder
             return $records;
         }
 
-        $request = new OnOfficeRequest(
-            OnOfficeAction::Get,
-            OnOfficeResourceType::GetSearchCriteria,
-            parameters: [
-                OnOfficeService::MODE => 'filter',
-                OnOfficeService::FILTER => $this->getFilters(),
-                ...$this->getSplitSortParameters(),
-                ...$this->customParameters,
-            ],
-        );
+        $request = $this->buildReadRequest([
+            OnOfficeService::MODE => 'filter',
+            OnOfficeService::FILTER => $this->getFilters(),
+            ...$this->getSplitSortParameters(),
+        ]);
 
         $offset = $this->offset;
 
@@ -131,6 +116,23 @@ class SearchCriteriaBuilder extends Builder
         } while (count($page) === $pageSize && ($this->limit === -1 || $records->count() < $this->limit));
 
         return $records;
+    }
+
+    /**
+     * Build the search criteria read request shared by find(), get() and getFiltered().
+     *
+     * @param  array<string, mixed>  $extraParameters  the per-method parameters (mode and ids, or filter and sort)
+     */
+    protected function buildReadRequest(array $extraParameters = []): OnOfficeRequest
+    {
+        return new OnOfficeRequest(
+            OnOfficeAction::Get,
+            OnOfficeResourceType::GetSearchCriteria,
+            parameters: [
+                ...$extraParameters,
+                ...$this->customParameters,
+            ],
+        );
     }
 
     /**
