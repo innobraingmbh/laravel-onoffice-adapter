@@ -7,12 +7,14 @@ namespace Innobrain\OnOfficeAdapter\Facades;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponse;
 use Innobrain\OnOfficeAdapter\Dtos\OnOfficeResponsePage;
 use Innobrain\OnOfficeAdapter\Query\UserBuilder;
+use Innobrain\OnOfficeAdapter\Query\UserListBuilder;
 use Innobrain\OnOfficeAdapter\Repositories\UserRepository as RootRepository;
 
 /**
  * @see RootRepository
  *
  * @method static UserBuilder query()
+ * @method static UserListBuilder list()
  */
 class UserRepository extends BaseRepository
 {

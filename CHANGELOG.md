@@ -1,6 +1,8 @@
 # Changelog
 
 ## main
+- feat: `UserRepository::list()` reads the ready-made user list (action `get`, resource type `users`): `id`, `username`, `firstname`, `lastname`, `email`, `meetingurl`, `appointmentColor`, `code` and `online` of the users that can be picked in enterprise, without a `select()`. `group($groupId)` limits the list to one group, `onlyOwn()` to the user the credentials belong to. `UserRepository::query()` keeps reading the user records (action `read`, resource type `user`)
+- docs: `UserRepository::query()` and `SettingRepository::users()` need a `select()`. Without one onOffice returns no records, so `get()` is empty and `first()` and `find()` are `null`
 - perf: `uploadInBlocks()` sends 1 MiB of base64 per request by default instead of 20 KiB. A 2 MB picture takes 3 requests instead of 131, about 1 s instead of 8 s against the live API, and fewer requests leave fewer chances for a block to go missing. onOffice accepted a 30 MB file in a single request
 - fix: `save()` and `saveAndLink()` check the size onOffice reports after the last block against the file's size. onOffice appends every block to the temporary file, so a block it received twice or not at all corrupted the file without an error. On a mismatch the upload starts over once from a new temporary file, then throws `IncompleteUploadException` (an `OnOfficeException`), so a corrupt file is never linked. Responses without a `filesize`, as most fakes return, skip the check; `FileUploadFactory::filesize()` sets one
 - feat: `AddressRepository::hierarchyContacts($addressId)` reads the addresses to contact within the contact hierarchy of a parent address (action `get`, resource type `addressHierarchyContacts`). Which addresses come back depends on the parent's `receiverSelection`
