@@ -296,14 +296,14 @@ trait Paginate
     }
 
     /**
-     * Normalize the per-page value, capping at API maximum of 500.
+     * Normalize the per-page value, capping at the API maximum page size.
      */
     private function normalizePerPage(?int $perPage): int
     {
         $perPage ??= 15;
         $perPage = max(1, $perPage);
 
-        return min(500, $perPage);
+        return min(OnOfficeService::MAX_PAGE_SIZE, $perPage);
     }
 
     /**
