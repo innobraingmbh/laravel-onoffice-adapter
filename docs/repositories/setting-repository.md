@@ -9,13 +9,13 @@ use Innobrain\OnOfficeAdapter\Facades\SettingRepository;
 ## Users
 
 ```php
-$users = SettingRepository::users()->get();
-$user = SettingRepository::users()->find(1);
+$users = SettingRepository::users()->select(['Vorname', 'Nachname'])->get();
+$user = SettingRepository::users()->select(['Vorname', 'Nachname'])->find(1);
 $users = SettingRepository::users()->where('active', 1)->select(['Name', 'email'])->get();
 $count = SettingRepository::users()->count();
 ```
 
-`SettingRepository::users()` and [`UserRepository::query()`](/repositories/user-repository) return the same builder.
+`SettingRepository::users()` and [`UserRepository::query()`](/repositories/user-repository#user-records) return the same builder. It reads the user records and needs a `select()`; for the ready-made list of users see [`UserRepository::list()`](/repositories/user-repository#user-list).
 
 ## Regions
 
