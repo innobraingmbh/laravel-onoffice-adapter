@@ -68,7 +68,7 @@ class BatchRepository extends BaseRepository
         }
 
         /** @var array<int, array<string, mixed>> $results */
-        $results = $response->json('response.results', []);
+        $results = $response->json(OnOfficeResponsePath::RESULTS, []);
 
         return collect($results);
     }

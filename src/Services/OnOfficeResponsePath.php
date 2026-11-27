@@ -15,11 +15,18 @@ namespace Innobrain\OnOfficeAdapter\Services;
 final class OnOfficeResponsePath
 {
     /**
+     * The result blocks onOffice returns for a request: one per action sent.
+     *
+     * Resolves to `response.results`.
+     */
+    public const RESULTS = 'response.results';
+
+    /**
      * The single result block onOffice returns for a request.
      *
      * Resolves to `response.results.0`.
      */
-    public const FIRST_RESULT = 'response.results.0';
+    public const FIRST_RESULT = self::RESULTS.'.0';
 
     /**
      * All records of the first result block.
@@ -85,6 +92,31 @@ final class OnOfficeResponsePath
     public const META_COUNT_ABSOLUTE = self::FIRST_RESULT.'.data.meta.cntabsolute';
 
     /**
+     * The HTTP-level status code of the whole request envelope.
+     *
+     * This is the status of the overall API call, not of a single action's
+     * result — for the latter use statusErrorCode() / statusMessage(), which
+     * read a status block inside `response.results`.
+     *
+     * Resolves to `status.code`.
+     */
+    public const STATUS_CODE = 'status.code';
+
+    /**
+     * The error code of the whole request envelope's status.
+     *
+     * Resolves to `status.errorcode`.
+     */
+    public const STATUS_ERROR_CODE = 'status.errorcode';
+
+    /**
+     * The message of the whole request envelope's status.
+     *
+     * Resolves to `status.message`.
+     */
+    public const STATUS_MESSAGE = 'status.message';
+
+    /**
      * The result block at the given index.
      *
      * A batch request returns one result block per action, so the index
@@ -94,7 +126,7 @@ final class OnOfficeResponsePath
      */
     public static function result(int $index): string
     {
-        return 'response.results.'.$index;
+        return self::RESULTS.'.'.$index;
     }
 
     /**

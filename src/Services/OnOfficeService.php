@@ -426,7 +426,7 @@ class OnOfficeService
      */
     public function throwIfBatchResponseIsFailed(Response $response, int $expectedResultCount): void
     {
-        $resultCount = count($response->json('response.results', []) ?? []);
+        $resultCount = count($response->json(OnOfficeResponsePath::RESULTS, []) ?? []);
 
         for ($index = 0; $index < max(1, $resultCount); $index++) {
             $this->throwIfResultIsFailed($response, $index);
@@ -444,11 +444,11 @@ class OnOfficeService
      */
     protected function throwIfResultIsFailed(Response $response, int $index): void
     {
-        $statusCode = $response->json('status.code', 500);
-        $statusErrorCode = $response->json('status.errorcode', 0);
+        $statusCode = $response->json(OnOfficeResponsePath::STATUS_CODE, 500);
+        $statusErrorCode = $response->json(OnOfficeResponsePath::STATUS_ERROR_CODE, 0);
         $responseStatusCode = $response->json(OnOfficeResponsePath::statusErrorCode($index), 0);
 
-        $errorMessage = $response->json('status.message', '');
+        $errorMessage = $response->json(OnOfficeResponsePath::STATUS_MESSAGE, '');
         if ($errorMessage === '') {
             $errorMessage = "Status code: $statusCode";
         }
